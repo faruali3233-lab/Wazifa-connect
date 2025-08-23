@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Briefcase, Users, MessageSquare } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function RecruiterDashboard() {
   const { user, recruiterProfile, isProfileComplete } = useAuth();
@@ -25,12 +26,18 @@ export default function RecruiterDashboard() {
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-        <div>
-            <h1 className="text-3xl font-bold tracking-tight">Recruiter Dashboard</h1>
-            <p className="text-muted-foreground">Welcome, {recruiterProfile?.companyName}!</p>
+        <div className="flex items-center gap-4">
+             <Avatar className="h-16 w-16">
+                <AvatarImage src={recruiterProfile?.profilePhotoUrl} />
+                <AvatarFallback>{recruiterProfile?.yourName.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">Recruiter Dashboard</h1>
+                <p className="text-muted-foreground">Welcome, {recruiterProfile?.yourName} from {recruiterProfile?.companyName}!</p>
+            </div>
         </div>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Post a New Job
+        <Button onClick={() => router.push('/recruiter/profile')}>
+          Edit Profile
         </Button>
       </div>
       
@@ -85,7 +92,7 @@ export default function RecruiterDashboard() {
           </CardHeader>
           <CardContent className="text-center py-12">
             <p className="text-muted-foreground">You have no active job postings.</p>
-            <Button className="mt-4">Post Your First Job</Button>
+            <Button className="mt-4"><PlusCircle className="mr-2 h-4 w-4" />Post Your First Job</Button>
           </CardContent>
         </Card>
       </div>

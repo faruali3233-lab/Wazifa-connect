@@ -1,10 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth, type RecruiterProfile } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -12,29 +13,61 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UploadCloud, User } from "lucide-react";
 
 const profileSchema = z.object({
+  yourName: z.string().min(2, "Your name is required."),
+  yourEmail: z.string().email("Please enter a valid email address."),
+  yourCountry: z.string().min(1, "Please select your country."),
+  yourCity: z.string().min(2, "Your city is required."),
   companyName: z.string().min(2, "Company name is required."),
   companyWebsite: z.string().url("Please enter a valid website URL."),
   companyDescription: z.string().min(20, "Please provide a brief description of your company."),
+  profilePhoto: z.any().optional(),
 });
 
 export function RecruiterProfileForm() {
   const { updateRecruiterProfile } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
+      yourName: "",
+      yourEmail: "",
+      yourCountry: "",
+      yourCity: "",
       companyName: "",
       companyWebsite: "",
       companyDescription: "",
     },
   });
 
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result as string);
+        form.setValue("profilePhoto", file);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
   const onSubmit = (values: z.infer<typeof profileSchema>) => {
-    updateRecruiterProfile(values);
+    // In a real app, you would upload the photo to a storage service
+    // and get back a URL. For now, we'll use the data URL as a placeholder.
+    const profileData: RecruiterProfile = {
+      ...values,
+      profilePhotoUrl: photoPreview || "",
+    };
+    
+    updateRecruiterProfile(profileData);
     toast({
       title: "Company Profile Saved!",
       description: "You can now access your recruiter dashboard.",
@@ -42,7 +75,7 @@ export function RecruiterProfileForm() {
     router.push('/recruiter/dashboard');
   };
   
-  const progress = Object.values(form.watch()).filter(Boolean).length / Object.keys(form.getValues()).length * 100;
+  const progress = (Object.values(form.watch()).filter(v => v).length / Object.keys(form.getValues()).length) * 100;
 
   return (
     <Card className="w-full max-w-3xl mx-auto">
@@ -57,7 +90,62 @@ export function RecruiterProfileForm() {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
+            <div className="flex justify-center">
+              <FormField control={form.control} name="profilePhoto" render={({ field }) => (
+                  <FormItem className="flex flex-col items-center">
+                    <FormLabel htmlFor="photo-upload" className="cursor-pointer">
+                      <Avatar className="h-32 w-32">
+                        <AvatarImage src={photoPreview || undefined} alt="Profile photo preview" />
+                        <AvatarFallback className="bg-muted">
+                           <div className="flex flex-col items-center justify-center text-muted-foreground">
+                            <UploadCloud className="h-8 w-8" />
+                            <span>Upload Photo</span>
+                           </div>
+                        </AvatarFallback>
+                      </Avatar>
+                    </FormLabel>
+                    <FormControl>
+                       <Input id="photo-upload" type="file" className="hidden" accept=".jpg,.png" onChange={handlePhotoChange} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+              )} />
+            </div>
+            
              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <FormField control={form.control} name="yourName" render={({ field }) => (
+                    <FormItem><FormLabel>Your Name</FormLabel><FormControl><Input placeholder="Enter your full name" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                 <FormField control={form.control} name="yourEmail" render={({ field }) => (
+                    <FormItem><FormLabel>Your Email</FormLabel><FormControl><Input type="email" placeholder="Enter your email address" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                <FormField control={form.control} name="yourCountry" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Your Country</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your country" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="in">India</SelectItem>
+                        <SelectItem value="sa">Saudi Arabia</SelectItem>
+                        <SelectItem value="ae">UAE</SelectItem>
+                        <SelectItem value="qa">Qatar</SelectItem>
+                        <SelectItem value="om">Oman</SelectItem>
+                        <SelectItem value="kw">Kuwait</SelectItem>
+                        <SelectItem value="bh">Bahrain</SelectItem>
+                        <SelectItem value="other">Others</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="yourCity" render={({ field }) => (
+                    <FormItem><FormLabel>Your City</FormLabel><FormControl><Input placeholder="Enter your city" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
                 <FormField control={form.control} name="companyName" render={({ field }) => (
                     <FormItem><FormLabel>Company Name</FormLabel><FormControl><Input placeholder="e.g., Acme Corporation" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />

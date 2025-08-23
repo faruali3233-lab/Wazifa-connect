@@ -13,10 +13,16 @@ export interface User {
 }
 
 export type SeekerProfile = JobRecommendationsInput['profile'];
+
 export interface RecruiterProfile {
   companyName: string;
   companyWebsite: string;
   companyDescription: string;
+  yourName: string;
+  yourCountry: string;
+  yourCity: string;
+  yourEmail: string;
+  profilePhotoUrl: string;
 }
 
 export interface AuthState {
