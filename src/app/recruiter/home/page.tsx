@@ -53,7 +53,7 @@ export default function RecruiterHomePage() {
           </div>
           <div>
             <Image 
-              src="/recruiter_home_hero.png"
+              src="https://placehold.co/600x600.png"
               alt="Three skilled workers ready for hire"
               width={600}
               height={600}
