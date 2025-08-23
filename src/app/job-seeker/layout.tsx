@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { Header } from '@/components/header';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Footer } from '@/components/footer';
 
 export default function JobSeekerLayout({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -27,11 +28,12 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <div className="min-h-screen flex flex-col bg-white">
       <Header />
       <main className="flex-1">
         {children}
       </main>
+      <Footer />
     </div>
   );
 }
