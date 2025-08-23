@@ -15,16 +15,16 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UploadCloud, User } from "lucide-react";
+import { UploadCloud } from "lucide-react";
 
 const profileSchema = z.object({
   yourName: z.string().min(2, "Your name is required."),
   yourEmail: z.string().email("Please enter a valid email address."),
   yourCountry: z.string().min(1, "Please select your country."),
   yourCity: z.string().min(2, "Your city is required."),
-  companyName: z.string().min(2, "Company name is required."),
-  companyWebsite: z.string().url("Please enter a valid website URL."),
-  companyDescription: z.string().min(20, "Please provide a brief description of your company."),
+  companyName: z.string().optional(),
+  companyWebsite: z.string().url("Please enter a valid URL.").optional().or(z.literal('')),
+  companyDescription: z.string().optional(),
   profilePhoto: z.any().optional(),
 });
 
@@ -60,22 +60,23 @@ export function RecruiterProfileForm() {
   };
   
   const onSubmit = (values: z.infer<typeof profileSchema>) => {
-    // In a real app, you would upload the photo to a storage service
-    // and get back a URL. For now, we'll use the data URL as a placeholder.
     const profileData: RecruiterProfile = {
       ...values,
+      companyName: values.companyName || "",
+      companyWebsite: values.companyWebsite || "",
+      companyDescription: values.companyDescription || "",
       profilePhotoUrl: photoPreview || "",
     };
     
     updateRecruiterProfile(profileData);
     toast({
-      title: "Company Profile Saved!",
+      title: "Profile Saved!",
       description: "You can now access your recruiter dashboard.",
     });
     router.push('/recruiter/dashboard');
   };
   
-  const progress = (Object.values(form.watch()).filter(v => v).length / Object.keys(form.getValues()).length) * 100;
+  const progress = (Object.values(form.watch()).filter(v => v).length / (Object.keys(form.getValues()).length-3)) * 100;
 
   return (
     <Card className="w-full max-w-3xl mx-auto">
@@ -147,15 +148,15 @@ export function RecruiterProfileForm() {
                     <FormItem><FormLabel>Your City</FormLabel><FormControl><Input placeholder="Enter your city" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="companyName" render={({ field }) => (
-                    <FormItem><FormLabel>Company Name</FormLabel><FormControl><Input placeholder="e.g., Acme Corporation" {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Company Name (if any) (optional)</FormLabel><FormControl><Input placeholder="e.g., Acme Corporation" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="companyWebsite" render={({ field }) => (
-                    <FormItem><FormLabel>Company Website</FormLabel><FormControl><Input type="url" placeholder="https://acme.com" {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Company Website (if any) (optional)</FormLabel><FormControl><Input type="url" placeholder="https://acme.com" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
              </div>
              
              <FormField control={form.control} name="companyDescription" render={({ field }) => (
-                <FormItem><FormLabel>Company Description</FormLabel><FormControl><Textarea rows={5} placeholder="Describe your company, its mission, and values." {...field} /></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>Note (optional)</FormLabel><FormControl><Textarea rows={5} placeholder="Describe your company, its mission, and values." {...field} /></FormControl><FormMessage /></FormItem>
              )} />
             
             <Button type="submit" className="w-full md:w-auto">Save & Continue to Dashboard</Button>
