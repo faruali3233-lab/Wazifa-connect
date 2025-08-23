@@ -148,10 +148,10 @@ export function RecruiterProfileForm() {
                     <FormItem><FormLabel>Your City</FormLabel><FormControl><Input placeholder="Enter your city" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="companyName" render={({ field }) => (
-                    <FormItem><FormLabel>Company Name (if any) (optional)</FormLabel><FormControl><Input placeholder="e.g., Acme Corporation" {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Company Name (optional)</FormLabel><FormControl><Input placeholder="e.g., Acme Corporation" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="companyWebsite" render={({ field }) => (
-                    <FormItem><FormLabel>Company Website (if any) (optional)</FormLabel><FormControl><Input type="url" placeholder="https://acme.com" {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Company Website (optional)</FormLabel><FormControl><Input type="url" placeholder="https://acme.com" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
              </div>
              
