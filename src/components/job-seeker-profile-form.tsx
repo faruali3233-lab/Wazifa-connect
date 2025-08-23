@@ -19,6 +19,7 @@ import { UploadCloud } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Link from "next/link";
 import { Checkbox } from "./ui/checkbox";
+import { useTranslation } from "./i18n-provider";
 
 const profileSchema = z.object({
   yourFullName: z.string().min(2, "Full name is required.").max(80, "Full name is too long."),
@@ -93,6 +94,7 @@ export function JobSeekerProfileForm() {
   const { updateSeekerProfile } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof profileSchema>>({
@@ -152,8 +154,8 @@ export function JobSeekerProfileForm() {
     
     updateSeekerProfile(profileData);
     toast({
-      title: "Profile Saved!",
-      description: "You are all set to find opportunities.",
+      title: t('jobSeeker_profile_toast_saved_title'),
+      description: t('jobSeeker_profile_toast_saved_description'),
     });
     router.push('/job-seeker/dashboard');
   };
@@ -186,8 +188,8 @@ export function JobSeekerProfileForm() {
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
-        <CardTitle>Complete Your Profile</CardTitle>
-        <CardDescription>Fill these details so recruiters can verify and contact you quickly.</CardDescription>
+        <CardTitle>{t('jobSeeker_profile_title')}</CardTitle>
+        <CardDescription>{t('jobSeeker_profile_subtitle')}</CardDescription>
         <div className="flex items-center gap-4 pt-4">
             <Progress value={progress} className="w-full" />
             <span className="font-semibold text-primary">{Math.round(progress)}%</span>
@@ -201,13 +203,13 @@ export function JobSeekerProfileForm() {
                 <FormField control={form.control} name="profilePhoto" render={({ field }) => (
                   <FormItem className="md:col-span-2 flex flex-col items-center">
                     <FormLabel htmlFor="photo-upload" className="cursor-pointer">
-                      Profile Photo <span className="text-primary">*</span>
+                      {t('jobSeeker_profile_photo_label')} <span className="text-primary">*</span>
                        <Avatar className="h-32 w-32 mt-2">
                         <AvatarImage src={photoPreview || undefined} alt="Profile photo preview" />
                         <AvatarFallback className="bg-muted">
                            <div className="flex flex-col items-center justify-center text-muted-foreground">
                             <UploadCloud className="h-8 w-8" />
-                            <span>Upload</span>
+                            <span>{t('jobSeeker_profile_upload_button')}</span>
                            </div>
                         </AvatarFallback>
                       </Avatar>
@@ -221,24 +223,24 @@ export function JobSeekerProfileForm() {
 
                 {/* Row 2 */}
                 <FormField control={form.control} name="yourFullName" render={({ field }) => (
-                    <FormItem><FormLabel>Your Full Name <span className="text-primary">*</span></FormLabel><FormControl><Input placeholder="e.g., Mohammed Al Harbi" {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>{t('jobSeeker_profile_name_label')} <span className="text-primary">*</span></FormLabel><FormControl><Input placeholder={t('jobSeeker_profile_name_placeholder')} {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="profession" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Select Profession <span className="text-primary">*</span></FormLabel>
+                    <FormLabel>{t('jobSeeker_profile_profession_label')} <span className="text-primary">*</span></FormLabel>
                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger><SelectValue placeholder="Select your profession" /></SelectTrigger>
+                        <SelectTrigger><SelectValue placeholder={t('jobSeeker_profile_profession_placeholder')} /></SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         {Object.entries(professions).map(([group, options]) => (
                             <SelectGroup key={group}>
-                                <FormLabel className="px-2 text-xs text-muted-foreground">{group}</FormLabel>
-                                {options.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+                                <FormLabel className="px-2 text-xs text-muted-foreground">{t(group as any)}</FormLabel>
+                                {options.map(option => <SelectItem key={option} value={option}>{t(option.replace(/[^a-zA-Z0-9]/g, '') as any, option)}</SelectItem>)}
                             </SelectGroup>
                         ))}
                         <SelectGroup>
-                           <SelectItem value="Other">Other</SelectItem>
+                           <SelectItem value="Other">{t('jobSeeker_profile_profession_other')}</SelectItem>
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -250,8 +252,8 @@ export function JobSeekerProfileForm() {
                 {watchProfession === 'Other' && (
                     <FormField control={form.control} name="otherProfession" render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Please Specify Profession <span className="text-primary">*</span></FormLabel>
-                            <FormControl><Input placeholder="e.g., IT Technician" {...field} /></FormControl>
+                            <FormLabel>{t('jobSeeker_profile_other_profession_label')} <span className="text-primary">*</span></FormLabel>
+                            <FormControl><Input placeholder={t('jobSeeker_profile_other_profession_placeholder')} {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )} />
@@ -259,20 +261,20 @@ export function JobSeekerProfileForm() {
 
                 <FormField control={form.control} name="religion" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Religion <span className="text-primary">*</span></FormLabel>
+                    <FormLabel>{t('jobSeeker_profile_religion_label')} <span className="text-primary">*</span></FormLabel>
                      <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
                       <FormControl>
-                        <SelectTrigger><SelectValue placeholder="Select your religion" /></SelectTrigger>
+                        <SelectTrigger><SelectValue placeholder={t('jobSeeker_profile_religion_placeholder')} /></SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="islam">Islam</SelectItem>
-                        <SelectItem value="hinduism">Hinduism</SelectItem>
-                        <SelectItem value="christianity">Christianity</SelectItem>
-                        <SelectItem value="sikhism">Sikhism</SelectItem>
-                        <SelectItem value="buddhism">Buddhism</SelectItem>
-                        <SelectItem value="jainism">Jainism</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                        <SelectItem value="prefer_not_to_say">Prefer not to say</SelectItem>
+                        <SelectItem value="islam">{t('jobSeeker_profile_religion_islam')}</SelectItem>
+                        <SelectItem value="hinduism">{t('jobSeeker_profile_religion_hinduism')}</SelectItem>
+                        <SelectItem value="christianity">{t('jobSeeker_profile_religion_christianity')}</SelectItem>
+                        <SelectItem value="sikhism">{t('jobSeeker_profile_religion_sikhism')}</SelectItem>
+                        <SelectItem value="buddhism">{t('jobSeeker_profile_religion_buddhism')}</SelectItem>
+                        <SelectItem value="jainism">{t('jobSeeker_profile_religion_jainism')}</SelectItem>
+                        <SelectItem value="other">{t('jobSeeker_profile_religion_other')}</SelectItem>
+                        <SelectItem value="prefer_not_to_say">{t('jobSeeker_profile_religion_prefer_not_to_say')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -281,20 +283,20 @@ export function JobSeekerProfileForm() {
 
                 {/* Row 3 */}
                 <FormField control={form.control} name="age" render={({ field }) => (
-                    <FormItem><FormLabel>Age <span className="text-primary">*</span></FormLabel><FormControl><Input type="number" placeholder="e.g., 28" {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>{t('jobSeeker_profile_age_label')} <span className="text-primary">*</span></FormLabel><FormControl><Input type="number" placeholder={t('jobSeeker_profile_age_placeholder')} {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="gulfExperience" render={({ field }) => (
                     <FormItem className="space-y-3">
-                        <FormLabel>Gulf Experience or Fresher <span className="text-primary">*</span></FormLabel>
+                        <FormLabel>{t('jobSeeker_profile_gulf_experience_label')} <span className="text-primary">*</span></FormLabel>
                         <FormControl>
                             <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex gap-4">
                                 <FormItem className="flex items-center space-x-2 space-y-0">
                                     <FormControl><RadioGroupItem value="experienced" /></FormControl>
-                                    <FormLabel className="font-normal">Gulf Experienced</FormLabel>
+                                    <FormLabel className="font-normal">{t('jobSeeker_profile_gulf_experience_experienced')}</FormLabel>
                                 </FormItem>
                                 <FormItem className="flex items-center space-x-2 space-y-0">
                                     <FormControl><RadioGroupItem value="fresher" /></FormControl>
-                                    <FormLabel className="font-normal">Fresher</FormLabel>
+                                    <FormLabel className="font-normal">{t('jobSeeker_profile_gulf_experience_fresher')}</FormLabel>
                                 </FormItem>
                             </RadioGroup>
                         </FormControl>
@@ -306,11 +308,11 @@ export function JobSeekerProfileForm() {
                 {watchGulfExperience === 'experienced' && (
                     <>
                         <FormField control={form.control} name="yearsInGulf" render={({ field }) => (
-                            <FormItem><FormLabel>Years in Gulf</FormLabel><FormControl><Input type="number" placeholder="e.g., 5" {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>{t('jobSeeker_profile_years_in_gulf_label')}</FormLabel><FormControl><Input type="number" placeholder={t('jobSeeker_profile_years_in_gulf_placeholder')} {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="countriesWorked" render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Countries Worked In</FormLabel>
+                                <FormLabel>{t('jobSeeker_profile_countries_worked_label')}</FormLabel>
                                 <div className="grid grid-cols-2 gap-2">
                                 {gulfCountries.map((country) => (
                                     <FormField key={country} control={form.control} name="countriesWorked" render={({ field }) => {
@@ -342,9 +344,9 @@ export function JobSeekerProfileForm() {
                  <div className="md:col-span-2">
                     <FormField control={form.control} name="educationExperience" render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Education (Optional)</FormLabel>
-                            <FormControl><Textarea rows={3} placeholder="B.Com | 4 years" {...field} /></FormControl>
-                             <CardDescription className="text-xs">Summarize your education and years of experience.</CardDescription>
+                            <FormLabel>{t('jobSeeker_profile_education_label')}</FormLabel>
+                            <FormControl><Textarea rows={3} placeholder={t('jobSeeker_profile_education_placeholder')} {...field} /></FormControl>
+                             <CardDescription className="text-xs">{t('jobSeeker_profile_education_helper')}</CardDescription>
                             <FormMessage />
                         </FormItem>
                      )} />
@@ -353,22 +355,22 @@ export function JobSeekerProfileForm() {
                  {/* Row 5 - File Uploads */}
                  <FormField control={form.control} name="passport" render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Passport <span className="text-primary">*</span></FormLabel>
+                        <FormLabel>{t('jobSeeker_profile_passport_label')} <span className="text-primary">*</span></FormLabel>
                         <FormControl>
                             <Input type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => field.onChange(e.target.files)} />
                         </FormControl>
-                        <CardDescription className="text-xs">First page or full PDF. Hide sensitive numbers if needed.</CardDescription>
+                        <CardDescription className="text-xs">{t('jobSeeker_profile_passport_helper')}</CardDescription>
                         <FormMessage />
                     </FormItem>
                  )} />
 
                  <FormField control={form.control} name="fullPhoto" render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Full Photo (Optional)</FormLabel>
+                        <FormLabel>{t('jobSeeker_profile_full_photo_label')}</FormLabel>
                         <FormControl>
                             <Input type="file" accept=".jpg,.jpeg,.png" onChange={(e) => field.onChange(e.target.files)} />
                         </FormControl>
-                        <CardDescription className="text-xs">Full-length photo on plain background.</CardDescription>
+                        <CardDescription className="text-xs">{t('jobSeeker_profile_full_photo_helper')}</CardDescription>
                         <FormMessage />
                     </FormItem>
                  )} />
@@ -376,11 +378,11 @@ export function JobSeekerProfileForm() {
                  <div className="md:col-span-2">
                     <FormField control={form.control} name="workVideo" render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Work Video (Optional)</FormLabel>
+                            <FormLabel>{t('jobSeeker_profile_work_video_label')}</FormLabel>
                             <FormControl>
                                 <Input type="file" accept=".mp4,.mov,.webm" onChange={(e) => field.onChange(e.target.files)} />
                             </FormControl>
-                            <CardDescription className="text-xs">Show your work (e.g., driving, painting, housekeeping). Max 60s, 60MB.</CardDescription>
+                            <CardDescription className="text-xs">{t('jobSeeker_profile_work_video_helper')}</CardDescription>
                             <FormMessage />
                         </FormItem>
                     )} />
@@ -388,13 +390,13 @@ export function JobSeekerProfileForm() {
             </div>
 
             <div className="md:col-span-2 text-xs text-muted-foreground">
-                Your documents are stored securely and shared only with verified recruiters. By continuing, you agree to our{' '}
-                <Link href="#" target="_blank" className="underline">Terms</Link> & <Link href="#" target="_blank" className="underline">Privacy Policy</Link>.
+                {t('jobSeeker_profile_privacy_note_part1')}{' '}
+                <Link href="#" target="_blank" className="underline">{t('terms')}</Link> & <Link href="#" target="_blank" className="underline">{t('privacy')}</Link>.
             </div>
             
             <div className="flex gap-4">
-                <Button type="submit" size="lg" className="rounded-xl">Save & Continue to Dashboard</Button>
-                <Button type="button" variant="outline" size="lg" className="rounded-xl">Save Draft</Button>
+                <Button type="submit" size="lg" className="rounded-xl">{t('jobSeeker_profile_save_button')}</Button>
+                <Button type="button" variant="outline" size="lg" className="rounded-xl">{t('jobSeeker_profile_draft_button')}</Button>
             </div>
           </form>
         </Form>
@@ -402,5 +404,3 @@ export function JobSeekerProfileForm() {
     </Card>
   );
 }
-
-    
