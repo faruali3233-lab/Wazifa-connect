@@ -135,7 +135,7 @@
   "jobSeeker_profile_profession_other": "Other",
   "jobSeeker_profile_other_profession_label": "Please Specify Profession",
   "jobSeeker_profile_other_profession_placeholder": "e.g., IT Technician",
-  "jobSeeker_profile_education_label": "Education",
+  "jobSeeker_profile_education_label": "Education (Optional)",
   "jobSeeker_profile_education_placeholder": "B.Com | 4 years",
   "jobSeeker_profile_education_helper": "Summarize your education and years of experience.",
   "jobSeeker_profile_religion_label": "Religion",
