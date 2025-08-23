@@ -54,11 +54,11 @@ export default function RecruiterHomePage() {
           <div>
             <Image 
               src="https://placehold.co/600x600.png"
-              alt="Three skilled workers ready for hire"
+              alt="Three skilled Indian workers ready for hire"
               width={600}
               height={600}
               className="rounded-lg shadow-lg"
-              data-ai-hint="skilled workers"
+              data-ai-hint="skilled indian workers"
             />
           </div>
         </div>
