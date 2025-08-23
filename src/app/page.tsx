@@ -1,3 +1,38 @@
-export default function Home() {
-  return <></>;
+"use client";
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/use-auth';
+import { LoginForm } from "@/components/login-form";
+
+export default function LoginPage() {
+  const { user, isProfileComplete } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      const dashboardPath = user.role === 'jobSeeker' ? '/job-seeker/dashboard' : '/recruiter/dashboard';
+      const profilePath = user.role === 'jobSeeker' ? '/job-seeker/profile' : '/recruiter/profile';
+      
+      if (isProfileComplete) {
+        router.replace(dashboardPath);
+      } else {
+        // Redirect to home page first, which will then gate to profile
+        router.replace(user.role === 'jobSeeker' ? '/job-seeker/home' : '/recruiter/home');
+      }
+    }
+  }, [user, isProfileComplete, router]);
+
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-50">
+      <div className="absolute top-8 flex items-center gap-2">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="8" fill="hsl(var(--primary))"/>
+          <path d="M10 13C10 11.3431 11.3431 10 13 10H19C20.6569 10 22 11.3431 22 13V22H10V13Z" fill="white"/>
+        </svg>
+        <span className="text-2xl font-bold text-primary">GulfHired</span>
+      </div>
+      <LoginForm />
+    </main>
+  );
 }
