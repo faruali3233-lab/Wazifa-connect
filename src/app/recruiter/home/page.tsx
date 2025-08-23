@@ -53,7 +53,7 @@ export default function RecruiterHomePage() {
           </div>
           <div>
             <Image 
-              src="/images/recruiter_home_hero.png"
+              src="/image/Recruiter home image.png"
               alt="Three skilled Indian workers ready for hire"
               width={600}
               height={600}
