@@ -3,7 +3,7 @@
 
 import { useState, useEffect, type ReactNode, type Dispatch, type SetStateAction } from "react";
 import { AuthContext, type AuthState, type User, type SeekerProfile, type RecruiterProfile, type Language } from "@/hooks/use-auth";
-import { I18nProvider, useTranslation } from "./i18n-provider";
+import { I18nProvider } from "./i18n-provider";
 import { useToast } from "@/hooks/use-toast";
 
 interface AuthProviderProps {
@@ -11,6 +11,7 @@ interface AuthProviderProps {
 }
 
 const getInitialLanguage = (): Language => {
+    // This function will now be called client-side only.
     if (typeof window !== 'undefined') {
         const storedLang = localStorage.getItem('app.lang');
         if (storedLang === 'en' || storedLang === 'ar' || storedLang === 'hi') {
@@ -22,25 +23,33 @@ const getInitialLanguage = (): Language => {
 
 function AuthProviderContent({ children }: { children: ReactNode }) {
     const { toast } = useToast();
-    const { t } = useTranslation();
     const [user, setUser] = useState<User | null>(null);
     const [seekerProfile, setSeekerProfile] = useState<SeekerProfile | null>(null);
     const [recruiterProfile, setRecruiterProfile] = useState<RecruiterProfile | null>(null);
     const [isProfileComplete, setProfileComplete] = useState(false);
-    const [language, setLanguage] = useState<Language>(getInitialLanguage);
+    
+    // Defer reading from localStorage until the component mounts on the client
+    const [language, setLanguage] = useState<Language>('en'); // Default to 'en' on server
+    const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
+        setIsClient(true);
+        setLanguage(getInitialLanguage());
+    }, []);
+
+    useEffect(() => {
+        if (isClient) {
             localStorage.setItem('app.lang', language);
             document.documentElement.lang = language;
             document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
         }
-    }, [language]);
+    }, [language, isClient]);
 
     const handleSetLanguage = (newLang: Language) => {
         setLanguage(newLang);
         let message = '';
         let title = '';
+        // This part needs to be aware of the current language to show the correct toast
         if (newLang === 'en') {
             message = 'Language changed to English.';
             title = 'Language Updated';
@@ -94,35 +103,25 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
         updateRecruiterProfile,
     };
 
+    // Render children only after client-side hydration is complete
+    // to ensure language and direction are correctly set.
+    if (!isClient) {
+        return null;
+    }
+
     return (
         <AuthContext.Provider value={value}>
-            {children}
+            <I18nProvider language={language}>
+                {children}
+            </I18nProvider>
         </AuthContext.Provider>
     );
 }
 
-
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [language, setLanguage] = useState<Language>(getInitialLanguage);
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-        const storedLang = localStorage.getItem('app.lang');
-        if (storedLang === 'en' || storedLang === 'ar' || storedLang === 'hi') {
-            setLanguage(storedLang);
-        }
-    }
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-        window.removeEventListener('storage', handleStorageChange);
-    }
-  }, []);
-
   return (
-      <I18nProvider language={language}>
-         <AuthProviderContent>
-            {children}
-         </AuthProviderContent>
-      </I18nProvider>
+     <AuthProviderContent>
+        {children}
+     </AuthProviderContent>
   );
 }

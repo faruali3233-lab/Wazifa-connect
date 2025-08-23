@@ -12,15 +12,15 @@ const translations = { en, ar, hi };
 type TranslationKeys = keyof typeof en;
 
 type I18nContextType = {
-  t: (key: TranslationKeys) => string;
+  t: (key: TranslationKeys, fallback?: string) => string;
   language: Language;
 };
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 export const I18nProvider = ({ children, language }: { children: ReactNode, language: Language }) => {
-  const t = (key: TranslationKeys) => {
-    return translations[language][key] || translations['en'][key] || key;
+  const t = (key: TranslationKeys, fallback?: string) => {
+    return translations[language][key] || (fallback || (translations['en'][key] || key));
   };
 
   const value = useMemo(() => ({ t, language }), [language]);
