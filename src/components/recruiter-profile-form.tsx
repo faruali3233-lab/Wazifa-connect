@@ -47,7 +47,7 @@ export function RecruiterProfileForm() {
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader>
-        <CardTitle>Complete Your Company Profile</CardTitle>
+        <CardTitle>Complete Your Profile</CardTitle>
         <CardDescription>Provide your company details to start hiring.</CardDescription>
         <div className="flex items-center gap-4 pt-4">
             <Progress value={progress} className="w-full" />
