@@ -8,10 +8,12 @@ import { Button } from '@/components/ui/button';
 import { PlusCircle, Briefcase, Users, MessageSquare } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useTranslation } from '@/components/i18n-provider';
 
 export default function RecruiterDashboard() {
   const { user, recruiterProfile, isProfileComplete } = useAuth();
   const router = useRouter();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!isProfileComplete) {
@@ -32,54 +34,54 @@ export default function RecruiterDashboard() {
                 <AvatarFallback>{recruiterProfile?.yourName.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">Recruiter Dashboard</h1>
-                <p className="text-muted-foreground">Welcome, {recruiterProfile?.yourName} from {recruiterProfile?.companyName}!</p>
+                <h1 className="text-3xl font-bold tracking-tight">{t('recruiter_dashboard_title')}</h1>
+                <p className="text-muted-foreground">{t('recruiter_dashboard_welcome').replace('{name}', recruiterProfile?.yourName || '').replace('{company}', recruiterProfile?.companyName || '')}</p>
             </div>
         </div>
         <Button onClick={() => router.push('/recruiter/profile')}>
-          Edit Profile
+          {t('recruiter_dashboard_edit_profile')}
         </Button>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Open Roles</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('recruiter_dashboard_stat_open_roles')}</CardTitle>
                 <Briefcase className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">0</div>
-                <p className="text-xs text-muted-foreground">No active job postings</p>
+                <p className="text-xs text-muted-foreground">{t('recruiter_dashboard_stat_no_postings')}</p>
             </CardContent>
         </Card>
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Applicants</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('recruiter_dashboard_stat_total_applicants')}</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">0</div>
-                <p className="text-xs text-muted-foreground">No applicants yet</p>
+                <p className="text-xs text-muted-foreground">{t('recruiter_dashboard_stat_no_applicants')}</p>
             </CardContent>
         </Card>
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Shortlisted</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('recruiter_dashboard_stat_shortlisted')}</CardTitle>
                 <Users className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">0</div>
-                <p className="text-xs text-muted-foreground">Build your talent pipeline</p>
+                <p className="text-xs text-muted-foreground">{t('recruiter_dashboard_stat_pipeline')}</p>
             </CardContent>
         </Card>
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Messages</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('recruiter_dashboard_stat_messages')}</CardTitle>
                 <MessageSquare className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">0</div>
-                <p className="text-xs text-muted-foreground">No unread messages</p>
+                <p className="text-xs text-muted-foreground">{t('recruiter_dashboard_stat_no_messages')}</p>
             </CardContent>
         </Card>
       </div>
@@ -87,12 +89,12 @@ export default function RecruiterDashboard() {
       <div className="mt-8">
         <Card>
           <CardHeader>
-            <CardTitle>Active Job Postings</CardTitle>
-            <CardDescription>Manage your open roles and view applicants.</CardDescription>
+            <CardTitle>{t('recruiter_dashboard_postings_title')}</CardTitle>
+            <CardDescription>{t('recruiter_dashboard_postings_subtitle')}</CardDescription>
           </CardHeader>
           <CardContent className="text-center py-12">
-            <p className="text-muted-foreground">You have no active job postings.</p>
-            <Button className="mt-4"><PlusCircle className="mr-2 h-4 w-4" />Post Your First Job</Button>
+            <p className="text-muted-foreground">{t('recruiter_dashboard_no_postings')}</p>
+            <Button className="mt-4"><PlusCircle className="mr-2 h-4 w-4" />{t('recruiter_dashboard_post_job_button')}</Button>
           </CardContent>
         </Card>
       </div>

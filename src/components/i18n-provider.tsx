@@ -5,19 +5,22 @@ import type { Language } from '@/hooks/use-auth';
 
 import en from '@/lib/locales/en.json';
 import ar from '@/lib/locales/ar.json';
+import hi from '@/lib/locales/hi.json';
 
-const translations = { en, ar };
+const translations = { en, ar, hi };
+
+type TranslationKeys = keyof typeof en;
 
 type I18nContextType = {
-  t: (key: keyof typeof en) => string;
+  t: (key: TranslationKeys) => string;
   language: Language;
 };
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 export const I18nProvider = ({ children, language }: { children: ReactNode, language: Language }) => {
-  const t = (key: keyof typeof en) => {
-    return translations[language][key] || key;
+  const t = (key: TranslationKeys) => {
+    return translations[language][key] || translations['en'][key] || key;
   };
 
   const value = useMemo(() => ({ t, language }), [language]);

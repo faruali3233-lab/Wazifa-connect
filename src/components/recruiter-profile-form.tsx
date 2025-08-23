@@ -17,6 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UploadCloud } from "lucide-react";
+import { useTranslation } from "./i18n-provider";
 
 const profileSchema = z.object({
   yourName: z.string().min(2, "Your name is required."),
@@ -33,6 +34,7 @@ export function RecruiterProfileForm() {
   const { updateRecruiterProfile } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof profileSchema>>({
@@ -72,20 +74,31 @@ export function RecruiterProfileForm() {
     
     updateRecruiterProfile(profileData);
     toast({
-      title: "Profile Saved!",
-      description: "You can now access your recruiter dashboard.",
+      title: t('recruiter_profile_toast_saved_title'),
+      description: t('recruiter_profile_toast_saved_description'),
     });
     router.push('/recruiter/dashboard');
   };
   
   const calculateProgress = () => {
     const values = form.watch();
-    const totalFields = Object.keys(profileSchema.shape).length - 3; // Excluding optional fields for baseline
-    const filledFields = Object.entries(values).filter(([key, value]) => {
-        const isOptional = ['companyName', 'companyWebsite', 'companyDescription', 'profilePhoto'].includes(key);
-        return !isOptional && !!value;
-    }).length;
-    return (filledFields / totalFields) * 100;
+    let progress = 0;
+    const totalFields = 4; // required fields
+    let filledFields = 0;
+    if (values.yourName) filledFields++;
+    if (values.yourEmail) filledFields++;
+    if (values.yourCountry) filledFields++;
+    if (values.yourCity) filledFields++;
+
+    progress = (filledFields / totalFields) * 100;
+    
+    // Add bonus for optional fields
+    if (values.companyName) progress = Math.min(100, progress + 5);
+    if (values.companyWebsite) progress = Math.min(100, progress + 5);
+    if (values.companyDescription) progress = Math.min(100, progress + 5);
+    if (values.profilePhoto) progress = Math.min(100, progress + 10);
+    
+    return Math.round(progress);
   };
   
   const progress = calculateProgress();
@@ -93,11 +106,11 @@ export function RecruiterProfileForm() {
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader>
-        <CardTitle>Complete Your Profile</CardTitle>
-        <CardDescription>Provide your company details to start hiring.</CardDescription>
+        <CardTitle>{t('recruiter_profile_title')}</CardTitle>
+        <CardDescription>{t('recruiter_profile_subtitle')}</CardDescription>
         <div className="flex items-center gap-4 pt-4">
             <Progress value={progress} className="w-full" />
-            <span className="font-semibold text-primary">{Math.round(progress)}%</span>
+            <span className="font-semibold text-primary">{progress}%</span>
         </div>
       </CardHeader>
       <CardContent>
@@ -113,7 +126,7 @@ export function RecruiterProfileForm() {
                         <AvatarFallback className="bg-muted">
                            <div className="flex flex-col items-center justify-center text-muted-foreground">
                             <UploadCloud className="h-8 w-8" />
-                            <span>Upload Photo</span>
+                            <span>{t('recruiter_profile_upload_photo')}</span>
                            </div>
                         </AvatarFallback>
                       </Avatar>
@@ -128,18 +141,18 @@ export function RecruiterProfileForm() {
             
              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <FormField control={form.control} name="yourName" render={({ field }) => (
-                    <FormItem><FormLabel>Your Name</FormLabel><FormControl><Input placeholder="Enter your full name" {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>{t('recruiter_profile_name_label')}</FormLabel><FormControl><Input placeholder={t('recruiter_profile_name_placeholder')} {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
                 )} />
                  <FormField control={form.control} name="yourEmail" render={({ field }) => (
-                    <FormItem><FormLabel>Your Email</FormLabel><FormControl><Input type="email" placeholder="Enter your email address" {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>{t('recruiter_profile_email_label')}</FormLabel><FormControl><Input type="email" placeholder={t('recruiter_profile_email_placeholder')} {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="yourCountry" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Your Country</FormLabel>
+                    <FormLabel>{t('recruiter_profile_country_label')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || ''} defaultValue="">
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select your country" />
+                          <SelectValue placeholder={t('recruiter_profile_country_placeholder')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -150,28 +163,28 @@ export function RecruiterProfileForm() {
                         <SelectItem value="om">Oman</SelectItem>
                         <SelectItem value="kw">Kuwait</SelectItem>
                         <SelectItem value="bh">Bahrain</SelectItem>
-                        <SelectItem value="other">Others</SelectItem>
+                        <SelectItem value="other">{t('recruiter_profile_country_option_other')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="yourCity" render={({ field }) => (
-                    <FormItem><FormLabel>Your City</FormLabel><FormControl><Input placeholder="Enter your city" {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>{t('recruiter_profile_city_label')}</FormLabel><FormControl><Input placeholder={t('recruiter_profile_city_placeholder')} {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="companyName" render={({ field }) => (
-                    <FormItem><FormLabel>Company Name (optional)</FormLabel><FormControl><Input placeholder="e.g., Acme Corporation" {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>{t('recruiter_profile_company_name_label')}</FormLabel><FormControl><Input placeholder={t('recruiter_profile_company_name_placeholder')} {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="companyWebsite" render={({ field }) => (
-                    <FormItem><FormLabel>Company Website (optional)</FormLabel><FormControl><Input type="url" placeholder="https://acme.com" {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>{t('recruiter_profile_company_website_label')}</FormLabel><FormControl><Input type="url" placeholder={t('recruiter_profile_company_website_placeholder')} {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
                 )} />
              </div>
              
              <FormField control={form.control} name="companyDescription" render={({ field }) => (
-                <FormItem><FormLabel>Note (optional)</FormLabel><FormControl><Textarea rows={5} placeholder="Describe your company, its mission, and values." {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>{t('recruiter_profile_note_label')}</FormLabel><FormControl><Textarea rows={5} placeholder={t('recruiter_profile_note_placeholder')} {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
              )} />
             
-            <Button type="submit" className="w-full md:w-auto">Save & Continue to Dashboard</Button>
+            <Button type="submit" className="w-full md:w-auto">{t('recruiter_profile_save_button')}</Button>
           </form>
         </Form>
       </CardContent>

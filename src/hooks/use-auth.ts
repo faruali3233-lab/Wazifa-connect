@@ -1,4 +1,3 @@
-
 "use client";
 
 import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
@@ -6,7 +5,7 @@ import type { JobRecommendationsInput } from '@/ai/flows/job-recommendations';
 
 export type UserRole = "jobSeeker" | "recruiter";
 
-export type Language = 'en' | 'ar';
+export type Language = 'en' | 'ar' | 'hi';
 
 export interface User {
   phone: string;

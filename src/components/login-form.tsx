@@ -13,7 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth, type UserRole } from "@/hooks/use-auth";
-import { ALL_COUNTRY_CODES, GULF_CODES } from "@/lib/constants";
+import { ALL_COUNTRY_CODES } from "@/lib/constants";
+import { useTranslation } from "./i18n-provider";
 
 const formSchema = z.object({
   countryCode: z.string().nonempty("Country code is required."),
@@ -25,6 +26,7 @@ export function LoginForm() {
   const router = useRouter();
   const { login } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [otpSent, setOtpSent] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -40,8 +42,8 @@ export function LoginForm() {
     // In a real app, you'd call an API here.
     setOtpSent(true);
     toast({
-      title: "OTP Sent",
-      description: "An OTP has been sent to your phone number.",
+      title: t('login_toast_otpSent_title'),
+      description: t('login_toast_otpSent_description'),
     });
   };
 
@@ -51,8 +53,8 @@ export function LoginForm() {
     if (!selectedCountry) {
         toast({
             variant: "destructive",
-            title: "Unsupported Region",
-            description: "Currently supporting India (+91) and Gulf region phone codes.",
+            title: t('login_toast_error_unsupported_title'),
+            description: t('login_toast_error_unsupported_description'),
         });
         return;
     }
@@ -66,8 +68,8 @@ export function LoginForm() {
     });
     
     toast({
-      title: "Login Successful",
-      description: `Welcome! You are being redirected as a ${role === 'jobSeeker' ? 'Job Seeker' : 'Recruiter'}.`,
+      title: t('login_toast_success_title'),
+      description: t(role === 'jobSeeker' ? 'login_toast_success_description_jobSeeker' : 'login_toast_success_description_recruiter'),
     });
 
     if (role === "jobSeeker") {
@@ -80,8 +82,8 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Welcome to GulfHired</CardTitle>
-        <CardDescription>Enter your phone number to continue.</CardDescription>
+        <CardTitle className="text-2xl">{t('login_welcome')}</CardTitle>
+        <CardDescription>{t('login_continue')}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -92,11 +94,11 @@ export function LoginForm() {
                 name="countryCode"
                 render={({ field }) => (
                   <FormItem className="w-1/3">
-                    <FormLabel>Code</FormLabel>
+                    <FormLabel>{t('login_countryCode')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Code" />
+                          <SelectValue placeholder={t('login_countryCode')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -113,7 +115,7 @@ export function LoginForm() {
                 name="phone"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel>Phone Number</FormLabel>
+                    <FormLabel>{t('login_phone')}</FormLabel>
                     <FormControl>
                       <Input placeholder="9876543210" {...field} />
                     </FormControl>
@@ -128,7 +130,7 @@ export function LoginForm() {
                 name="otp"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>OTP</FormLabel>
+                    <FormLabel>{t('login_otp')}</FormLabel>
                     <FormControl>
                       <Input placeholder="_ _ _ _ _ _" {...field} />
                     </FormControl>
@@ -140,16 +142,16 @@ export function LoginForm() {
             
             {!otpSent ? (
                 <Button type="button" onClick={handleRequestOtp} className="w-full">
-                    Request OTP
+                    {t('login_requestOtp')}
                 </Button>
             ) : (
                 <Button type="submit" className="w-full">
-                    Verify & Continue
+                    {t('login_verify')}
                 </Button>
             )}
 
             <p className="px-2 text-center text-sm text-muted-foreground">
-              You’ll be routed to Job Seeker (India) or Recruiter (Gulf) automatically.
+              {t('login_role_route_info')}
             </p>
           </form>
         </Form>
