@@ -38,7 +38,6 @@ export function Header() {
   const renderJobSeekerNav = () => (
     <>
       <nav className="hidden md:flex gap-6 items-center">
-        <NavLink href="/job-seeker/home#featured-roles">Featured Roles</NavLink>
         <NavLink href="/job-seeker/home#why-complete-profile">Why Complete Profile</NavLink>
         <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Log out">
           <LogOut className="w-5 h-5" />
@@ -53,7 +52,6 @@ export function Header() {
           </SheetTrigger>
           <SheetContent side="right">
             <div className="flex flex-col gap-6 pt-10">
-              <NavLink href="/job-seeker/home#featured-roles">Featured Roles</NavLink>
               <NavLink href="/job-seeker/home#why-complete-profile">Why Complete Profile</NavLink>
               <Button variant="outline" onClick={handleLogout}><LogOut className="mr-2 h-4 w-4" /> Log out</Button>
             </div>
