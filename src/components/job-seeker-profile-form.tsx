@@ -283,7 +283,7 @@ export function JobSeekerProfileForm() {
 
                 {/* Row 3 */}
                 <FormField control={form.control} name="age" render={({ field }) => (
-                    <FormItem><FormLabel>{t('jobSeeker_profile_age_label')} <span className="text-primary">*</span></FormLabel><FormControl><Input type="number" placeholder={t('jobSeeker_profile_age_placeholder')} {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>{t('jobSeeker_profile_age_label')} <span className="text-primary">*</span></FormLabel><FormControl><Input type="number" placeholder={t('jobSeeker_profile_age_placeholder')} {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="gulfExperience" render={({ field }) => (
                     <FormItem className="space-y-3">
@@ -308,7 +308,7 @@ export function JobSeekerProfileForm() {
                 {watchGulfExperience === 'experienced' && (
                     <>
                         <FormField control={form.control} name="yearsInGulf" render={({ field }) => (
-                            <FormItem><FormLabel>{t('jobSeeker_profile_years_in_gulf_label')}</FormLabel><FormControl><Input type="number" placeholder={t('jobSeeker_profile_years_in_gulf_placeholder')} {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>{t('jobSeeker_profile_years_in_gulf_label')}</FormLabel><FormControl><Input type="number" placeholder={t('jobSeeker_profile_years_in_gulf_placeholder')} {...field} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="countriesWorked" render={({ field }) => (
                             <FormItem>

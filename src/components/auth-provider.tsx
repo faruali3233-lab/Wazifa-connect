@@ -105,6 +105,19 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [language, setLanguage] = useState<Language>(getInitialLanguage);
 
+  useEffect(() => {
+    const handleStorageChange = () => {
+        const storedLang = localStorage.getItem('app.lang');
+        if (storedLang === 'en' || storedLang === 'ar' || storedLang === 'hi') {
+            setLanguage(storedLang);
+        }
+    }
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+        window.removeEventListener('storage', handleStorageChange);
+    }
+  }, []);
+
   return (
       <I18nProvider language={language}>
          <AuthProviderContent>
