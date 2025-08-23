@@ -41,7 +41,6 @@ export function Header() {
         <NavLink href="/job-seeker/home#gulf-jobs">Gulf Jobs</NavLink>
         <NavLink href="/job-seeker/home#featured-roles">Featured Roles</NavLink>
         <NavLink href="/job-seeker/home#why-complete-profile">Why Complete Profile</NavLink>
-        {!isProfileComplete && <Button onClick={handleCompleteProfile} size="sm">Complete Profile</Button>}
         <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Log out">
           <LogOut className="w-5 h-5" />
         </Button>
@@ -58,7 +57,6 @@ export function Header() {
               <NavLink href="/job-seeker/home#gulf-jobs">Gulf Jobs</NavLink>
               <NavLink href="/job-seeker/home#featured-roles">Featured Roles</NavLink>
               <NavLink href="/job-seeker/home#why-complete-profile">Why Complete Profile</NavLink>
-              {!isProfileComplete && <Button onClick={handleCompleteProfile}>Complete Profile</Button>}
               <Button variant="outline" onClick={handleLogout}><LogOut className="mr-2 h-4 w-4" /> Log out</Button>
             </div>
           </SheetContent>
