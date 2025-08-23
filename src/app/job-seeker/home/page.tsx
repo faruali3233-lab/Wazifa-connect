@@ -55,7 +55,7 @@ export default function JobSeekerHomePage() {
           </div>
           <div>
             <Image 
-              src="https://placehold.co/600x600.png"
+              src="/image/Job seeker home image.png"
               alt="Professional Saudi man in thobe"
               width={600}
               height={600}
