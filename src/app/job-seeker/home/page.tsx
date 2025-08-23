@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowRight, Briefcase, CheckCircle, Search, Verified, Zap } from 'lucide-react';
 import Image from 'next/image';
+import { useTranslation } from '@/components/i18n-provider';
 
 const jobListings = [
   { title: "AI Engineer", companyLogo: "https://placehold.co/40x40.png", salary: "Competitive" },
@@ -19,6 +20,7 @@ const jobListings = [
 export default function JobSeekerHomePage() {
   const { user, isProfileComplete } = useAuth();
   const router = useRouter();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isProfileComplete) {
@@ -42,13 +44,13 @@ export default function JobSeekerHomePage() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground">
-              Find Your Next Opportunity in the Gulf
+              {t('jobSeeker_home_title')}
             </h1>
             <p className="text-lg text-muted-foreground">
-              Top recruiters in Saudi Arabia and across the Gulf are looking for talent like you.
+              {t('jobSeeker_home_subtitle')}
             </p>
             <Button size="lg" onClick={handleCompleteProfile}>
-              Complete Profile to Get Jobs <ArrowRight className="ml-2 h-5 w-5" />
+              {t('jobSeeker_home_cta_button')} <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
           <div>
@@ -67,22 +69,22 @@ export default function JobSeekerHomePage() {
       {/* Gulf Jobs Section */}
       <section id="gulf-jobs" className="bg-gray-50 py-20">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-4">Explore Gulf Opportunities</h2>
+          <h2 className="text-3xl font-bold text-center mb-4">{t('jobSeeker_home_explore_title')}</h2>
           <div className="flex justify-center items-center gap-4 mb-12">
             <Select defaultValue="sa">
-              <SelectTrigger className="w-[180px] bg-white"><SelectValue placeholder="Country" /></SelectTrigger>
+              <SelectTrigger className="w-[180px] bg-white"><SelectValue placeholder={t('jobSeeker_home_country_placeholder')} /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="sa">Saudi Arabia</SelectItem>
-                <SelectItem value="uae">UAE</SelectItem>
-                <SelectItem value="qa">Qatar</SelectItem>
+                <SelectItem value="sa">{t('jobSeeker_home_country_sa')}</SelectItem>
+                <SelectItem value="uae">{t('jobSeeker_home_country_uae')}</SelectItem>
+                <SelectItem value="qa">{t('jobSeeker_home_country_qa')}</SelectItem>
               </SelectContent>
             </Select>
             <Select defaultValue="tech">
-              <SelectTrigger className="w-[180px] bg-white"><SelectValue placeholder="Category" /></SelectTrigger>
+              <SelectTrigger className="w-[180px] bg-white"><SelectValue placeholder={t('jobSeeker_home_category_placeholder')} /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="tech">AI/Tech</SelectItem>
-                <SelectItem value="finance">Finance</SelectItem>
-                <SelectItem value="oil">Oil & Gas</SelectItem>
+                <SelectItem value="tech">{t('jobSeeker_home_category_tech')}</SelectItem>
+                <SelectItem value="finance">{t('jobSeeker_home_category_finance')}</SelectItem>
+                <SelectItem value="oil">{t('jobSeeker_home_category_oil')}</SelectItem>
               </SelectContent>
             </Select>
             <Button variant="outline" size="icon"><Search className="h-4 w-4"/></Button>
@@ -97,7 +99,7 @@ export default function JobSeekerHomePage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">Salary: {job.salary}</p>
+                  <p className="text-sm text-muted-foreground">{t('jobSeeker_home_job_salary')}: {job.salary}</p>
                 </CardContent>
               </Card>
             ))}
@@ -108,27 +110,27 @@ export default function JobSeekerHomePage() {
       {/* Featured Roles / Importance Section */}
       <section id="featured-roles" className="py-20">
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-10">Why Gulf Companies Choose Talent Here</h2>
+          <h2 className="text-3xl font-bold mb-10">{t('jobSeeker_home_why_title')}</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="border-0 shadow-none">
               <CardContent className="flex flex-col items-center text-center p-6">
                 <Verified className="w-12 h-12 text-primary mb-4"/>
-                <h3 className="text-xl font-semibold mb-2">Verified Recruiters</h3>
-                <p className="text-muted-foreground">Connect with trusted and vetted companies.</p>
+                <h3 className="text-xl font-semibold mb-2">{t('jobSeeker_home_why_verified')}</h3>
+                <p className="text-muted-foreground">{t('jobSeeker_home_why_verified_desc')}</p>
               </CardContent>
             </Card>
             <Card className="border-0 shadow-none">
               <CardContent className="flex flex-col items-center text-center p-6">
                 <Briefcase className="w-12 h-12 text-primary mb-4"/>
-                <h3 className="text-xl font-semibold mb-2">High Demand Sectors</h3>
-                <p className="text-muted-foreground">Growth in AI/Tech, Oil & Finance.</p>
+                <h3 className="text-xl font-semibold mb-2">{t('jobSeeker_home_why_sectors')}</h3>
+                <p className="text-muted-foreground">{t('jobSeeker_home_why_sectors_desc')}</p>
               </CardContent>
             </Card>
             <Card className="border-0 shadow-none">
               <CardContent className="flex flex-col items-center text-center p-6">
                 <Zap className="w-12 h-12 text-primary mb-4"/>
-                <h3 className="text-xl font-semibold mb-2">Trusted Career Platform</h3>
-                <p className="text-muted-foreground">A reliable path to your career goals.</p>
+                <h3 className="text-xl font-semibold mb-2">{t('jobSeeker_home_why_trusted')}</h3>
+                <p className="text-muted-foreground">{t('jobSeeker_home_why_trusted_desc')}</p>
               </CardContent>
             </Card>
           </div>
@@ -150,14 +152,14 @@ export default function JobSeekerHomePage() {
               />
             </div>
             <div className="space-y-6">
-              <h2 className="text-3xl font-bold">Complete your profile to unlock full access to recruiters in Saudi & the Gulf.</h2>
+              <h2 className="text-3xl font-bold">{t('jobSeeker_home_unlock_title')}</h2>
               <ul className="space-y-3">
-                <li className="flex items-center gap-3"><CheckCircle className="w-5 h-5 text-primary" /> Get seen by top companies</li>
-                <li className="flex items-center gap-3"><CheckCircle className="w-5 h-5 text-primary" /> Priority in job matching</li>
-                <li className="flex items-center gap-3"><CheckCircle className="w-5 h-5 text-primary" /> Build trust with recruiters</li>
+                <li className="flex items-center gap-3"><CheckCircle className="w-5 h-5 text-primary" /> {t('jobSeeker_home_unlock_point1')}</li>
+                <li className="flex items-center gap-3"><CheckCircle className="w-5 h-5 text-primary" /> {t('jobSeeker_home_unlock_point2')}</li>
+                <li className="flex items-center gap-3"><CheckCircle className="w-5 h-5 text-primary" /> {t('jobSeeker_home_unlock_point3')}</li>
               </ul>
               <Button size="lg" onClick={handleCompleteProfile}>
-                Complete Profile Now <ArrowRight className="ml-2 h-5 w-5" />
+                {t('jobSeeker_home_cta_complete_now')} <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
           </div>
