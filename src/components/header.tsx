@@ -1,3 +1,4 @@
+
 "use client";
 
 import { LogOut, Menu } from 'lucide-react';
@@ -15,7 +16,7 @@ const NavLink = ({ href, children }: { href: string, children: React.ReactNode }
 );
 
 export function Header() {
-  const { user, logout } = useAuth();
+  const { user, logout, isProfileComplete } = useAuth();
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
@@ -30,9 +31,8 @@ export function Header() {
   }
 
   const handleCompleteProfile = () => {
-    if (user?.role === 'jobSeeker') {
-      router.push('/job-seeker/profile');
-    }
+    const path = user?.role === 'jobSeeker' ? '/job-seeker/profile' : '/recruiter/profile';
+    router.push(path);
   };
 
   const renderJobSeekerNav = () => (
@@ -41,7 +41,7 @@ export function Header() {
         <NavLink href="/job-seeker/home#gulf-jobs">Gulf Jobs</NavLink>
         <NavLink href="/job-seeker/home#featured-roles">Featured Roles</NavLink>
         <NavLink href="/job-seeker/home#why-complete-profile">Why Complete Profile</NavLink>
-        <Button onClick={handleCompleteProfile} size="sm">Complete Profile</Button>
+        {!isProfileComplete && <Button onClick={handleCompleteProfile} size="sm">Complete Profile</Button>}
         <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Log out">
           <LogOut className="w-5 h-5" />
         </Button>
@@ -58,7 +58,7 @@ export function Header() {
               <NavLink href="/job-seeker/home#gulf-jobs">Gulf Jobs</NavLink>
               <NavLink href="/job-seeker/home#featured-roles">Featured Roles</NavLink>
               <NavLink href="/job-seeker/home#why-complete-profile">Why Complete Profile</NavLink>
-              <Button onClick={handleCompleteProfile}>Complete Profile</Button>
+              {!isProfileComplete && <Button onClick={handleCompleteProfile}>Complete Profile</Button>}
               <Button variant="outline" onClick={handleLogout}><LogOut className="mr-2 h-4 w-4" /> Log out</Button>
             </div>
           </SheetContent>
@@ -68,9 +68,33 @@ export function Header() {
   );
 
   const renderRecruiterNav = () => (
-    <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Log out">
-      <LogOut className="w-5 h-5" />
-    </Button>
+     <>
+      <nav className="hidden md:flex gap-6 items-center">
+        <NavLink href="/recruiter/home#categories">Categories</NavLink>
+        <NavLink href="/recruiter/home#why-choose-us">Why Choose Us</NavLink>
+        {!isProfileComplete && <Button onClick={handleCompleteProfile} size="sm">Complete Profile</Button>}
+        <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Log out">
+          <LogOut className="w-5 h-5" />
+        </Button>
+      </nav>
+      <div className="md:hidden">
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="icon">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right">
+            <div className="flex flex-col gap-6 pt-10">
+               <NavLink href="/recruiter/home#categories">Categories</NavLink>
+               <NavLink href="/recruiter/home#why-choose-us">Why Choose Us</NavLink>
+              {!isProfileComplete && <Button onClick={handleCompleteProfile}>Complete Profile</Button>}
+              <Button variant="outline" onClick={handleLogout}><LogOut className="mr-2 h-4 w-4" /> Log out</Button>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+    </>
   );
 
   return (
