@@ -1,10 +1,12 @@
 
 "use client";
 
-import { createContext, useContext } from 'react';
+import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
 import type { JobRecommendationsInput } from '@/ai/flows/job-recommendations';
 
 export type UserRole = "jobSeeker" | "recruiter";
+
+export type Language = 'en' | 'ar';
 
 export interface User {
   phone: string;
@@ -30,6 +32,8 @@ export interface AuthState {
   seekerProfile: SeekerProfile | null;
   recruiterProfile: RecruiterProfile | null;
   isProfileComplete: boolean;
+  language: Language;
+  setLanguage: Dispatch<SetStateAction<Language>>;
   login: (user: User) => void;
   logout: () => void;
   updateSeekerProfile: (profile: SeekerProfile) => void;

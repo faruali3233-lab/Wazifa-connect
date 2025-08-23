@@ -1,13 +1,14 @@
 
 "use client";
 
-import { LogOut, Menu } from 'lucide-react';
+import { LogOut, Menu, Languages } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useState } from 'react';
+import { useTranslation } from './i18n-provider';
 
 const NavLink = ({ href, children }: { href: string, children: React.ReactNode }) => (
   <Link href={href} className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
@@ -16,13 +17,21 @@ const NavLink = ({ href, children }: { href: string, children: React.ReactNode }
 );
 
 export function Header() {
-  const { user, logout, isProfileComplete } = useAuth();
+  const { user, logout, isProfileComplete, language, setLanguage } = useAuth();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
 
   const handleLogout = () => {
     logout();
     router.push('/');
+  };
+
+  const toggleLanguage = () => {
+    const newLang = language === 'en' ? 'ar' : 'en';
+    setLanguage(newLang);
+    document.documentElement.lang = newLang;
+    document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr';
   };
   
   const getHomeLink = () => {
@@ -37,7 +46,10 @@ export function Header() {
 
   const renderJobSeekerNav = () => (
     <>
-      <nav className="hidden md:flex gap-6 items-center">
+      <nav className="hidden md:flex gap-4 items-center">
+         <Button variant="ghost" size="icon" onClick={toggleLanguage} aria-label="Toggle Language">
+            <Languages className="w-5 h-5" />
+        </Button>
         <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Log out">
           <LogOut className="w-5 h-5" />
         </Button>
@@ -51,7 +63,8 @@ export function Header() {
           </SheetTrigger>
           <SheetContent side="right">
             <div className="flex flex-col gap-6 pt-10">
-              <Button variant="outline" onClick={handleLogout}><LogOut className="mr-2 h-4 w-4" /> Log out</Button>
+              <Button variant="outline" onClick={toggleLanguage}><Languages className="mr-2 h-4 w-4" /> {t('toggle_language')}</Button>
+              <Button variant="outline" onClick={handleLogout}><LogOut className="mr-2 h-4 w-4" /> {t('logout')}</Button>
             </div>
           </SheetContent>
         </Sheet>
@@ -62,9 +75,12 @@ export function Header() {
   const renderRecruiterNav = () => (
      <>
       <nav className="hidden md:flex gap-6 items-center">
-        <NavLink href="/recruiter/home#categories">Categories</NavLink>
-        <NavLink href="/recruiter/home#why-choose-us">Why Choose Us</NavLink>
-        {!isProfileComplete && <Button onClick={handleCompleteProfile} size="sm">Complete Profile</Button>}
+        <NavLink href="/recruiter/home#categories">{t('categories')}</NavLink>
+        <NavLink href="/recruiter/home#why-choose-us">{t('why_choose_us')}</NavLink>
+        {!isProfileComplete && <Button onClick={handleCompleteProfile} size="sm">{t('complete_profile')}</Button>}
+        <Button variant="ghost" size="icon" onClick={toggleLanguage} aria-label="Toggle Language">
+            <Languages className="w-5 h-5" />
+        </Button>
         <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Log out">
           <LogOut className="w-5 h-5" />
         </Button>
@@ -78,10 +94,11 @@ export function Header() {
           </SheetTrigger>
           <SheetContent side="right">
             <div className="flex flex-col gap-6 pt-10">
-               <NavLink href="/recruiter/home#categories">Categories</NavLink>
-               <NavLink href="/recruiter/home#why-choose-us">Why Choose Us</NavLink>
-              {!isProfileComplete && <Button onClick={handleCompleteProfile}>Complete Profile</Button>}
-              <Button variant="outline" onClick={handleLogout}><LogOut className="mr-2 h-4 w-4" /> Log out</Button>
+               <NavLink href="/recruiter/home#categories">{t('categories')}</NavLink>
+               <NavLink href="/recruiter/home#why-choose-us">{t('why_choose_us')}</NavLink>
+              {!isProfileComplete && <Button onClick={handleCompleteProfile}>{t('complete_profile')}</Button>}
+              <Button variant="outline" onClick={toggleLanguage}><Languages className="mr-2 h-4 w-4" /> {t('toggle_language')}</Button>
+              <Button variant="outline" onClick={handleLogout}><LogOut className="mr-2 h-4 w-4" /> {t('logout')}</Button>
             </div>
           </SheetContent>
         </Sheet>
