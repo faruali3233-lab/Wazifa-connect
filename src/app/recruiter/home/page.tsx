@@ -51,13 +51,14 @@ export default function RecruiterHomePage() {
               {t('recruiter_home_cta_button')} <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
-          <div>
+          <div className="relative w-full max-w-[600px] aspect-square">
             <Image 
-              src="/image/Recruiter home image.png"
+              src="/images/recruiter-hero.png"
               alt="Three skilled Indian workers ready for hire"
-              width={600}
-              height={600}
-              className="rounded-lg shadow-lg"
+              fill
+              priority
+              className="rounded-lg shadow-lg object-cover"
+              sizes="(min-width: 1024px) 600px, 100vw"
               data-ai-hint="skilled indian workers"
             />
           </div>
@@ -154,3 +155,5 @@ export default function RecruiterHomePage() {
     </div>
   );
 }
+
+    
