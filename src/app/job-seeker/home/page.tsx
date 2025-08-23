@@ -170,5 +170,3 @@ export default function JobSeekerHomePage() {
     </div>
   );
 }
-
-    

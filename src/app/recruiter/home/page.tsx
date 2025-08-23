@@ -155,5 +155,3 @@ export default function RecruiterHomePage() {
     </div>
   );
 }
-
-    
