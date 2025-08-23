@@ -34,7 +34,7 @@ const profileSchema = z.object({
   workVideo: z.any().optional(),
 }).refine(data => {
   if (data.gulfExperience === "experienced") {
-    return !!data.yearsInGulf && (data.countriesWorked?.length ?? 0) > 0;
+    return data.yearsInGulf !== undefined && data.yearsInGulf >= 0 && (data.countriesWorked?.length ?? 0) > 0;
   }
   return true;
 }, {
@@ -57,10 +57,14 @@ export function JobSeekerProfileForm() {
       yourFullName: "",
       educationExperience: "",
       religion: "",
-      age: undefined,
+      age: 18,
       gulfExperience: undefined,
-      yearsInGulf: undefined,
+      yearsInGulf: 0,
       countriesWorked: [],
+      profilePhoto: undefined,
+      passport: undefined,
+      fullPhoto: undefined,
+      workVideo: undefined,
     },
   });
 

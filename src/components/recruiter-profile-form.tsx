@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -44,6 +45,7 @@ export function RecruiterProfileForm() {
       companyName: "",
       companyWebsite: "",
       companyDescription: "",
+      profilePhoto: undefined,
     },
   });
 
@@ -76,7 +78,17 @@ export function RecruiterProfileForm() {
     router.push('/recruiter/dashboard');
   };
   
-  const progress = (Object.values(form.watch()).filter(v => v).length / (Object.keys(form.getValues()).length-3)) * 100;
+  const calculateProgress = () => {
+    const values = form.watch();
+    const totalFields = Object.keys(profileSchema.shape).length - 3; // Excluding optional fields for baseline
+    const filledFields = Object.entries(values).filter(([key, value]) => {
+        const isOptional = ['companyName', 'companyWebsite', 'companyDescription', 'profilePhoto'].includes(key);
+        return !isOptional && !!value;
+    }).length;
+    return (filledFields / totalFields) * 100;
+  };
+  
+  const progress = calculateProgress();
 
   return (
     <Card className="w-full max-w-3xl mx-auto">
@@ -116,15 +128,15 @@ export function RecruiterProfileForm() {
             
              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <FormField control={form.control} name="yourName" render={({ field }) => (
-                    <FormItem><FormLabel>Your Name</FormLabel><FormControl><Input placeholder="Enter your full name" {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Your Name</FormLabel><FormControl><Input placeholder="Enter your full name" {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
                 )} />
                  <FormField control={form.control} name="yourEmail" render={({ field }) => (
-                    <FormItem><FormLabel>Your Email</FormLabel><FormControl><Input type="email" placeholder="Enter your email address" {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Your Email</FormLabel><FormControl><Input type="email" placeholder="Enter your email address" {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="yourCountry" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Your Country</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value || ''} defaultValue="">
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select your country" />
@@ -145,18 +157,18 @@ export function RecruiterProfileForm() {
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="yourCity" render={({ field }) => (
-                    <FormItem><FormLabel>Your City</FormLabel><FormControl><Input placeholder="Enter your city" {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Your City</FormLabel><FormControl><Input placeholder="Enter your city" {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="companyName" render={({ field }) => (
-                    <FormItem><FormLabel>Company Name (optional)</FormLabel><FormControl><Input placeholder="e.g., Acme Corporation" {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Company Name (optional)</FormLabel><FormControl><Input placeholder="e.g., Acme Corporation" {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="companyWebsite" render={({ field }) => (
-                    <FormItem><FormLabel>Company Website (optional)</FormLabel><FormControl><Input type="url" placeholder="https://acme.com" {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Company Website (optional)</FormLabel><FormControl><Input type="url" placeholder="https://acme.com" {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
                 )} />
              </div>
              
              <FormField control={form.control} name="companyDescription" render={({ field }) => (
-                <FormItem><FormLabel>Note (optional)</FormLabel><FormControl><Textarea rows={5} placeholder="Describe your company, its mission, and values." {...field} /></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>Note (optional)</FormLabel><FormControl><Textarea rows={5} placeholder="Describe your company, its mission, and values." {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
              )} />
             
             <Button type="submit" className="w-full md:w-auto">Save & Continue to Dashboard</Button>
