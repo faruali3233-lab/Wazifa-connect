@@ -260,7 +260,7 @@ export function JobSeekerProfileForm() {
                  <div className="md:col-span-2">
                     <FormField control={form.control} name="educationExperience" render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Education / Profession / Experience (Optional)</FormLabel>
+                            <FormLabel>Education (Optional)</FormLabel>
                             <FormControl><Textarea rows={3} placeholder="B.Com | Driver | 4 years" {...field} /></FormControl>
                              <CardDescription className="text-xs">Summarize your education, job title, and years of experience.</CardDescription>
                             <FormMessage />
@@ -320,3 +320,5 @@ export function JobSeekerProfileForm() {
     </Card>
   );
 }
+
+    
