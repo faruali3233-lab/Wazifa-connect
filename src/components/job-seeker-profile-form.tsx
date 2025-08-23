@@ -14,7 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UploadCloud } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Link from "next/link";
@@ -22,6 +22,8 @@ import { Checkbox } from "./ui/checkbox";
 
 const profileSchema = z.object({
   yourFullName: z.string().min(2, "Full name is required.").max(80, "Full name is too long."),
+  profession: z.string().min(1, "Profession is required."),
+  otherProfession: z.string().optional(),
   educationExperience: z.string().optional(),
   religion: z.string().min(1, "Religion is required."),
   age: z.coerce.number().min(18, "Must be at least 18.").max(60, "Must be 60 or younger."),
@@ -40,10 +42,52 @@ const profileSchema = z.object({
 }, {
   message: "Years in Gulf and countries worked are required for experienced candidates.",
   path: ["yearsInGulf"],
+}).refine(data => {
+    if (data.profession === 'Other') {
+        return data.otherProfession && data.otherProfession.length > 0;
+    }
+    return true;
+}, {
+    message: "Please specify your profession.",
+    path: ["otherProfession"],
 });
 
 
 const gulfCountries = ["Saudi Arabia", "UAE", "Qatar", "Oman", "Kuwait", "Bahrain"];
+
+const professions = {
+    "Driving Jobs": [
+        "Light Vehicle Driver (Car / Taxi / Pick-up)",
+        "Heavy Vehicle Driver (Truck / Trailer / Bus)",
+        "Delivery Driver (Bike / Van)",
+        "Personal Driver / Chauffeur",
+    ],
+    "Domestic & Household Work": [
+        "House Helper / Maid",
+        "Nanny / Babysitter",
+        "Cook / Kitchen Helper",
+        "Elderly Caregiver",
+        "Cleaner (Home / Office)",
+        "Gardener",
+    ],
+    "General Labor & Helper Jobs": [
+        "Construction Laborer",
+        "Warehouse Helper / Loader / Packer",
+        "Office Boy",
+        "Factory Worker / Machine Helper",
+        "Supermarket Helper / Shelf Stacker",
+        "Painter",
+        "Carpenter Assistant",
+        "Plumber Helper",
+        "Mason / Tile Worker",
+        "Electrician Helper",
+        "AC Technician Helper",
+        "Waiter / Restaurant Helper",
+        "Kitchen Staff (Dishwasher, Assistant Cook)",
+        "Tea Boy / Coffee Server",
+        "Security Guard",
+    ],
+};
 
 export function JobSeekerProfileForm() {
   const { updateSeekerProfile } = useAuth();
@@ -55,6 +99,8 @@ export function JobSeekerProfileForm() {
     resolver: zodResolver(profileSchema),
     defaultValues: {
       yourFullName: "",
+      profession: "",
+      otherProfession: "",
       educationExperience: "",
       religion: "",
       age: 18,
@@ -69,6 +115,7 @@ export function JobSeekerProfileForm() {
   });
 
   const watchGulfExperience = form.watch("gulfExperience");
+  const watchProfession = form.watch("profession");
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -88,15 +135,15 @@ export function JobSeekerProfileForm() {
   };
 
   const onSubmit = (values: z.infer<typeof profileSchema>) => {
-    // This is a simplified mapping. In a real app, you would handle file uploads
-    // and map the data more robustly to your SeekerProfile type.
+    const desiredJobTitle = values.profession === 'Other' ? values.otherProfession : values.profession;
+    
     const profileData: SeekerProfile = {
        basics: {
-        desiredJobTitle: values.educationExperience?.split('|')[1]?.trim() || "Worker",
+        desiredJobTitle: desiredJobTitle || "Worker",
         locationPreferences: "Gulf Region",
         experienceYears: values.age - 18, // Placeholder logic
       },
-      skills: [],
+      skills: [desiredJobTitle || ""],
       experience: values.educationExperience?.split('|').map(s => s.trim()) || [],
       education: values.educationExperience?.split('|').map(s => s.trim()) || [],
       preferences: `Religion: ${values.religion}, Age: ${values.age}`,
@@ -114,7 +161,8 @@ export function JobSeekerProfileForm() {
     const calculateProgress = () => {
         const values = form.watch();
         let progress = 0;
-        if (values.yourFullName) progress += 15;
+        if (values.yourFullName) progress += 10;
+        if (values.profession) progress += 15;
         if (values.religion) progress += 10;
         if (values.age) progress += 10;
         if (values.gulfExperience) {
@@ -126,7 +174,7 @@ export function JobSeekerProfileForm() {
             }
         }
         if (values.profilePhoto) progress += 20;
-        if (values.passport) progress += 20;
+        if (values.passport) progress += 10;
         if (values.fullPhoto) progress += 5;
         if (values.workVideo) progress += 5;
         
@@ -175,10 +223,44 @@ export function JobSeekerProfileForm() {
                 <FormField control={form.control} name="yourFullName" render={({ field }) => (
                     <FormItem><FormLabel>Your Full Name <span className="text-primary">*</span></FormLabel><FormControl><Input placeholder="e.g., Mohammed Al Harbi" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
+                <FormField control={form.control} name="profession" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Select Profession <span className="text-primary">*</span></FormLabel>
+                     <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger><SelectValue placeholder="Select your profession" /></SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.entries(professions).map(([group, options]) => (
+                            <SelectGroup key={group}>
+                                <FormLabel className="px-2 text-xs text-muted-foreground">{group}</FormLabel>
+                                {options.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+                            </SelectGroup>
+                        ))}
+                        <SelectGroup>
+                           <SelectItem value="Other">Other</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                {/* Conditional Other Profession */}
+                {watchProfession === 'Other' && (
+                    <FormField control={form.control} name="otherProfession" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Please Specify Profession <span className="text-primary">*</span></FormLabel>
+                            <FormControl><Input placeholder="e.g., IT Technician" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                )}
+
                 <FormField control={form.control} name="religion" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Religion <span className="text-primary">*</span></FormLabel>
-                     <Select onValueChange={field.onChange} defaultValue={field.value}>
+                     <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
                       <FormControl>
                         <SelectTrigger><SelectValue placeholder="Select your religion" /></SelectTrigger>
                       </FormControl>
@@ -199,7 +281,7 @@ export function JobSeekerProfileForm() {
 
                 {/* Row 3 */}
                 <FormField control={form.control} name="age" render={({ field }) => (
-                    <FormItem><FormLabel>Age <span className="text-primary">*</span></FormLabel><FormControl><Input type="number" placeholder="e.g., 28" {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Age <span className="text-primary">*</span></FormLabel><FormControl><Input type="number" placeholder="e.g., 28" {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="gulfExperience" render={({ field }) => (
                     <FormItem className="space-y-3">
@@ -224,7 +306,7 @@ export function JobSeekerProfileForm() {
                 {watchGulfExperience === 'experienced' && (
                     <>
                         <FormField control={form.control} name="yearsInGulf" render={({ field }) => (
-                            <FormItem><FormLabel>Years in Gulf</FormLabel><FormControl><Input type="number" placeholder="e.g., 5" {...field} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Years in Gulf</FormLabel><FormControl><Input type="number" placeholder="e.g., 5" {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="countriesWorked" render={({ field }) => (
                             <FormItem>
@@ -261,8 +343,8 @@ export function JobSeekerProfileForm() {
                     <FormField control={form.control} name="educationExperience" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Education (Optional)</FormLabel>
-                            <FormControl><Textarea rows={3} placeholder="B.Com | Driver | 4 years" {...field} /></FormControl>
-                             <CardDescription className="text-xs">Summarize your education, job title, and years of experience.</CardDescription>
+                            <FormControl><Textarea rows={3} placeholder="B.Com | 4 years" {...field} /></FormControl>
+                             <CardDescription className="text-xs">Summarize your education and years of experience.</CardDescription>
                             <FormMessage />
                         </FormItem>
                      )} />
