@@ -12,34 +12,35 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CalendarIcon, UploadCloud } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Calendar } from "./ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { Textarea } from "./ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Checkbox } from "./ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const regionsOfOperation = ["UAE", "Saudi Arabia", "India", "Qatar", "Kuwait", "Oman", "Bahrain"];
 const languagesSpoken = ["English", "Hindi", "Arabic", "Malayalam", "Tamil", "Urdu"];
 
+const hasFile = (v: any) => (v instanceof FileList && v.length > 0) || (Array.isArray(v) && v.length > 0) || v instanceof File;
 
 const agentProfileSchema = z.object({
   fullName: z.string().min(2, "Full name is required."),
-  profilePhoto: z.any().refine((files) => files?.length > 0, "Profile photo is required."),
+  profilePhoto: z.any().refine(hasFile, "Profile photo is required."),
   email: z.string().email("A valid email is required."),
   dob: z.date().optional(),
   officeAddress: z.string().min(10, "A full office address is required."),
   licenseNumber: z.string().min(1, "License number is required. Enter N/A if individual."),
   agencyType: z.enum(["individual", "company"], { required_error: "Please select an agency type." }),
-  yearsOfExperience: z.string().min(1, "Years of experience is required."),
-  regions: z.array(z.string()).refine((value) => value.some((item) => item), {
+  yearsOfExperience: z.enum(["<1", "1-3", "3-5", "5+"], { required_error: "Years of experience is required." }),
+  regions: z.array(z.string()).refine((value) => value.length > 0, {
     message: "You have to select at least one region.",
   }),
-  governmentId: z.any().refine((files) => files?.length > 0, "Government ID is required."),
+  governmentId: z.any().refine(hasFile, "Government ID is required."),
   businessLicense: z.any().optional(),
   gstNumber: z.string().optional(),
   languages: z.array(z.string()).optional(),
@@ -47,7 +48,7 @@ const agentProfileSchema = z.object({
   terms: z.boolean().refine((val) => val === true, "You must accept the terms."),
 }).refine((data) => {
     if (data.agencyType === "company") {
-        return data.businessLicense?.length > 0;
+        return hasFile(data.businessLicense);
     }
     return true;
 }, {
@@ -77,8 +78,9 @@ export function AgentProfileForm() {
 
   const watchAgencyType = form.watch("agencyType");
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>, fieldChange: (files: FileList | null) => void) => {
     const file = e.target.files?.[0];
+    fieldChange(e.target.files);
     if (file) {
       if (file.size > 5 * 1024 * 1024) { // 5MB limit
         form.setError("profilePhoto", { message: "File must be under 5MB" });
@@ -87,8 +89,6 @@ export function AgentProfileForm() {
       const reader = new FileReader();
       reader.onloadend = () => {
         setPhotoPreview(reader.result as string);
-        form.setValue("profilePhoto", e.target.files);
-        form.clearErrors("profilePhoto");
       };
       reader.readAsDataURL(file);
     }
@@ -98,12 +98,23 @@ export function AgentProfileForm() {
     // In a real app, you'd upload files and get URLs back.
     // For now, we'll just store the fact that a file was provided.
     const profileData: AgentProfile = {
-      ...values,
+      fullName: values.fullName,
+      email: values.email,
       phone: user?.phone || '',
       countryCode: user?.countryCode || '',
       profilePhotoUrl: photoPreview || "",
+      dob: values.dob,
+      officeAddress: values.officeAddress,
+      licenseNumber: values.licenseNumber,
+      agencyType: values.agencyType,
+      yearsOfExperience: values.yearsOfExperience,
+      regions: values.regions,
       governmentIdUrl: "file_provided",
-      businessLicenseUrl: values.businessLicense ? "file_provided" : "",
+      businessLicenseUrl: hasFile(values.businessLicense) ? "file_provided" : "",
+      gstNumber: values.gstNumber,
+      languages: values.languages,
+      candidatePoolSize: values.candidatePoolSize,
+      terms: values.terms,
       name: values.fullName,
     };
     updateAgentProfile(profileData);
@@ -143,7 +154,7 @@ export function AgentProfileForm() {
                           </Avatar>
                         </FormLabel>
                         <FormControl>
-                           <Input id="photo-upload" type="file" className="hidden" accept=".jpg,.jpeg,.png" onChange={handlePhotoChange} />
+                           <Input id="photo-upload" type="file" className="hidden" accept=".jpg,.jpeg,.png" onChange={(e) => handlePhotoChange(e, field.onChange)} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -190,7 +201,7 @@ export function AgentProfileForm() {
                     
                     <FormField control={form.control} name="agencyType" render={({ field }) => (
                         <FormItem><FormLabel>Agency Type <span className="text-destructive">*</span></FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select agency type" /></SelectTrigger></FormControl>
+                            <Select value={field.value} onValueChange={field.onChange}><FormControl><SelectTrigger><SelectValue placeholder="Select agency type" /></SelectTrigger></FormControl>
                             <SelectContent><SelectItem value="individual">Individual</SelectItem><SelectItem value="company">Registered Company</SelectItem></SelectContent></Select><FormMessage />
                         </FormItem>
                     )} />
@@ -201,8 +212,13 @@ export function AgentProfileForm() {
 
                     <FormField control={form.control} name="yearsOfExperience" render={({ field }) => (
                         <FormItem><FormLabel>Years of Experience <span className="text-destructive">*</span></FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select years of experience" /></SelectTrigger></FormControl>
-                            <SelectContent><SelectItem value="<1">&lt;1 Year</SelectItem><SelectItem value="1-3">1 - 3 Years</SelectItem><SelectItem value="3-5">3 - 5 Years</SelectItem><SelectItem value="5+">5+ Years</SelectItem></SelectContent></Select><FormMessage />
+                            <Select value={field.value} onValueChange={field.onChange}><FormControl><SelectTrigger><SelectValue placeholder="Select years of experience" /></SelectTrigger></FormControl>
+                            <SelectContent>
+                                <SelectItem value="&lt;1">&lt;1 Year</SelectItem>
+                                <SelectItem value="1-3">1 - 3 Years</SelectItem>
+                                <SelectItem value="3-5">3 - 5 Years</SelectItem>
+                                <SelectItem value="5+">5+ Years</SelectItem>
+                            </SelectContent></Select><FormMessage />
                         </FormItem>
                     )} />
 
@@ -220,13 +236,40 @@ export function AgentProfileForm() {
                         )} />
                     )}
 
-                    <FormField control={form.control} name="regions" render={({ field }) => (
-                        <FormItem className="md:col-span-2"><FormLabel>Regions of Operation <span className="text-destructive">*</span></FormLabel>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            {regionsOfOperation.map((region) => (<FormField key={region} control={form.control} name="regions" render={({ field }) => (<FormItem key={region} className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value?.includes(region)} onCheckedChange={(checked) => {return checked ? field.onChange([...(field.value || []), region]) : field.onChange(field.value?.filter((value) => value !== region))}} /></FormControl><FormLabel className="font-normal">{region}</FormLabel></FormItem>)} />))}
-                            </div><FormMessage />
-                        </FormItem>
-                    )} />
+                    <FormField
+                        control={form.control}
+                        name="regions"
+                        render={() => (
+                            <FormItem className="md:col-span-2">
+                                <FormLabel>Regions of Operation <span className="text-destructive">*</span></FormLabel>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                    {regionsOfOperation.map((region) => (
+                                        <FormField
+                                            key={region}
+                                            control={form.control}
+                                            name="regions"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={field.value?.includes(region)}
+                                                            onCheckedChange={(checked) => {
+                                                                return checked
+                                                                    ? field.onChange([...field.value, region])
+                                                                    : field.onChange(field.value?.filter((value) => value !== region));
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">{region}</FormLabel>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    ))}
+                                </div>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                 </div>
             </div>
 
@@ -234,20 +277,50 @@ export function AgentProfileForm() {
              <div className="space-y-6">
                 <h3 className="text-lg font-medium border-b pb-2">Additional Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                     <FormField control={form.control} name="languages" render={({ field }) => (
-                        <FormItem><FormLabel>Languages Spoken</FormLabel>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                                {languagesSpoken.map((lang) => (<FormField key={lang} control={form.control} name="languages" render={({ field }) => (<FormItem key={lang} className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value?.includes(lang)} onCheckedChange={(checked) => {return checked ? field.onChange([...(field.value || []), lang]) : field.onChange(field.value?.filter((value) => value !== lang))}} /></FormControl><FormLabel className="font-normal">{lang}</FormLabel></FormItem>)} />))}
-                            </div><FormMessage />
-                        </FormItem>
-                    )} />
+                     <FormField
+                        control={form.control}
+                        name="languages"
+                        render={() => (
+                            <FormItem>
+                                <FormLabel>Languages Spoken</FormLabel>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                    {languagesSpoken.map((lang) => (
+                                        <FormField
+                                            key={lang}
+                                            control={form.control}
+                                            name="languages"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={field.value?.includes(lang)}
+                                                            onCheckedChange={(checked) => {
+                                                                const currentValue = field.value || [];
+                                                                return checked
+                                                                    ? field.onChange([...currentValue, lang])
+                                                                    : field.onChange(currentValue.filter((value) => value !== lang));
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">{lang}</FormLabel>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    ))}
+                                </div>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                     />
                      <FormField control={form.control} name="candidatePoolSize" render={({ field }) => (
                         <FormItem className="space-y-3"><FormLabel>Candidate Pool Size</FormLabel>
-                            <FormControl><RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex flex-col space-y-1">
-                                <FormItem className="flex items-center space-x-3 space-y-0"><FormControl><RadioGroupItem value="0-50" /></FormControl><FormLabel className="font-normal">0 - 50</FormLabel></FormItem>
-                                <FormItem className="flex items-center space-x-3 space-y-0"><FormControl><RadioGroupItem value="50-200" /></FormControl><FormLabel className="font-normal">50 - 200</FormLabel></FormItem>
-                                <FormItem className="flex items-center space-x-3 space-y-0"><FormControl><RadioGroupItem value="200+" /></FormControl><FormLabel className="font-normal">200+</FormLabel></FormItem>
-                            </RadioGroup></FormControl><FormMessage />
+                            <FormControl>
+                                <RadioGroup value={field.value} onValueChange={field.onChange} className="flex flex-col space-y-1">
+                                    <FormItem className="flex items-center space-x-3 space-y-0"><FormControl><RadioGroupItem value="0-50" /></FormControl><FormLabel className="font-normal">0 - 50</FormLabel></FormItem>
+                                    <FormItem className="flex items-center space-x-3 space-y-0"><FormControl><RadioGroupItem value="50-200" /></FormControl><FormLabel className="font-normal">50 - 200</FormLabel></FormItem>
+                                    <FormItem className="flex items-center space-x-3 space-y-0"><FormControl><RadioGroupItem value="200+" /></FormControl><FormLabel className="font-normal">200+</FormLabel></FormItem>
+                                </RadioGroup>
+                            </FormControl><FormMessage />
                         </FormItem>
                      )} />
                 </div>
@@ -255,7 +328,12 @@ export function AgentProfileForm() {
 
             <FormField control={form.control} name="terms" render={({ field }) => (
                 <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                    <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                    <FormControl>
+                        <Checkbox 
+                            checked={field.value} 
+                            onCheckedChange={(v) => field.onChange(v === true)}
+                        />
+                    </FormControl>
                     <div className="space-y-1 leading-none">
                     <FormLabel>Terms & Compliance <span className="text-destructive">*</span></FormLabel>
                     <FormDescription>I confirm that I am authorized to operate as an agent and agree to the platform's terms of service.</FormDescription>
