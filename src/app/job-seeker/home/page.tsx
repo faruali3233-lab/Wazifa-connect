@@ -32,18 +32,14 @@ export default function JobSeekerHomePage() {
   const router = useRouter();
 
   const handleRoleSelection = (role: UserRole) => {
-    setUserRole(role);
-    if (role === 'jobSeeker') {
-      router.push('/job-seeker/profile');
-    } else if (role === 'agent') {
-      router.push('/job-seeker/agent-profile');
-    } else if (role === 'subAgent') {
-      router.push('/job-seeker/sub-agent-profile');
+    if (role === 'jobSeeker' || role === 'agent' || role === 'subAgent') {
+      setUserRole(role);
+      router.push(`/job-seeker/${role}-profile`);
     }
   };
 
   useEffect(() => {
-    if (user && isProfileComplete) {
+    if (user && user.role !== 'unselected' && isProfileComplete) {
         if(user.role === 'jobSeeker') router.replace('/job-seeker/dashboard');
         if(user.role === 'agent') router.replace('/job-seeker/agent-dashboard');
         if(user.role === 'subAgent') router.replace('/job-seeker/sub-agent-dashboard');
@@ -51,8 +47,8 @@ export default function JobSeekerHomePage() {
   }, [user, isProfileComplete, router]);
 
 
-  // If profile is already complete, redirect away.
-  if (isProfileComplete) {
+  // If profile is already complete for a selected role, redirect away.
+  if (user && user.role !== 'unselected' && isProfileComplete) {
     return null;
   }
   

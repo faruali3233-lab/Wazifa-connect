@@ -13,10 +13,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
-      const selectedCountry = ALL_COUNTRY_CODES.find(c => c.value === user.countryCode);
-      const isRecruiter = selectedCountry?.role === 'recruiter';
-
-      if (isRecruiter) {
+      if (user.role === 'recruiter') {
         const homePath = isProfileComplete ? '/recruiter/dashboard' : '/recruiter/home';
         router.replace(homePath);
       } else {
@@ -28,11 +25,7 @@ export default function LoginPage() {
             router.replace(dashboardPath);
         } else {
             const profilePath = `/job-seeker/${user.role}-profile`;
-             if (user.role === 'jobSeeker') {
-                router.replace('/job-seeker/profile');
-             } else {
-                router.replace(profilePath);
-             }
+            router.replace(profilePath);
         }
       }
     }

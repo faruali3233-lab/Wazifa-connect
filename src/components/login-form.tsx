@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth, type UserRole } from "@/hooks/use-auth";
 import { useTranslation } from "./i18n-provider";
 import Link from "next/link";
+import { ALL_COUNTRY_CODES } from "@/lib/constants";
 
 const formSchema = z.object({
   userId: z.string().min(1, "User ID is required."),
@@ -22,8 +23,10 @@ const formSchema = z.object({
 
 // Mock user data for demonstration
 const MOCK_USERS: { [key: string]: { password?: string, role: UserRole, phone: string, countryCode: string } } = {
-  'jobseeker': { password: 'password', role: 'jobSeeker', phone: '9876543210', countryCode: '+91' },
+  'jobseeker': { password: 'password', role: 'unselected', phone: '9876543210', countryCode: '+91' },
   'recruiter': { password: 'password', role: 'recruiter', phone: '501234567', countryCode: '+971' },
+  'agent': { password: 'password', role: 'unselected', phone: '9876543211', countryCode: '+91' },
+  'subagent': { password: 'password', role: 'unselected', phone: '9876543212', countryCode: '+91' },
 };
 
 
@@ -47,18 +50,19 @@ export function LoginForm() {
     if (user && user.password === values.password) {
         login({
             id: values.userId,
-            role: user.role,
             phone: user.phone,
             countryCode: user.countryCode,
         });
         
         toast({
           title: t('login_toast_success_title'),
-          description: t(user.role === 'jobSeeker' ? 'login_toast_success_description_jobSeeker' : 'login_toast_success_description_recruiter'),
+          description: t(user.role === 'recruiter' ? 'login_toast_success_description_recruiter' : 'login_toast_success_description_jobSeeker'),
         });
 
-        const homePath = user.role === "jobSeeker" ? "/job-seeker/home" : "/recruiter/home";
+        const isRecruiter = ALL_COUNTRY_CODES.find(c => c.value === user.countryCode)?.role === 'recruiter';
+        const homePath = isRecruiter ? "/recruiter/home" : "/job-seeker/home";
         router.push(homePath);
+
     } else {
         toast({
             variant: "destructive",
