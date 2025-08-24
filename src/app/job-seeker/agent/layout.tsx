@@ -22,6 +22,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 
 const NavItem = ({ href, icon, children, currentPath }: { href: string; icon: React.ReactNode; children: React.ReactNode; currentPath: string; }) => (
     <SidebarMenuItem>
@@ -44,9 +46,9 @@ export default function AgentLayout({ children }: { children: ReactNode }) {
       return;
     }
     
-    // This layout is only for agents. If a non-agent gets here,
-    // other layouts will handle their redirection.
     if (user && user.role !== 'agent') {
+      // This layout is only for agents. If a non-agent gets here,
+      // another layout will handle them. Let's show a loader to avoid flicker.
       return;
     }
     
@@ -60,8 +62,7 @@ export default function AgentLayout({ children }: { children: ReactNode }) {
 
   }, [user, isProfileComplete, router, pathname]);
 
-  // If the user role isn't set, or is not an agent, show a loader.
-  // This prevents flicker while the correct layout takes over.
+  // Loading state while auth is resolving or if user is not an agent
   if (!user || user.role !== 'agent') {
     return (
         <div className="flex items-center justify-center min-h-screen">
@@ -70,8 +71,22 @@ export default function AgentLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  // Allow the profile page to render for new users even if profile is null.
-  if (!agentProfile && pathname !== '/job-seeker/agent/profile') {
+  // If profile is not complete and we are on the profile page, show the form without the dashboard layout
+  if (!isProfileComplete && pathname === '/job-seeker/agent/profile') {
+      return (
+         <div className="min-h-screen flex flex-col bg-white">
+            <Header />
+            <main className="flex-1 bg-gray-50/50">
+              {children}
+            </main>
+            <Footer />
+        </div>
+      )
+  }
+
+  // If profile is complete, show the full dashboard layout.
+  // Also show a loader if agentProfile data isn't available yet for dashboard pages.
+  if (!agentProfile) {
       return (
         <div className="flex items-center justify-center min-h-screen">
             <Skeleton className="h-screen w-screen" />
@@ -137,7 +152,7 @@ export default function AgentLayout({ children }: { children: ReactNode }) {
                 <h1 className="text-2xl font-bold">
                    {getPageTitle()}
                 </h1>
-                <div>{/* Other header content like search, notifications */}</div>
+                <div></div>
             </header>
             <main className="flex-1 p-6 bg-gray-50/50">
                 {children}
