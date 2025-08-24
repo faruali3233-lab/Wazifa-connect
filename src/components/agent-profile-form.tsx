@@ -26,7 +26,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 const regionsOfOperation = ["UAE", "Saudi Arabia", "India", "Qatar", "Kuwait", "Oman", "Bahrain"];
 const languagesSpoken = ["English", "Hindi", "Arabic", "Malayalam", "Tamil", "Urdu"];
 
-const hasFile = (v: any) => (v instanceof FileList && v.length > 0) || (Array.isArray(v) && v.length > 0) || v instanceof File;
+const hasFile = (v: any) => (v instanceof FileList && v.length > 0) || v instanceof File;
 
 const agentProfileSchema = z.object({
   fullName: z.string().min(2, "Full name is required."),
@@ -37,7 +37,7 @@ const agentProfileSchema = z.object({
   licenseNumber: z.string().min(1, "License number is required. Enter N/A if individual."),
   agencyType: z.enum(["individual", "company"], { required_error: "Please select an agency type." }),
   yearsOfExperience: z.enum(["<1", "1-3", "3-5", "5+"], { required_error: "Years of experience is required." }),
-  regions: z.array(z.string()).refine((value) => value.some((item) => item), {
+  regions: z.array(z.string()).refine((value) => value.length > 0, {
     message: "You have to select at least one region.",
   }),
   governmentId: z.any().refine(hasFile, "Government ID is required."),
@@ -66,7 +66,7 @@ export function AgentProfileForm() {
     resolver: zodResolver(agentProfileSchema),
     defaultValues: {
       fullName: "",
-      email: "",
+      email: user?.id || "",
       officeAddress: "",
       licenseNumber: "",
       regions: [],
@@ -135,7 +135,6 @@ export function AgentProfileForm() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-12">
             
-            {/* Personal Identity Section */}
             <div className="space-y-6">
                 <h3 className="text-lg font-medium border-b pb-2">Personal Identity</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-start">
@@ -190,8 +189,7 @@ export function AgentProfileForm() {
                     )} />
                 </div>
             </div>
-
-            {/* Business Information Section */}
+            
             <div className="space-y-6">
                 <h3 className="text-lg font-medium border-b pb-2">Business / Agency Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
@@ -268,8 +266,7 @@ export function AgentProfileForm() {
                 </div>
             </div>
 
-            {/* Additional Value Section */}
-             <div className="space-y-6">
+            <div className="space-y-6">
                 <h3 className="text-lg font-medium border-b pb-2">Additional Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                     <div>
