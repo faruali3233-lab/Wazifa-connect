@@ -37,7 +37,7 @@ const agentProfileSchema = z.object({
   licenseNumber: z.string().min(1, "License number is required. Enter N/A if individual."),
   agencyType: z.enum(["individual", "company"], { required_error: "Please select an agency type." }),
   yearsOfExperience: z.enum(["<1", "1-3", "3-5", "5+"], { required_error: "Years of experience is required." }),
-  regions: z.array(z.string()).refine((value) => value.length > 0, {
+  regions: z.array(z.string()).refine((value) => value.some((item) => item), {
     message: "You have to select at least one region.",
   }),
   governmentId: z.any().refine(hasFile, "Government ID is required."),
@@ -214,7 +214,7 @@ export function AgentProfileForm() {
                         <FormItem><FormLabel>Years of Experience <span className="text-destructive">*</span></FormLabel>
                             <Select value={field.value} onValueChange={field.onChange}><FormControl><SelectTrigger><SelectValue placeholder="Select years of experience" /></SelectTrigger></FormControl>
                             <SelectContent>
-                                <SelectItem value="&lt;1">&lt;1 Year</SelectItem>
+                                <SelectItem value="<1">&lt;1 Year</SelectItem>
                                 <SelectItem value="1-3">1 - 3 Years</SelectItem>
                                 <SelectItem value="3-5">3 - 5 Years</SelectItem>
                                 <SelectItem value="5+">5+ Years</SelectItem>
@@ -236,40 +236,35 @@ export function AgentProfileForm() {
                         )} />
                     )}
 
-                    <FormField
-                        control={form.control}
-                        name="regions"
-                        render={() => (
-                            <FormItem className="md:col-span-2">
-                                <FormLabel>Regions of Operation <span className="text-destructive">*</span></FormLabel>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                                    {regionsOfOperation.map((region) => (
-                                        <FormField
-                                            key={region}
-                                            control={form.control}
-                                            name="regions"
-                                            render={({ field }) => (
-                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={field.value?.includes(region)}
-                                                            onCheckedChange={(checked) => {
-                                                                return checked
-                                                                    ? field.onChange([...field.value, region])
-                                                                    : field.onChange(field.value?.filter((value) => value !== region));
-                                                            }}
-                                                        />
-                                                    </FormControl>
-                                                    <FormLabel className="font-normal">{region}</FormLabel>
-                                                </FormItem>
-                                            )}
-                                        />
-                                    ))}
-                                </div>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    <div className="md:col-span-2">
+                        <FormLabel>Regions of Operation <span className="text-destructive">*</span></FormLabel>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+                            {regionsOfOperation.map((region) => (
+                                <FormField
+                                    key={region}
+                                    control={form.control}
+                                    name="regions"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                            <FormControl>
+                                                <Checkbox
+                                                    checked={field.value?.includes(region)}
+                                                    onCheckedChange={(checked) => {
+                                                        const currentValue = field.value || [];
+                                                        return checked
+                                                            ? field.onChange([...currentValue, region])
+                                                            : field.onChange(currentValue.filter((value) => value !== region));
+                                                    }}
+                                                />
+                                            </FormControl>
+                                            <FormLabel className="font-normal">{region}</FormLabel>
+                                        </FormItem>
+                                    )}
+                                />
+                            ))}
+                        </div>
+                        <FormMessage>{form.formState.errors.regions?.message}</FormMessage>
+                    </div>
                 </div>
             </div>
 
@@ -277,41 +272,35 @@ export function AgentProfileForm() {
              <div className="space-y-6">
                 <h3 className="text-lg font-medium border-b pb-2">Additional Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                     <FormField
-                        control={form.control}
-                        name="languages"
-                        render={() => (
-                            <FormItem>
-                                <FormLabel>Languages Spoken</FormLabel>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                                    {languagesSpoken.map((lang) => (
-                                        <FormField
-                                            key={lang}
-                                            control={form.control}
-                                            name="languages"
-                                            render={({ field }) => (
-                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={field.value?.includes(lang)}
-                                                            onCheckedChange={(checked) => {
-                                                                const currentValue = field.value || [];
-                                                                return checked
-                                                                    ? field.onChange([...currentValue, lang])
-                                                                    : field.onChange(currentValue.filter((value) => value !== lang));
-                                                            }}
-                                                        />
-                                                    </FormControl>
-                                                    <FormLabel className="font-normal">{lang}</FormLabel>
-                                                </FormItem>
-                                            )}
-                                        />
-                                    ))}
-                                </div>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                     />
+                    <div>
+                        <FormLabel>Languages Spoken</FormLabel>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+                            {languagesSpoken.map((lang) => (
+                                <FormField
+                                    key={lang}
+                                    control={form.control}
+                                    name="languages"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                            <FormControl>
+                                                <Checkbox
+                                                    checked={field.value?.includes(lang)}
+                                                    onCheckedChange={(checked) => {
+                                                        const currentValue = field.value || [];
+                                                        return checked
+                                                            ? field.onChange([...currentValue, lang])
+                                                            : field.onChange(currentValue.filter((value) => value !== lang));
+                                                    }}
+                                                />
+                                            </FormControl>
+                                            <FormLabel className="font-normal">{lang}</FormLabel>
+                                        </FormItem>
+                                    )}
+                                />
+                            ))}
+                        </div>
+                        <FormMessage>{form.formState.errors.languages?.message}</FormMessage>
+                    </div>
                      <FormField control={form.control} name="candidatePoolSize" render={({ field }) => (
                         <FormItem className="space-y-3"><FormLabel>Candidate Pool Size</FormLabel>
                             <FormControl>
