@@ -30,12 +30,16 @@ export default function LoginPage() {
           let dashboardPath = '/job-seeker/dashboard'; // default for jobSeeker
           if (user.role === 'subAgent') {
             dashboardPath = '/job-seeker/sub-agent-dashboard';
+          } else if (user.role === 'agent') {
+            dashboardPath = '/job-seeker/agent/dashboard';
           }
           router.replace(dashboardPath);
       } else { // Profile is not complete
           let profilePath = '/job-seeker/profile'; // default for jobSeeker
           if (user.role === 'subAgent') {
             profilePath = '/job-seeker/sub-agent-profile';
+          } else if (user.role === 'agent') {
+            profilePath = '/job-seeker/agent/profile';
           }
           router.replace(profilePath);
       }

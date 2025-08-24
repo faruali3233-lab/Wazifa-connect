@@ -229,83 +229,85 @@ export default function AgentProfileForm() {
                            <FormMessage />
                        </FormItem>
                     )} />
-                    <FormItem className="md:col-span-2">
-                        <FormLabel>Regions of Operation <span className="text-destructive">*</span></FormLabel>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            {regionsOfOperation.map((region) => (
-                                <FormField
-                                    key={region}
-                                    control={form.control}
-                                    name="regions"
-                                    render={({ field }) => (
-                                    <FormItem
-                                        key={region}
-                                        className="flex flex-row items-start space-x-3 space-y-0"
-                                    >
-                                        <FormControl>
-                                        <Checkbox
-                                            checked={field.value?.includes(region)}
-                                            onCheckedChange={(checked) => {
-                                            const currentRegions = field.value ?? [];
-                                            return checked
-                                                ? field.onChange([...currentRegions, region])
-                                                : field.onChange(
-                                                    currentRegions.filter(
-                                                    (value: string) => value !== region
-                                                    )
-                                                );
-                                            }}
-                                        />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                        {region}
-                                        </FormLabel>
-                                    </FormItem>
-                                    )}
-                                />
-                            ))}
-                        </div>
-                        <FormField control={form.control} name="regions" render={() => ( <FormMessage /> )}/>
-                    </FormItem>
+                    <FormField control={form.control} name="regions" render={({ field }) => (
+                      <FormItem className="md:col-span-2">
+                          <FormLabel>Regions of Operation <span className="text-destructive">*</span></FormLabel>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                              {regionsOfOperation.map((region) => (
+                                  <FormField
+                                      key={region}
+                                      control={form.control}
+                                      name="regions"
+                                      render={({ field }) => (
+                                      <FormItem
+                                          key={region}
+                                          className="flex flex-row items-start space-x-3 space-y-0"
+                                      >
+                                          <FormControl>
+                                          <Checkbox
+                                              checked={field.value?.includes(region)}
+                                              onCheckedChange={(checked) => {
+                                              return checked
+                                                  ? field.onChange([...field.value, region])
+                                                  : field.onChange(
+                                                      field.value?.filter(
+                                                      (value) => value !== region
+                                                      )
+                                                  )
+                                              }}
+                                          />
+                                          </FormControl>
+                                          <FormLabel className="font-normal">
+                                          {region}
+                                          </FormLabel>
+                                      </FormItem>
+                                      )}
+                                  />
+                              ))}
+                          </div>
+                          <FormMessage />
+                      </FormItem>
+                    )} />
 
-                    <FormItem className="md:col-span-2">
-                        <FormLabel>Languages Spoken</FormLabel>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            {languageOptions.map((lang) => (
-                                <FormField
-                                    key={lang}
-                                    control={form.control}
-                                    name="languages"
-                                    render={({ field }) => (
-                                    <FormItem
+                    <FormField control={form.control} name="languages" render={({ field }) => (
+                        <FormItem className="md:col-span-2">
+                            <FormLabel>Languages Spoken</FormLabel>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                {languageOptions.map((lang) => (
+                                    <FormField
                                         key={lang}
-                                        className="flex flex-row items-start space-x-3 space-y-0"
-                                    >
-                                        <FormControl>
-                                        <Checkbox
-                                            checked={field.value?.includes(lang)}
-                                            onCheckedChange={(checked) => {
-                                            const currentLanguages = field.value ?? [];
-                                            return checked
-                                                ? field.onChange([...currentLanguages, lang])
-                                                : field.onChange(
-                                                    currentLanguages.filter(
-                                                    (value: string) => value !== lang
+                                        control={form.control}
+                                        name="languages"
+                                        render={({ field }) => (
+                                        <FormItem
+                                            key={lang}
+                                            className="flex flex-row items-start space-x-3 space-y-0"
+                                        >
+                                            <FormControl>
+                                            <Checkbox
+                                                checked={field.value?.includes(lang)}
+                                                onCheckedChange={(checked) => {
+                                                return checked
+                                                    ? field.onChange([...field.value, lang])
+                                                    : field.onChange(
+                                                        field.value?.filter(
+                                                        (value) => value !== lang
+                                                        )
                                                     )
-                                                );
-                                            }}
-                                        />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                        {lang}
-                                        </FormLabel>
-                                    </FormItem>
-                                    )}
-                                />
-                            ))}
-                        </div>
-                        <FormField control={form.control} name="languages" render={() => ( <FormMessage /> )}/>
-                    </FormItem>
+                                                }}
+                                            />
+                                            </FormControl>
+                                            <FormLabel className="font-normal">
+                                            {lang}
+                                            </FormLabel>
+                                        </FormItem>
+                                        )}
+                                    />
+                                ))}
+                            </div>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
 
                 </div>
             </div>
@@ -359,5 +361,3 @@ export default function AgentProfileForm() {
     </Card>
   );
 }
-
-    

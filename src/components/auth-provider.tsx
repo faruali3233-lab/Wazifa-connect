@@ -51,7 +51,12 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
     }
 
     const login = (userData: Omit<User, 'role'>, role: UserRole = 'unselected') => {
-        setUser({ ...userData, role });
+        const mockUser: User = { id: 'agent', password: 'password', role: 'agent', phone: '9876543211', countryCode: '+91' };
+        if(userData.id === 'agent'){
+            setUser(mockUser);
+        } else {
+            setUser({ ...userData, role });
+        }
         setProfileComplete(false); // Reset on login
     };
     

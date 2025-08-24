@@ -17,7 +17,7 @@ import {
   SidebarMenuButton,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { LayoutDashboard, Users, UserCheck, Briefcase, HandCoins, MessageSquare, BarChart, Settings, ShieldCheck, FileText, LifeBuoy } from 'lucide-react';
+import { LayoutDashboard, Users, UserCheck, Briefcase, HandCoins, MessageSquare, BarChart, Settings, FileText, LifeBuoy } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
@@ -71,7 +71,6 @@ export default function AgentLayout({ children }: { children: ReactNode }) {
   }
 
   // Allow the profile page to render for new users even if profile is null.
-  // For any other page, if the profile isn't loaded yet, show the skeleton.
   if (!agentProfile && pathname !== '/job-seeker/agent/profile') {
       return (
         <div className="flex items-center justify-center min-h-screen">

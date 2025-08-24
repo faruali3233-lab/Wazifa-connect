@@ -25,6 +25,7 @@ const formSchema = z.object({
 const MOCK_USERS: { [key: string]: { password?: string, role: UserRole, phone: string, countryCode: string } } = {
   'jobseeker': { password: 'password', role: 'unselected', phone: '9876543210', countryCode: '+91' },
   'recruiter': { password: 'password', role: 'recruiter', phone: '501234567', countryCode: '+971' },
+  'agent': { password: 'password', role: 'agent', phone: '9876543211', countryCode: '+91' },
   'subagent': { password: 'password', role: 'subAgent', phone: '9876543212', countryCode: '+91' },
   'admin': { password: 'password', role: 'admin', phone: '000000000', countryCode: '+1' },
 };
@@ -61,6 +62,11 @@ export function LoginForm() {
 
         if (user.role === 'admin') {
             router.push('/admin');
+            return;
+        }
+
+        if (user.role === 'agent') {
+            router.push('/job-seeker/agent/profile');
             return;
         }
 
