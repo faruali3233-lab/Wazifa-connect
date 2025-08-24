@@ -29,7 +29,6 @@ export interface RecruiterProfile {
   profilePhotoUrl: string;
 }
 
-// TODO: Define Agent and SubAgent profile structures
 export interface AgentProfile {
   name: string;
   // Add other agent-specific fields
