@@ -29,7 +29,7 @@ export default function LoginPage() {
       } else if (isProfileComplete) {
           let dashboardPath = '/job-seeker/dashboard'; // default for jobSeeker
           if (user.role === 'subAgent') {
-            dashboardPath = '/job-seeker/sub-agent-dashboard';
+            dashboardPath = '/job-seeker/sub-agent/dashboard';
           } else if (user.role === 'agent') {
             dashboardPath = '/job-seeker/agent/dashboard';
           }
@@ -37,7 +37,7 @@ export default function LoginPage() {
       } else { // Profile is not complete
           let profilePath = '/job-seeker/profile'; // default for jobSeeker
           if (user.role === 'subAgent') {
-            profilePath = '/job-seeker/sub-agent-profile';
+            profilePath = '/job-seeker/sub-agent/profile';
           } else if (user.role === 'agent') {
             profilePath = '/job-seeker/agent/profile';
           }

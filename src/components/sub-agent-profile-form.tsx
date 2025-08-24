@@ -114,7 +114,7 @@ export function SubAgentProfileForm() {
       title: "Sub Agent Profile Saved!",
       description: "You can now access your sub-agent dashboard.",
     });
-    router.push('/job-seeker/sub-agent-dashboard');
+    router.push('/job-seeker/sub-agent/dashboard');
   };
 
   return (
