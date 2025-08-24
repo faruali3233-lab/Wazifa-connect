@@ -25,10 +25,10 @@ export default function LoginPage() {
         if (user.role === 'unselected') {
            router.replace('/job-seeker/home');
         } else if (isProfileComplete) {
-            const dashboardPath = `/job-seeker/${user.role}-dashboard`;
+            const dashboardPath = user.role === 'jobSeeker' ? '/job-seeker/dashboard' : `/job-seeker/${user.role}-dashboard`;
             router.replace(dashboardPath);
         } else {
-            const profilePath = `/job-seeker/${user.role}-profile`;
+            const profilePath = user.role === 'jobSeeker' ? '/job-seeker/profile' : `/job-seeker/${user.role}-profile`;
             router.replace(profilePath);
         }
       }

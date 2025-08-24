@@ -42,8 +42,7 @@ export default function JobSeekerHomePage() {
   useEffect(() => {
     if (user && user.role !== 'unselected' && isProfileComplete) {
         if(user.role === 'jobSeeker') router.replace('/job-seeker/dashboard');
-        if(user.role === 'agent') router.replace('/job-seeker/agent-dashboard');
-        if(user.role === 'subAgent') router.replace('/job-seeker/sub-agent-dashboard');
+        else router.replace(`/job-seeker/${user.role}-dashboard`);
     }
   }, [user, isProfileComplete, router]);
 

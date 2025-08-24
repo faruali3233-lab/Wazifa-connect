@@ -30,7 +30,7 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
       if (user.role === 'unselected' && pathname !== '/job-seeker/home') {
           router.replace('/job-seeker/home');
       } else if (user.role !== 'unselected' && !isProfileComplete) {
-          const profilePath = `/job-seeker/${user.role}-profile`;
+          const profilePath = user.role === 'jobSeeker' ? `/job-seeker/profile` : `/job-seeker/${user.role}-profile`;
           if (pathname !== profilePath) {
                router.replace(profilePath);
           }
