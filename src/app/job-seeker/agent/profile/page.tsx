@@ -1,4 +1,4 @@
-import { AgentProfileForm } from "@/components/agent-profile-form";
+import AgentProfileForm from "@/components/agent-profile-form";
 
 export default function AgentProfilePage() {
   return (
@@ -9,3 +9,5 @@ export default function AgentProfilePage() {
     </div>
   );
 }
+
+    

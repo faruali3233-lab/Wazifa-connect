@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -22,7 +23,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-
 
 const hasFile = (v: any) => (v instanceof FileList && v.length > 0) || (Array.isArray(v) && v.length > 0) || v instanceof File;
 
@@ -55,7 +55,7 @@ const agentProfileSchema = z.object({
 const regionsOfOperation = ["Saudi Arabia", "UAE", "Qatar", "Oman", "Kuwait", "Bahrain"];
 const languageOptions = ["English", "Hindi", "Arabic", "Malayalam", "Tamil", "Bengali"];
 
-export function AgentProfileForm() {
+export default function AgentProfileForm() {
   const { user, updateAgentProfile } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
@@ -323,3 +323,5 @@ export function AgentProfileForm() {
     </Card>
   );
 }
+
+    
