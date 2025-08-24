@@ -46,8 +46,7 @@ export default function AgentLayout({ children }: { children: ReactNode }) {
     
     if (user && user.role !== 'agent') {
         // This layout is only for agents. If a non-agent gets here,
-        // the main layouts will handle their redirection.
-        // We prevent flicker by not doing anything here for other roles.
+        // other layouts will handle their redirection.
         return;
     }
     
@@ -59,32 +58,19 @@ export default function AgentLayout({ children }: { children: ReactNode }) {
 
   }, [user, isProfileComplete, router, pathname]);
 
-  // Render a loading state if the user is not an agent,
-  // letting the root/job-seeker layouts handle the final destination.
-  if (!user || user.role !== 'agent') {
+  // If the user is not an agent, or if the profile data hasn't loaded yet for non-profile pages,
+  // show a loading skeleton. Profile page should be allowed to render without profile data.
+  if (!user || user.role !== 'agent' || (!agentProfile && pathname !== '/job-seeker/agent/profile')) {
     return (
         <div className="flex items-center justify-center min-h-screen">
-          <div className="flex items-center justify-center min-h-screen">
-             <Skeleton className="h-screen w-screen" />
-          </div>
+          <Skeleton className="h-screen w-screen" />
         </div>
     );
-  }
-
-  // If the profile data hasn't loaded yet, show skeleton
-  if (!agentProfile) {
-     if (pathname.startsWith('/job-seeker/agent/dashboard')) {
-       return (
-         <div className="flex items-center justify-center min-h-screen">
-           <Skeleton className="h-screen w-screen" />
-         </div>
-       );
-     }
-     // Allow profile page to render without profile data
   }
   
   const getPageTitle = () => {
     if (pathname.includes('/dashboard')) return 'Dashboard';
+    if (pathname.includes('/profile')) return 'Profile';
     if (pathname.includes('/jobs')) return 'Jobs';
     if (pathname.includes('/candidate-pool')) return 'Candidate Pool';
     if (pathname.includes('/sub-agents')) return 'Sub Agents';
