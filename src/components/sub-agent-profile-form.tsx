@@ -66,7 +66,7 @@ export function SubAgentProfileForm() {
     // In a real app, this would be an API call.
     await new Promise(resolve => setTimeout(resolve, 1000));
     // Mock response
-    if (referralLink === "AGENT123" && agentId === "AGENT_ID") {
+    if (referralLink === "REF-AG4829-Xy2Z" && agentId === "AG-12345678") {
       setVerifiedAgent("Verified Agent Name");
       toast({ title: "Agent Verified!", description: "You are now linked to Verified Agent Name." });
     } else {
