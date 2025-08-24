@@ -1,15 +1,48 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { getJobRecommendations, type JobRecommendationsOutput } from '@/ai/flows/job-recommendations';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { JobCard } from '@/components/job-card';
-import { FileText, Star, BrainCircuit, AlertTriangle } from 'lucide-react';
+import { FileText, Star, BrainCircuit, AlertTriangle, Briefcase, BarChart3, UserCheck, Mail } from 'lucide-react';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts"
+
+const chartData = [
+  { stage: "Applied", value: 12, fill: "var(--color-applied)" },
+  { stage: "Viewed", value: 8, fill: "var(--color-viewed)" },
+  { stage: "Interview", value: 4, fill: "var(--color-interview)" },
+  { stage: "Offer", value: 1, fill: "var(--color-offer)" },
+];
+
+const chartConfig = {
+  value: {
+    label: "Applications",
+  },
+  applied: {
+    label: "Applied",
+    color: "hsl(var(--chart-1))",
+  },
+  viewed: {
+    label: "Viewed",
+    color: "hsl(var(--chart-2))",
+  },
+  interview: {
+    label: "Interview",
+    color: "hsl(var(--chart-3))",
+  },
+  offer: {
+    label: "Offer",
+    color: "hsl(var(--chart-4))",
+  },
+} satisfies import("@/components/ui/chart").ChartConfig
+
 
 export default function JobSeekerDashboard() {
   const { user, seekerProfile, isProfileComplete } = useAuth();
@@ -18,7 +51,6 @@ export default function JobSeekerDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Only fetch recommendations if the profile is complete
     if (isProfileComplete && seekerProfile) {
       setLoading(true);
       getJobRecommendations({ profile: seekerProfile })
@@ -31,11 +63,9 @@ export default function JobSeekerDashboard() {
   }, [isProfileComplete, seekerProfile]);
 
   if (!user) {
-    // This should be handled by the layout, but as a fallback
     return <div className="container mx-auto p-8"><Skeleton className="h-64 w-full" /></div>;
   }
 
-  // A simple way to calculate a more realistic progress
   const calculateProgress = () => {
     if (!seekerProfile) return 10;
     let score = 0;
@@ -43,7 +73,7 @@ export default function JobSeekerDashboard() {
     if (seekerProfile.skills.length > 0) score += 20;
     if (seekerProfile.experience.length > 0) score += 20;
     if (seekerProfile.education.length > 0) score += 20;
-    if (seekerProfile.resumeUrl) score += 20; // Using resumeUrl to check for passport/docs
+    if (seekerProfile.resumeUrl) score += 20;
     return score;
   };
 
@@ -53,8 +83,50 @@ export default function JobSeekerDashboard() {
     <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold tracking-tight mb-8">Welcome, {seekerProfile?.basics.desiredJobTitle.split(' ')[0] || 'Job Seeker'}!</h1>
       
+       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Interviews Scheduled</CardTitle>
+            <UserCheck className="w-4 h-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">2</div>
+            <p className="text-xs text-muted-foreground">+1 since last week</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Applications Sent</CardTitle>
+            <Briefcase className="w-4 h-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">12</div>
+             <p className="text-xs text-muted-foreground">3 submitted this week</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Profile Views</CardTitle>
+            <BarChart3 className="w-4 h-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">18</div>
+            <p className="text-xs text-muted-foreground">Viewed by 5 recruiters</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Unread Messages</CardTitle>
+            <Mail className="w-4 h-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">1</div>
+            <p className="text-xs text-muted-foreground">From a recruiter in UAE</p>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content: Recommendations or Profile Completion Prompt */}
         <div className="lg:col-span-2 space-y-8">
           {isProfileComplete ? (
             <Card>
@@ -98,9 +170,28 @@ export default function JobSeekerDashboard() {
                 </CardContent>
             </Card>
           )}
+           <Card>
+            <CardHeader>
+              <CardTitle>Vacancy Stats</CardTitle>
+              <CardDescription>Your application funnel for the last 30 days.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+                <BarChart accessibilityLayer data={chartData}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis dataKey="stage" tickLine={false} tickMargin={10} axisLine={false} />
+                  <YAxis />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="value" radius={4} />
+                </BarChart>
+              </ChartContainer>
+            </CardContent>
+            <CardFooter>
+                 <p className="text-xs text-muted-foreground">Your shortlist rate is higher than average.</p>
+            </CardFooter>
+          </Card>
         </div>
 
-        {/* Sidebar Widgets */}
         <div className="space-y-8">
           <Card>
             <CardHeader>
@@ -127,14 +218,6 @@ export default function JobSeekerDashboard() {
             </CardHeader>
             <CardContent className="text-center text-muted-foreground">
               <p>Your applied jobs will appear here.</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2"><Star /> Saved Jobs</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center text-muted-foreground">
-              <p>Your saved jobs will appear here.</p>
             </CardContent>
           </Card>
         </div>
