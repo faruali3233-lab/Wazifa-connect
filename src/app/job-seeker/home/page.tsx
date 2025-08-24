@@ -32,17 +32,21 @@ export default function JobSeekerHomePage() {
   const router = useRouter();
 
   const handleRoleSelection = (role: UserRole) => {
-    if (role === 'jobSeeker' || role === 'agent' || role === 'subAgent') {
-      setUserRole(role);
-      const profilePath = role === 'jobSeeker' ? 'profile' : `${role}-profile`;
-      router.push(`/job-seeker/${profilePath}`);
+    setUserRole(role);
+    let profilePath = '/job-seeker/profile';
+    if (role === 'agent') {
+      profilePath = '/job-seeker/agent/profile';
+    } else if (role === 'subAgent') {
+      profilePath = '/job-seeker/sub-agent-profile';
     }
+    router.push(profilePath);
   };
 
   useEffect(() => {
     if (user && user.role !== 'unselected' && isProfileComplete) {
         if(user.role === 'jobSeeker') router.replace('/job-seeker/dashboard');
-        else router.replace(`/job-seeker/${user.role}-dashboard`);
+        else if (user.role === 'agent') router.replace('/job-seeker/agent/dashboard');
+        else if (user.role === 'subAgent') router.replace('/job-seeker/sub-agent-dashboard');
     }
   }, [user, isProfileComplete, router]);
 

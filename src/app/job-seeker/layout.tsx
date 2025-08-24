@@ -19,41 +19,43 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
       return;
     }
     
-    // Redirect recruiters away from job seeker section
-    if (user && user.role === 'recruiter') { 
-       router.replace('/recruiter/welcome');
+    // Redirect recruiters and agents away from this layout
+    if (user && (user.role === 'recruiter' || user.role === 'agent')) { 
+       if (user.role === 'recruiter') router.replace('/recruiter');
+       if (user.role === 'agent') router.replace('/job-seeker/agent/dashboard');
        return;
     }
 
-    // Logic for job seekers, agents, sub-agents
+    // Logic for job seekers & sub-agents
     if (user && user.countryCode === '+91') {
       if (user.role === 'unselected' && pathname !== '/job-seeker/home') {
           router.replace('/job-seeker/home');
       } else if (user.role !== 'unselected' && !isProfileComplete) {
           const profileMap = {
               jobSeeker: 'profile',
-              agent: 'agent-profile',
               subAgent: 'sub-agent-profile',
+              // These roles are handled in other layouts
+              agent: '', 
               unselected: 'home',
-              admin: '', // should not happen here
-              recruiter: '' // should not happen here
+              admin: '', 
+              recruiter: ''
           }
-          const rolePath = profileMap[user.role];
-          const profilePath = `/job-seeker/${rolePath}`;
-
-          if (pathname !== profilePath) {
-               router.replace(profilePath);
+          const rolePath = profileMap[user.role as keyof typeof profileMap];
+          if (rolePath) {
+            const profilePath = `/job-seeker/${rolePath}`;
+            if (pathname !== profilePath) {
+                 router.replace(profilePath);
+            }
           }
       }
     }
 
   }, [user, isProfileComplete, router, pathname]);
   
-  // Simplified check for initial loading state
-  if (!user || user.role === 'recruiter') {
+  if (!user || user.role === 'recruiter' || user.role === 'agent') {
     return (
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto p-8"><Skeleton className="h-24 w-full" /></div>
+        <div className="container mx-auto p-8"><Skeleton className="h-screen w-full" /></div>
       </div>
     );
   }

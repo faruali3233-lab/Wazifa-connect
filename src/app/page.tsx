@@ -25,10 +25,20 @@ export default function LoginPage() {
         if (user.role === 'unselected') {
            router.replace('/job-seeker/home');
         } else if (isProfileComplete) {
-            const dashboardPath = user.role === 'jobSeeker' ? '/job-seeker/dashboard' : `/job-seeker/${user.role}-dashboard`;
+            let dashboardPath = '/job-seeker/dashboard';
+            if (user.role === 'agent') {
+              dashboardPath = '/job-seeker/agent/dashboard';
+            } else if (user.role === 'subAgent') {
+              dashboardPath = '/job-seeker/sub-agent-dashboard';
+            }
             router.replace(dashboardPath);
         } else {
-            const profilePath = user.role === 'jobSeeker' ? '/job-seeker/profile' : `/job-seeker/${user.role}-profile`;
+            let profilePath = '/job-seeker/profile';
+            if (user.role === 'agent') {
+              profilePath = '/job-seeker/agent/profile';
+            } else if (user.role === 'subAgent') {
+              profilePath = '/job-seeker/sub-agent-profile';
+            }
             router.replace(profilePath);
         }
       }

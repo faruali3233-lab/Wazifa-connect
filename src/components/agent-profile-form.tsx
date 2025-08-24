@@ -111,7 +111,7 @@ export function AgentProfileForm() {
       title: "Agent Profile Saved!",
       description: "You can now access your agent dashboard.",
     });
-    router.push('/job-seeker/agent-dashboard');
+    router.push('/job-seeker/agent/dashboard');
   };
 
   return (

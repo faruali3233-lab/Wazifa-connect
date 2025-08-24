@@ -36,10 +36,9 @@ export default function AgentDashboard() {
 
 
   return (
-    <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold tracking-tight mb-8">Agent Dashboard</h1>
+    <div className="space-y-6">
        
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Active Candidates</CardTitle>
@@ -112,7 +111,7 @@ export default function AgentDashboard() {
                   ? "Your profile is complete." 
                   : "Complete your profile to build more trust."}
               </p>
-              <Button variant="outline" className="w-full" onClick={() => router.push('/job-seeker/agent-profile')}>
+              <Button variant="outline" className="w-full" onClick={() => router.push('/job-seeker/agent/profile')}>
                 {progress === 100 ? 'Edit Profile' : 'Complete Profile'}
               </Button>
             </CardContent>
