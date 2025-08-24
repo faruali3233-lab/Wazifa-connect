@@ -30,8 +30,23 @@ export interface RecruiterProfile {
 }
 
 export interface AgentProfile {
-  name: string;
-  // Add other agent-specific fields
+  fullName: string;
+  profilePhotoUrl: string;
+  phone: string;
+  countryCode: string;
+  email: string;
+  dob?: Date;
+  officeAddress: string;
+  licenseNumber: string;
+  agencyType: "individual" | "company";
+  yearsOfExperience: string;
+  regions: string[];
+  governmentIdUrl: string; // URL after upload
+  businessLicenseUrl?: string; // URL after upload
+  gstNumber?: string;
+  languages?: string[];
+  candidatePoolSize?: "0-50" | "50-200" | "200+";
+  terms: boolean;
 }
 
 export interface SubAgentProfile {
