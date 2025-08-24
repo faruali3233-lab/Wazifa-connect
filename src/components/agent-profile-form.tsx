@@ -74,7 +74,7 @@ export default function AgentProfileForm() {
     },
   });
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>, fieldChange: (files: FileList | null) => void) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) { // 5MB limit
@@ -86,13 +86,14 @@ export default function AgentProfileForm() {
         setPhotoPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
-      form.setValue("profilePhoto", e.target.files);
+      fieldChange(e.target.files);
     }
   };
 
   const onSubmit = (values: z.infer<typeof agentProfileSchema>) => {
     const profileData: AgentProfile = {
-      ...values,
+      fullName: values.fullName,
+      email: values.email,
       phone: user?.phone || '',
       countryCode: user?.countryCode || '',
       profilePhotoUrl: photoPreview || "",
@@ -100,6 +101,16 @@ export default function AgentProfileForm() {
       businessLicenseUrl: hasFile(values.businessLicense) ? "file_provided" : undefined,
       name: values.fullName,
       kycStatus: 'Pending',
+      dob: values.dob,
+      officeAddress: values.officeAddress,
+      licenseNumber: values.licenseNumber,
+      agencyType: values.agencyType,
+      yearsOfExperience: values.yearsOfExperience,
+      regions: values.regions,
+      gstNumber: values.gstNumber,
+      languages: values.languages,
+      candidatePoolSize: values.candidatePoolSize,
+      terms: values.terms,
     };
     
     updateAgentProfile(profileData);
@@ -140,7 +151,7 @@ export default function AgentProfileForm() {
                         </Avatar>
                       </FormLabel>
                       <FormControl>
-                         <Input id="photo-upload" type="file" className="hidden" accept=".jpg,.jpeg,.png" onChange={handlePhotoChange} />
+                         <Input id="photo-upload" type="file" className="hidden" accept=".jpg,.jpeg,.png" onChange={(e) => handlePhotoChange(e, field.onChange)} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -220,51 +231,55 @@ export default function AgentProfileForm() {
                     )} />
                      <FormItem className="md:col-span-2">
                         <FormLabel>Regions of Operation <span className="text-destructive">*</span></FormLabel>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            {regionsOfOperation.map((region) => (
-                                <FormField key={region} control={form.control} name="regions" render={({ field }) => (
-                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value?.includes(region)}
-                                                onCheckedChange={(checked) => {
-                                                    const currentRegions = field.value ?? [];
-                                                    return checked
-                                                        ? field.onChange([...currentRegions, region])
-                                                        : field.onChange(currentRegions.filter((value: string) => value !== region))
-                                                }}
-                                            />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">{region}</FormLabel>
-                                    </FormItem>
-                                )} />
-                            ))}
-                        </div>
+                         <FormField control={form.control} name="regions" render={() => (
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                {regionsOfOperation.map((region) => (
+                                    <FormField key={region} control={form.control} name="regions" render={({ field }) => (
+                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                            <FormControl>
+                                                <Checkbox
+                                                    checked={field.value?.includes(region)}
+                                                    onCheckedChange={(checked) => {
+                                                        const currentRegions = field.value ?? [];
+                                                        return checked
+                                                            ? field.onChange([...currentRegions, region])
+                                                            : field.onChange(currentRegions.filter((value: string) => value !== region))
+                                                    }}
+                                                />
+                                            </FormControl>
+                                            <FormLabel className="font-normal">{region}</FormLabel>
+                                        </FormItem>
+                                    )} />
+                                ))}
+                            </div>
+                        )} />
                         <FormMessage />
                     </FormItem>
 
                     <FormItem className="md:col-span-2">
                         <FormLabel>Languages Spoken</FormLabel>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            {languageOptions.map((lang) => (
-                                <FormField key={lang} control={form.control} name="languages" render={({ field }) => (
-                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value?.includes(lang)}
-                                                onCheckedChange={(checked) => {
-                                                    const currentLanguages = field.value ?? [];
-                                                    return checked
-                                                        ? field.onChange([...currentLanguages, lang])
-                                                        : field.onChange(currentLanguages.filter((value: string) => value !== lang))
-                                                }}
-                                            />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">{lang}</FormLabel>
-                                    </FormItem>
-                                )} />
-                            ))}
-                        </div>
+                        <FormField control={form.control} name="languages" render={() => (
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                {languageOptions.map((lang) => (
+                                    <FormField key={lang} control={form.control} name="languages" render={({ field }) => (
+                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                            <FormControl>
+                                                <Checkbox
+                                                    checked={field.value?.includes(lang)}
+                                                    onCheckedChange={(checked) => {
+                                                        const currentLanguages = field.value ?? [];
+                                                        return checked
+                                                            ? field.onChange([...currentLanguages, lang])
+                                                            : field.onChange(currentLanguages.filter((value: string) => value !== lang))
+                                                    }}
+                                                />
+                                            </FormControl>
+                                            <FormLabel className="font-normal">{lang}</FormLabel>
+                                        </FormItem>
+                                    )} />
+                                ))}
+                            </div>
+                        )} />
                         <FormMessage />
                     </FormItem>
 
@@ -320,3 +335,5 @@ export default function AgentProfileForm() {
     </Card>
   );
 }
+
+    
