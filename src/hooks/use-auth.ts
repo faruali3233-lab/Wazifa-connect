@@ -50,8 +50,19 @@ export interface AgentProfile {
 }
 
 export interface SubAgentProfile {
-  name: string;
-  // Add other sub-agent-specific fields
+  fullName: string;
+  profilePhotoUrl: string;
+  phone: string;
+  countryCode: string;
+  email?: string;
+  dob?: Date;
+  governmentIdUrl: string; // URL after upload
+  agentReferralLink: string;
+  agentLoginId: string;
+  parentAgentName: string;
+  signedAgreementUrl?: string; // URL after upload
+  complianceCheckbox: boolean;
+  digitalSignature: string;
 }
 
 
