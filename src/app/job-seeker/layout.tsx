@@ -22,6 +22,7 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
     // Redirect recruiters and agents away from this layout
     if (user && (user.role === 'recruiter' || user.role === 'agent')) { 
        if (user.role === 'recruiter') router.replace('/recruiter');
+       // Agents are handled by their own layout, but this redirect is a safeguard.
        if (user.role === 'agent') router.replace('/job-seeker/agent/dashboard');
        return;
     }
@@ -34,8 +35,8 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
           const profileMap = {
               jobSeeker: 'profile',
               subAgent: 'sub-agent-profile',
-              // These roles are handled in other layouts
-              agent: '', 
+              agent: 'agent/profile', // Corrected path for agents
+              // These roles are handled in other layouts or are not applicable here
               unselected: 'home',
               admin: '', 
               recruiter: ''
