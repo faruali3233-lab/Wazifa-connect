@@ -34,7 +34,8 @@ export default function JobSeekerHomePage() {
   const handleRoleSelection = (role: UserRole) => {
     if (role === 'jobSeeker' || role === 'agent' || role === 'subAgent') {
       setUserRole(role);
-      router.push(`/job-seeker/${role}-profile`);
+      const profilePath = role === 'jobSeeker' ? 'profile' : `${role}-profile`;
+      router.push(`/job-seeker/${profilePath}`);
     }
   };
 
