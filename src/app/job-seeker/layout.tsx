@@ -19,14 +19,13 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
       return;
     }
     
-    if (user && (user.role === 'recruiter' || user.role === 'admin' || user.role === 'agent')) { 
-       if (user.role === 'recruiter') router.replace('/recruiter');
-       if (user.role === 'agent') router.replace('/job-seeker/agent/dashboard');
-       if (user.role === 'admin') router.replace('/admin');
+    // This layout should not handle admin, recruiter, or agent roles.
+    // They have their own layouts.
+    if (user && (user.role === 'recruiter' || user.role === 'admin' || user.role === 'agent')) {
        return;
     }
 
-    // Logic for job seekers & sub-agents
+    // This layout handles jobSeeker, subAgent, and unselected roles for +91 users
     if (user && user.countryCode === '+91') {
       if (user.role === 'unselected' && pathname !== '/job-seeker/home') {
           router.replace('/job-seeker/home');
@@ -34,6 +33,7 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
           const profileMap = {
               jobSeeker: '/job-seeker/profile',
               subAgent: '/job-seeker/sub-agent-profile',
+              // agent is handled by its own layout
           };
           const rolePath = profileMap[user.role as keyof typeof profileMap];
           if (rolePath && pathname !== rolePath) {
@@ -44,6 +44,8 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
 
   }, [user, isProfileComplete, router, pathname]);
   
+  // If the user role is one handled by another layout, render a loader
+  // to prevent flicker while the correct layout takes over.
   if (!user || user.role === 'recruiter' || user.role === 'agent' || user.role === 'admin') {
     return (
       <div className="min-h-screen bg-background">

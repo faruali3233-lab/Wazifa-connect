@@ -45,9 +45,9 @@ export default function AgentLayout({ children }: { children: ReactNode }) {
     }
     
     if (user && user.role !== 'agent') {
-        // Redirect to their correct dashboard if they land here
-        if (user.role === 'recruiter') router.replace('/recruiter');
-        else router.replace('/');
+        // This layout is only for agents. If a non-agent gets here,
+        // the main layouts will handle their redirection.
+        // We prevent flicker by not doing anything here for other roles.
         return;
     }
     
@@ -59,7 +59,9 @@ export default function AgentLayout({ children }: { children: ReactNode }) {
 
   }, [user, isProfileComplete, router, pathname]);
 
-  if (!user || user.role !== 'agent' || !agentProfile) {
+  // Render a loading state if the user is not an agent,
+  // letting the root/job-seeker layouts handle the final destination.
+  if (!user || user.role !== 'agent') {
     return (
         <div className="flex items-center justify-center min-h-screen">
           <div className="flex items-center justify-center min-h-screen">
@@ -67,6 +69,18 @@ export default function AgentLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
     );
+  }
+
+  // If the profile data hasn't loaded yet, show skeleton
+  if (!agentProfile) {
+     if (pathname.startsWith('/job-seeker/agent/dashboard')) {
+       return (
+         <div className="flex items-center justify-center min-h-screen">
+           <Skeleton className="h-screen w-screen" />
+         </div>
+       );
+     }
+     // Allow profile page to render without profile data
   }
   
   const getPageTitle = () => {
