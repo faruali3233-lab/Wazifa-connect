@@ -58,14 +58,23 @@ export default function AgentLayout({ children }: { children: ReactNode }) {
 
   }, [user, isProfileComplete, router, pathname]);
 
-  // If the user is not an agent, or if the profile data hasn't loaded yet for non-profile pages,
-  // show a loading skeleton. Profile page should be allowed to render without profile data.
-  if (!user || user.role !== 'agent' || (!agentProfile && pathname !== '/job-seeker/agent/profile')) {
+  // If the user role isn't set, or is not an agent, show a loader
+  // This prevents flicker while the correct layout takes over.
+  if (!user || user.role !== 'agent') {
     return (
         <div className="flex items-center justify-center min-h-screen">
           <Skeleton className="h-screen w-screen" />
         </div>
     );
+  }
+
+  // Allow profile page to render for new users even if profile is null
+  if (!agentProfile && pathname !== '/job-seeker/agent/profile') {
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+            <Skeleton className="h-screen w-screen" />
+        </div>
+      );
   }
   
   const getPageTitle = () => {
