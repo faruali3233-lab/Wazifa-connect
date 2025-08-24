@@ -20,7 +20,7 @@ const quickActions = [
     { title: "Book Medical", icon: <FilePlus /> },
 ];
 
-export default function SubAgentDashboard() {
+export default function SubAgentDashboardPage() {
   const { subAgentProfile } = useAuth();
   const router = useRouter();
 
