@@ -65,7 +65,7 @@ export interface AuthState {
   language: Language;
   setLanguage: Dispatch<SetStateAction<Language>>;
   setUserRole: (role: UserRole) => void;
-  login: (user: Omit<User, 'role'>) => void;
+  login: (user: Omit<User, 'role'>, role?: UserRole) => void;
   logout: () => void;
   updateSeekerProfile: (profile: SeekerProfile) => void;
   updateRecruiterProfile: (profile: RecruiterProfile) => void;

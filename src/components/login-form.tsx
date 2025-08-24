@@ -25,8 +25,8 @@ const formSchema = z.object({
 const MOCK_USERS: { [key: string]: { password?: string, role: UserRole, phone: string, countryCode: string } } = {
   'jobseeker': { password: 'password', role: 'unselected', phone: '9876543210', countryCode: '+91' },
   'recruiter': { password: 'password', role: 'recruiter', phone: '501234567', countryCode: '+971' },
-  'agent': { password: 'password', role: 'unselected', phone: '9876543211', countryCode: '+91' },
-  'subagent': { password: 'password', role: 'unselected', phone: '9876543212', countryCode: '+91' },
+  'agent': { password: 'password', role: 'agent', phone: '9876543211', countryCode: '+91' },
+  'subagent': { password: 'password', role: 'subAgent', phone: '9876543212', countryCode: '+91' },
 };
 
 
@@ -52,7 +52,7 @@ export function LoginForm() {
             id: values.userId,
             phone: user.phone,
             countryCode: user.countryCode,
-        });
+        }, user.role);
         
         toast({
           title: t('login_toast_success_title'),

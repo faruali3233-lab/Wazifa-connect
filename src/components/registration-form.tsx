@@ -14,7 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth, type UserRole } from "@/hooks/use-auth";
 import { ALL_COUNTRY_CODES } from "@/lib/constants";
 import { useTranslation } from "./i18n-provider";
 
@@ -59,12 +59,13 @@ export function RegistrationForm() {
     const selectedCountry = ALL_COUNTRY_CODES.find(c => c.value === values.countryCode);
     if (!selectedCountry) return;
 
-    // Log in without setting a role initially
+    const initialRole: UserRole = selectedCountry.role === 'recruiter' ? 'recruiter' : 'unselected';
+
     login({
         id: values.userId,
         phone: values.phone,
         countryCode: values.countryCode,
-    });
+    }, initialRole);
     
     toast({
       title: t('register_toast_success_title'),

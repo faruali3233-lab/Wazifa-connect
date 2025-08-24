@@ -50,8 +50,8 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
         // Toast logic can be improved to use translation keys
     }
 
-    const login = (userData: Omit<User, 'role'>) => {
-        setUser({ ...userData, role: 'unselected' });
+    const login = (userData: Omit<User, 'role'>, role: UserRole = 'unselected') => {
+        setUser({ ...userData, role });
         setProfileComplete(false); // Reset on login
     };
     
