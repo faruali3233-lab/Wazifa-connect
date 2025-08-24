@@ -20,27 +20,28 @@ export default function LoginPage() {
       if (user.role === 'recruiter') {
         const homePath = isProfileComplete ? '/recruiter' : '/recruiter/welcome';
         router.replace(homePath);
-      } else {
-        // Job Seeker, Agent, Sub-agent flow
-        if (user.role === 'unselected') {
-           router.replace('/job-seeker/home');
-        } else if (isProfileComplete) {
-            let dashboardPath = '/job-seeker/dashboard';
-            if (user.role === 'agent') {
-              dashboardPath = '/job-seeker/agent/dashboard';
-            } else if (user.role === 'subAgent') {
-              dashboardPath = '/job-seeker/sub-agent-dashboard';
-            }
-            router.replace(dashboardPath);
-        } else {
-            let profilePath = '/job-seeker/profile';
-            if (user.role === 'agent') {
-              profilePath = '/job-seeker/agent/profile';
-            } else if (user.role === 'subAgent') {
-              profilePath = '/job-seeker/sub-agent-profile';
-            }
-            router.replace(profilePath);
-        }
+        return;
+      }
+
+      // Handle all other roles (+91 country code users)
+      if (user.role === 'unselected') {
+         router.replace('/job-seeker/home');
+      } else if (isProfileComplete) {
+          let dashboardPath = '/job-seeker/dashboard'; // default for jobSeeker
+          if (user.role === 'agent') {
+            dashboardPath = '/job-seeker/agent/dashboard';
+          } else if (user.role === 'subAgent') {
+            dashboardPath = '/job-seeker/sub-agent-dashboard';
+          }
+          router.replace(dashboardPath);
+      } else { // Profile is not complete
+          let profilePath = '/job-seeker/profile'; // default for jobSeeker
+          if (user.role === 'agent') {
+            profilePath = '/job-seeker/agent/profile';
+          } else if (user.role === 'subAgent') {
+            profilePath = '/job-seeker/sub-agent-profile';
+          }
+          router.replace(profilePath);
       }
     }
   }, [user, isProfileComplete, router]);

@@ -6,7 +6,6 @@ import { useAuth, type UserRole } from '@/hooks/use-auth';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User, Briefcase, UserCheck } from 'lucide-react';
-import { useEffect } from 'react';
 
 const RoleCard = ({ icon, title, description, onClick }: { icon: React.ReactNode, title: string, description: string, onClick: () => void }) => (
   <Card className="hover:shadow-xl hover:border-primary transition-all cursor-pointer group" onClick={onClick}>
@@ -28,7 +27,7 @@ const RoleCard = ({ icon, title, description, onClick }: { icon: React.ReactNode
 );
 
 export default function JobSeekerHomePage() {
-  const { user, setUserRole, isProfileComplete } = useAuth();
+  const { setUserRole } = useAuth();
   const router = useRouter();
 
   const handleRoleSelection = (role: UserRole) => {
@@ -41,20 +40,6 @@ export default function JobSeekerHomePage() {
     }
     router.push(profilePath);
   };
-
-  useEffect(() => {
-    if (user && user.role !== 'unselected' && isProfileComplete) {
-        if(user.role === 'jobSeeker') router.replace('/job-seeker/dashboard');
-        else if (user.role === 'agent') router.replace('/job-seeker/agent/dashboard');
-        else if (user.role === 'subAgent') router.replace('/job-seeker/sub-agent-dashboard');
-    }
-  }, [user, isProfileComplete, router]);
-
-
-  // If profile is already complete for a selected role, redirect away.
-  if (user && user.role !== 'unselected' && isProfileComplete) {
-    return null;
-  }
   
   return (
     <div className="container mx-auto px-6 py-24">

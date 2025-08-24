@@ -19,11 +19,10 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
       return;
     }
     
-    // Redirect recruiters and agents away from this layout
-    if (user && (user.role === 'recruiter' || user.role === 'agent')) { 
+    if (user && (user.role === 'recruiter' || user.role === 'admin' || user.role === 'agent')) { 
        if (user.role === 'recruiter') router.replace('/recruiter');
-       // Agents are handled by their own layout, but this redirect is a safeguard.
        if (user.role === 'agent') router.replace('/job-seeker/agent/dashboard');
+       if (user.role === 'admin') router.replace('/admin');
        return;
     }
 
@@ -33,27 +32,19 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
           router.replace('/job-seeker/home');
       } else if (user.role !== 'unselected' && !isProfileComplete) {
           const profileMap = {
-              jobSeeker: 'profile',
-              subAgent: 'sub-agent-profile',
-              agent: 'agent/profile', // Corrected path for agents
-              // These roles are handled in other layouts or are not applicable here
-              unselected: 'home',
-              admin: '', 
-              recruiter: ''
-          }
+              jobSeeker: '/job-seeker/profile',
+              subAgent: '/job-seeker/sub-agent-profile',
+          };
           const rolePath = profileMap[user.role as keyof typeof profileMap];
-          if (rolePath) {
-            const profilePath = `/job-seeker/${rolePath}`;
-            if (pathname !== profilePath) {
-                 router.replace(profilePath);
-            }
+          if (rolePath && pathname !== rolePath) {
+            router.replace(rolePath);
           }
       }
     }
 
   }, [user, isProfileComplete, router, pathname]);
   
-  if (!user || user.role === 'recruiter' || user.role === 'agent') {
+  if (!user || user.role === 'recruiter' || user.role === 'agent' || user.role === 'admin') {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto p-8"><Skeleton className="h-screen w-full" /></div>
