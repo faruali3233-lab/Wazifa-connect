@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { LoginForm } from "@/components/login-form";
-import { ALL_COUNTRY_CODES } from '@/lib/constants';
 
 export default function LoginPage() {
   const { user, isProfileComplete } = useAuth();
@@ -13,6 +12,11 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
+      if (user.role === 'admin') {
+        router.replace('/admin');
+        return;
+      }
+      
       if (user.role === 'recruiter') {
         const homePath = isProfileComplete ? '/recruiter' : '/recruiter/welcome';
         router.replace(homePath);

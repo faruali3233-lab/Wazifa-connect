@@ -27,6 +27,7 @@ const MOCK_USERS: { [key: string]: { password?: string, role: UserRole, phone: s
   'recruiter': { password: 'password', role: 'recruiter', phone: '501234567', countryCode: '+971' },
   'agent': { password: 'password', role: 'agent', phone: '9876543211', countryCode: '+91' },
   'subagent': { password: 'password', role: 'subAgent', phone: '9876543212', countryCode: '+91' },
+  'admin': { password: 'password', role: 'admin', phone: '000000000', countryCode: '+1' },
 };
 
 
@@ -58,6 +59,11 @@ export function LoginForm() {
           title: t('login_toast_success_title'),
           description: t(user.role === 'recruiter' ? 'login_toast_success_description_recruiter' : 'login_toast_success_description_jobSeeker'),
         });
+
+        if (user.role === 'admin') {
+            router.push('/admin');
+            return;
+        }
 
         const isRecruiter = ALL_COUNTRY_CODES.find(c => c.value === user.countryCode)?.role === 'recruiter';
         const homePath = isRecruiter ? "/recruiter/welcome" : "/job-seeker/home";

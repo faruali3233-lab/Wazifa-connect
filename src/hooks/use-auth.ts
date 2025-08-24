@@ -4,7 +4,7 @@
 import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
 import type { JobRecommendationsInput } from '@/ai/flows/job-recommendations';
 
-export type UserRole = "jobSeeker" | "recruiter" | "agent" | "subAgent" | "unselected";
+export type UserRole = "jobSeeker" | "recruiter" | "agent" | "subAgent" | "unselected" | "admin";
 
 export type Language = 'en' | 'ar' | 'hi';
 
@@ -19,13 +19,13 @@ export interface User {
 export type SeekerProfile = JobRecommendationsInput['profile'];
 
 export interface RecruiterProfile {
+  yourName: string;
+  yourEmail: string;
+  yourCountry: string;
+  yourCity: string;
   companyName: string;
   companyWebsite: string;
   companyDescription: string;
-  yourName: string;
-  yourCountry: string;
-  yourCity: string;
-  yourEmail: string;
   profilePhotoUrl: string;
 }
 
