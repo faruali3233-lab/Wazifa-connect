@@ -36,7 +36,7 @@ export default function RecruiterDashboard() {
             </Avatar>
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">{t('recruiter_dashboard_title')}</h1>
-                <p className="text-muted-foreground">{t('recruiter_dashboard_welcome').replace('{name}', recruiterProfile?.yourName || '').replace('{company}', recruiterProfile?.companyName || '')}</p>
+                <p className="text-muted-foreground">{t('recruiter_dashboard_welcome')}</p>
             </div>
         </div>
         <Button onClick={() => router.push('/recruiter/profile')}>

@@ -97,7 +97,7 @@
   "recruiter_profile_toast_saved_title": "تم حفظ الملف الشخصي!",
   "recruiter_profile_toast_saved_description": "يمكنك الآن الوصول إلى لوحة تحكم مسؤول التوظيف.",
   "recruiter_dashboard_title": "لوحة تحكم مسؤول التوظيف",
-  "recruiter_dashboard_welcome": "أهلاً بك، {name} من {company}!",
+  "recruiter_dashboard_welcome": "أهلاً بك!",
   "recruiter_dashboard_edit_profile": "تعديل الملف الشخصي",
   "recruiter_dashboard_stat_open_roles": "الوظائف المفتوحة",
   "recruiter_dashboard_stat_no_postings": "لا توجد إعلانات وظائف نشطة",

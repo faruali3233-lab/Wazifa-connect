@@ -97,7 +97,7 @@
   "recruiter_profile_toast_saved_title": "Profile Saved!",
   "recruiter_profile_toast_saved_description": "You can now access your recruiter dashboard.",
   "recruiter_dashboard_title": "Recruiter Dashboard",
-  "recruiter_dashboard_welcome": "Welcome, {name} from {company}!",
+  "recruiter_dashboard_welcome": "Welcome!",
   "recruiter_dashboard_edit_profile": "Edit Profile",
   "recruiter_dashboard_stat_open_roles": "Open Roles",
   "recruiter_dashboard_stat_no_postings": "No active job postings",

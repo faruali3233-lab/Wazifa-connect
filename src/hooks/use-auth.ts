@@ -47,6 +47,7 @@ export interface AgentProfile {
   languages?: string[];
   candidatePoolSize?: "0-50" | "50-200" | "200+";
   terms: boolean;
+  name: string; // For dashboard display
 }
 
 export interface SubAgentProfile {
@@ -63,6 +64,7 @@ export interface SubAgentProfile {
   signedAgreementUrl?: string; // URL after upload
   complianceCheckbox: boolean;
   digitalSignature: string;
+  name: string; // For dashboard display
 }
 
 

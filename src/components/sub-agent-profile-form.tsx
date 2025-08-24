@@ -105,7 +105,8 @@ export function SubAgentProfileForm() {
       profilePhotoUrl: photoPreview || "",
       governmentIdUrl: "file_provided",
       signedAgreementUrl: values.signedAgreement ? "file_provided" : "",
-      parentAgentName: verifiedAgent
+      parentAgentName: verifiedAgent,
+      name: values.fullName,
     };
     
     updateSubAgentProfile(profileData);

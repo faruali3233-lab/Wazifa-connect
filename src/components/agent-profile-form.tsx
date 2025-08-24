@@ -104,6 +104,7 @@ export function AgentProfileForm() {
       profilePhotoUrl: photoPreview || "",
       governmentIdUrl: "file_provided",
       businessLicenseUrl: values.businessLicense ? "file_provided" : "",
+      name: values.fullName,
     };
     updateAgentProfile(profileData);
     toast({
@@ -270,4 +271,3 @@ export function AgentProfileForm() {
     </Card>
   );
 }
-

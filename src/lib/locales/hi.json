@@ -97,7 +97,7 @@
   "recruiter_profile_toast_saved_title": "प्रोफ़ाइल सहेजी गई!",
   "recruiter_profile_toast_saved_description": "अब आप अपने भर्तीकर्ता डैशबोर्ड तक पहुंच सकते हैं।",
   "recruiter_dashboard_title": "भर्तीकर्ता डैशबोर्ड",
-  "recruiter_dashboard_welcome": "स्वागत है, {name} {company} से!",
+  "recruiter_dashboard_welcome": "स्वागत है!",
   "recruiter_dashboard_edit_profile": "प्रोफ़ाइल संपादित करें",
   "recruiter_dashboard_stat_open_roles": "खुली भूमिकाएँ",
   "recruiter_dashboard_stat_no_postings": "कोई सक्रिय नौकरी पोस्टिंग नहीं",
