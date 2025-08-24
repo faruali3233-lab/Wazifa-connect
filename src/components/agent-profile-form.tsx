@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
@@ -112,7 +112,7 @@ export default function AgentProfileForm() {
       yearsOfExperience: values.yearsOfExperience,
       regions: values.regions,
       gstNumber: values.gstNumber,
-      languages: values.languages,
+      languages: values.languages || [],
       candidatePoolSize: values.candidatePoolSize,
       terms: values.terms,
     };
@@ -365,5 +365,3 @@ export default function AgentProfileForm() {
     </Card>
   );
 }
-
-    
