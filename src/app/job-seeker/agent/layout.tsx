@@ -22,8 +22,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
 
 const NavItem = ({ href, icon, children, currentPath }: { href: string; icon: React.ReactNode; children: React.ReactNode; currentPath: string; }) => (
     <SidebarMenuItem>
@@ -71,16 +69,12 @@ export default function AgentLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  // If profile is not complete and we are on the profile page, show the form without the dashboard layout
+  // If profile is not complete and we are on the profile page, show just the form
   if (!isProfileComplete && pathname === '/job-seeker/agent/profile') {
       return (
-         <div className="min-h-screen flex flex-col bg-white">
-            <Header />
-            <main className="flex-1 bg-gray-50/50">
-              {children}
-            </main>
-            <Footer />
-        </div>
+         <div className="bg-gray-50/50">
+            {children}
+         </div>
       )
   }
 
