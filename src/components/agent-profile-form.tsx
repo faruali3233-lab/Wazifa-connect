@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
@@ -71,6 +71,10 @@ export default function AgentProfileForm() {
       regions: [],
       languages: [],
       terms: false,
+      dob: undefined,
+      businessLicense: undefined,
+      gstNumber: "",
+      candidatePoolSize: undefined,
     },
   });
 
@@ -248,9 +252,9 @@ export default function AgentProfileForm() {
                                               checked={field.value?.includes(region)}
                                               onCheckedChange={(checked) => {
                                               return checked
-                                                  ? field.onChange([...field.value, region])
+                                                  ? field.onChange([...(field.value || []), region])
                                                   : field.onChange(
-                                                      field.value?.filter(
+                                                      (field.value || []).filter(
                                                       (value) => value !== region
                                                       )
                                                   )
@@ -288,9 +292,9 @@ export default function AgentProfileForm() {
                                                 checked={field.value?.includes(lang)}
                                                 onCheckedChange={(checked) => {
                                                 return checked
-                                                    ? field.onChange([...field.value, lang])
+                                                    ? field.onChange([...(field.value || []), lang])
                                                     : field.onChange(
-                                                        field.value?.filter(
+                                                        (field.value || []).filter(
                                                         (value) => value !== lang
                                                         )
                                                     )
@@ -333,7 +337,7 @@ export default function AgentProfileForm() {
                                 <FormItem><FormLabel>Business License Scan <span className="text-destructive">*</span></FormLabel><FormControl><Input type="file" onChange={(e) => field.onChange(e.target.files)} /></FormControl><FormDescription>Company registration document.</FormDescription><FormMessage /></FormItem>
                              )} />
                              <FormField control={form.control} name="gstNumber" render={({ field }) => (
-                                <FormItem><FormLabel>GST Number (Optional)</FormLabel><FormControl><Input placeholder="Enter GST number" {...field} /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>GST Number (Optional)</FormLabel><FormControl><Input placeholder="Enter GST number" {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
                             )} />
                         </>
                     )}
@@ -361,3 +365,5 @@ export default function AgentProfileForm() {
     </Card>
   );
 }
+
+    
