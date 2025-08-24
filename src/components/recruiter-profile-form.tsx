@@ -77,7 +77,7 @@ export function RecruiterProfileForm() {
       title: t('recruiter_profile_toast_saved_title'),
       description: t('recruiter_profile_toast_saved_description'),
     });
-    router.push('/recruiter/dashboard');
+    router.push('/recruiter');
   };
   
   const calculateProgress = () => {
