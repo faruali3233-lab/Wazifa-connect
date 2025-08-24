@@ -44,12 +44,14 @@ export default function AgentLayout({ children }: { children: ReactNode }) {
       return;
     }
     
+    // This layout is only for agents. If a non-agent gets here,
+    // other layouts will handle their redirection.
     if (user && user.role !== 'agent') {
-        // This layout is only for agents. If a non-agent gets here,
-        // other layouts will handle their redirection.
-        return;
+      return;
     }
     
+    // If the user is an agent but their profile is not complete,
+    // and they are NOT on the profile page, redirect them to it.
     if (user && user.role === 'agent' && !isProfileComplete) {
         if (pathname !== '/job-seeker/agent/profile') {
             router.replace('/job-seeker/agent/profile');
@@ -58,7 +60,7 @@ export default function AgentLayout({ children }: { children: ReactNode }) {
 
   }, [user, isProfileComplete, router, pathname]);
 
-  // If the user role isn't set, or is not an agent, show a loader
+  // If the user role isn't set, or is not an agent, show a loader.
   // This prevents flicker while the correct layout takes over.
   if (!user || user.role !== 'agent') {
     return (
@@ -68,7 +70,8 @@ export default function AgentLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  // Allow profile page to render for new users even if profile is null
+  // Allow the profile page to render for new users even if profile is null.
+  // For any other page, if the profile isn't loaded yet, show the skeleton.
   if (!agentProfile && pathname !== '/job-seeker/agent/profile') {
       return (
         <div className="flex items-center justify-center min-h-screen">
@@ -79,7 +82,7 @@ export default function AgentLayout({ children }: { children: ReactNode }) {
   
   const getPageTitle = () => {
     if (pathname.includes('/dashboard')) return 'Dashboard';
-    if (pathname.includes('/profile')) return 'Profile';
+    if (pathname.includes('/profile')) return 'Agent Profile';
     if (pathname.includes('/jobs')) return 'Jobs';
     if (pathname.includes('/candidate-pool')) return 'Candidate Pool';
     if (pathname.includes('/sub-agents')) return 'Sub Agents';
