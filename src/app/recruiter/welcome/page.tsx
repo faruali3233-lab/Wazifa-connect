@@ -18,14 +18,14 @@ const categories = [
   { name: "Cook", icon: <ChefHat className="w-12 h-12 text-primary mb-4" />, descriptionKey: "recruiter_home_category_cook_desc" },
 ];
 
-export default function RecruiterHomePage() {
+export default function RecruiterWelcomePage() {
   const { user, isProfileComplete } = useAuth();
   const router = useRouter();
   const { t } = useTranslation();
 
   useEffect(() => {
     if (isProfileComplete) {
-      router.replace('/recruiter/dashboard');
+      router.replace('/recruiter');
     }
   }, [isProfileComplete, router]);
 

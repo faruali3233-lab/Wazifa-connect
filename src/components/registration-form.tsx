@@ -72,7 +72,7 @@ export function RegistrationForm() {
     });
     
     // Redirect to the appropriate starting page
-    const homePath = selectedCountry.role === "jobSeeker" ? "/job-seeker/home" : "/recruiter/home";
+    const homePath = selectedCountry.role === "jobSeeker" ? "/job-seeker/home" : "/recruiter/welcome";
     router.push(homePath);
   };
 

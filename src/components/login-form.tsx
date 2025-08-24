@@ -60,7 +60,7 @@ export function LoginForm() {
         });
 
         const isRecruiter = ALL_COUNTRY_CODES.find(c => c.value === user.countryCode)?.role === 'recruiter';
-        const homePath = isRecruiter ? "/recruiter/home" : "/job-seeker/home";
+        const homePath = isRecruiter ? "/recruiter/welcome" : "/job-seeker/home";
         router.push(homePath);
 
     } else {

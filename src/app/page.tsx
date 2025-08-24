@@ -14,7 +14,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (user) {
       if (user.role === 'recruiter') {
-        const homePath = isProfileComplete ? '/recruiter/dashboard' : '/recruiter/home';
+        const homePath = isProfileComplete ? '/recruiter' : '/recruiter/welcome';
         router.replace(homePath);
       } else {
         // Job Seeker, Agent, Sub-agent flow

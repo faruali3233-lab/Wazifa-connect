@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect } from 'react';
@@ -17,7 +18,7 @@ export default function RecruiterDashboard() {
 
   useEffect(() => {
     if (!isProfileComplete) {
-      router.replace('/recruiter/home');
+      router.replace('/recruiter/welcome');
     }
   }, [isProfileComplete, router]);
 

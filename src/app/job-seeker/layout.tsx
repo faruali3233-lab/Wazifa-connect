@@ -21,7 +21,7 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
     
     // Redirect recruiters away from job seeker section
     if (user && user.role === 'recruiter') { 
-       router.replace('/recruiter/home');
+       router.replace('/recruiter/welcome');
        return;
     }
 

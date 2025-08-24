@@ -34,7 +34,8 @@ export function Header() {
   
   const getHomeLink = () => {
     if(!user) return '/';
-    return user.role === 'jobSeeker' ? '/job-seeker/home' : '/recruiter/home';
+    if(user.role === 'recruiter') return '/recruiter/welcome';
+    return '/job-seeker/home';
   }
 
   const handleCompleteProfile = () => {
@@ -86,8 +87,8 @@ export function Header() {
   const renderRecruiterNav = () => (
      <>
       <nav className="hidden md:flex gap-6 items-center">
-        <NavLink href="/recruiter/home#categories">{t('nav_categories')}</NavLink>
-        <NavLink href="/recruiter/home#why-choose-us">{t('nav_why')}</NavLink>
+        <NavLink href="/recruiter/welcome#categories">{t('nav_categories')}</NavLink>
+        <NavLink href="/recruiter/welcome#why-choose-us">{t('nav_why')}</NavLink>
         {!isProfileComplete && <Button onClick={handleCompleteProfile} size="sm">{t('cta_completeProfile')}</Button>}
         <LanguageSwitcher />
         <Button variant="ghost" size="icon" onClick={handleLogout} aria-label={t('logout')}>
@@ -103,8 +104,8 @@ export function Header() {
           </SheetTrigger>
           <SheetContent side="right">
             <div className="flex flex-col gap-6 pt-10">
-               <NavLink href="/recruiter/home#categories">{t('nav_categories')}</NavLink>
-               <NavLink href="/recruiter/home#why-choose-us">{t('nav_why')}</NavLink>
+               <NavLink href="/recruiter/welcome#categories">{t('nav_categories')}</NavLink>
+               <NavLink href="/recruiter/welcome#why-choose-us">{t('nav_why')}</NavLink>
               {!isProfileComplete && <Button onClick={handleCompleteProfile}>{t('cta_completeProfile')}</Button>}
               <LanguageSwitcher />
               <Button variant="outline" onClick={handleLogout}><LogOut className="mr-2 h-4 w-4" /> {t('logout')}</Button>
@@ -126,7 +127,7 @@ export function Header() {
             </svg>
             <span className="text-xl font-bold" style={{ color: '#005430' }}>GulfHired</span>
           </Link>
-          {user?.role === 'jobSeeker' ? renderJobSeekerNav() : renderRecruiterNav()}
+          {user?.role === 'recruiter' ? renderRecruiterNav() : renderJobSeekerNav()}
         </div>
       </div>
     </header>
