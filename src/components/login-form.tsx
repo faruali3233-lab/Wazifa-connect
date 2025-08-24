@@ -1,81 +1,70 @@
+
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth, type UserRole } from "@/hooks/use-auth";
-import { ALL_COUNTRY_CODES } from "@/lib/constants";
 import { useTranslation } from "./i18n-provider";
+import Link from "next/link";
 
 const formSchema = z.object({
-  countryCode: z.string().nonempty("Country code is required."),
-  phone: z.string().min(5, "Phone number is too short.").max(15, "Phone number is too long."),
-  otp: z.string().length(6, "OTP must be 6 digits."),
+  userId: z.string().min(1, "User ID is required."),
+  password: z.string().min(1, "Password is required."),
 });
+
+// Mock user data for demonstration
+const MOCK_USERS: { [key: string]: { password?: string, role: UserRole, phone: string, countryCode: string } } = {
+  'jobseeker': { password: 'password', role: 'jobSeeker', phone: '9876543210', countryCode: '+91' },
+  'recruiter': { password: 'password', role: 'recruiter', phone: '501234567', countryCode: '+971' },
+};
+
 
 export function LoginForm() {
   const router = useRouter();
   const { login } = useAuth();
   const { toast } = useToast();
   const { t } = useTranslation();
-  const [otpSent, setOtpSent] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      countryCode: "+91",
-      phone: "",
-      otp: "",
+      userId: "",
+      password: "",
     },
   });
 
-  const handleRequestOtp = () => {
-    // In a real app, you'd call an API here.
-    setOtpSent(true);
-    toast({
-      title: t('login_toast_otpSent_title'),
-      description: t('login_toast_otpSent_description'),
-    });
-  };
-
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    const selectedCountry = ALL_COUNTRY_CODES.find(c => c.value === values.countryCode);
+    const user = MOCK_USERS[values.userId.toLowerCase()];
 
-    if (!selectedCountry) {
+    if (user && user.password === values.password) {
+        login({
+            id: values.userId,
+            role: user.role,
+            phone: user.phone,
+            countryCode: user.countryCode,
+        });
+        
+        toast({
+          title: t('login_toast_success_title'),
+          description: t(user.role === 'jobSeeker' ? 'login_toast_success_description_jobSeeker' : 'login_toast_success_description_recruiter'),
+        });
+
+        const homePath = user.role === "jobSeeker" ? "/job-seeker/home" : "/recruiter/home";
+        router.push(homePath);
+    } else {
         toast({
             variant: "destructive",
-            title: t('login_toast_error_unsupported_title'),
-            description: t('login_toast_error_unsupported_description'),
+            title: t('login_toast_error_invalid_title'),
+            description: t('login_toast_error_invalid_description'),
         });
-        return;
-    }
-
-    const role: UserRole = selectedCountry.role;
-    
-    login({
-        phone: values.phone,
-        countryCode: values.countryCode,
-        role,
-    });
-    
-    toast({
-      title: t('login_toast_success_title'),
-      description: t(role === 'jobSeeker' ? 'login_toast_success_description_jobSeeker' : 'login_toast_success_description_recruiter'),
-    });
-
-    if (role === "jobSeeker") {
-      router.push("/job-seeker/home");
-    } else if (role === "recruiter") {
-      router.push("/recruiter/home");
     }
   };
 
@@ -88,74 +77,56 @@ export function LoginForm() {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="flex gap-2">
-              <FormField
-                control={form.control}
-                name="countryCode"
-                render={({ field }) => (
-                  <FormItem className="w-1/3">
-                    <FormLabel>{t('login_countryCode')}</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('login_countryCode')} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {ALL_COUNTRY_CODES.map(country => (
-                            <SelectItem key={country.value} value={country.value}>{country.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>{t('login_phone')}</FormLabel>
-                    <FormControl>
-                      <Input placeholder="9876543210" {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {otpSent && (
-              <FormField
-                control={form.control}
-                name="otp"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('login_otp')}</FormLabel>
-                    <FormControl>
-                      <Input placeholder="_ _ _ _ _ _" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+            <FormField
+              control={form.control}
+              name="userId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('login_userId_label')}</FormLabel>
+                  <FormControl>
+                    <Input placeholder={t('login_userId_placeholder')} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('login_password_label')}</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="********" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             
-            {!otpSent ? (
-                <Button type="button" onClick={handleRequestOtp} className="w-full">
-                    {t('login_requestOtp')}
-                </Button>
-            ) : (
-                <Button type="submit" className="w-full">
-                    {t('login_verify')}
-                </Button>
-            )}
-
-            <p className="px-2 text-center text-sm text-muted-foreground">
-              {t('login_role_route_info')}
-            </p>
+            <Button type="submit" className="w-full">
+                {t('login_button')}
+            </Button>
           </form>
         </Form>
       </CardContent>
+       <CardFooter className="flex flex-col gap-4">
+        <div className="relative w-full">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">
+              {t('login_register_separator')}
+            </span>
+          </div>
+        </div>
+        <Button variant="outline" className="w-full" asChild>
+          <Link href="/register">
+            {t('login_register_button')}
+          </Link>
+        </Button>
+      </CardFooter>
     </Card>
   );
 }

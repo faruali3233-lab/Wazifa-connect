@@ -1,3 +1,4 @@
+
 "use client";
 
 import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
@@ -8,6 +9,7 @@ export type UserRole = "jobSeeker" | "recruiter";
 export type Language = 'en' | 'ar' | 'hi';
 
 export interface User {
+  id: string;
   phone: string;
   countryCode: string;
   role: UserRole;

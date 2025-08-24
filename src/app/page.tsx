@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect } from 'react';
@@ -12,13 +13,12 @@ export default function LoginPage() {
   useEffect(() => {
     if (user) {
       const dashboardPath = user.role === 'jobSeeker' ? '/job-seeker/dashboard' : '/recruiter/dashboard';
-      const profilePath = user.role === 'jobSeeker' ? '/job-seeker/profile' : '/recruiter/profile';
+      const homePath = user.role === 'jobSeeker' ? '/job-seeker/home' : '/recruiter/home';
       
       if (isProfileComplete) {
         router.replace(dashboardPath);
       } else {
-        // Redirect to home page first, which will then gate to profile
-        router.replace(user.role === 'jobSeeker' ? '/job-seeker/home' : '/recruiter/home');
+        router.replace(homePath);
       }
     }
   }, [user, isProfileComplete, router]);
