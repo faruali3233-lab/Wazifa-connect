@@ -81,7 +81,7 @@ export default function JobSeekerDashboard() {
 
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold tracking-tight mb-8">Welcome, {seekerProfile?.basics.desiredJobTitle.split(' ')[0] || 'Job Seeker'}!</h1>
+      <h1 className="text-3xl font-bold tracking-tight mb-8">Welcome, {seekerProfile?.basics.name.split(' ')[0] || 'Job Seeker'}!</h1>
       
        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
         <Card>
@@ -215,7 +215,7 @@ export default function JobSeekerDashboard() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2"><FileText /> Application Status</CardTitle>
-            </CardHeader>
+            </Header>
             <CardContent className="text-center text-muted-foreground">
               <p>Your applied jobs will appear here.</p>
             </CardContent>

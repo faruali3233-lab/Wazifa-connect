@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -14,6 +15,7 @@ import {z} from 'genkit';
 const JobRecommendationsInputSchema = z.object({
   profile: z.object({
     basics: z.object({
+      name: z.string().describe('The name of the job seeker'),
       desiredJobTitle: z.string().describe('The job title the user is looking for'),
       locationPreferences: z.string().describe('The preferred locations for the job'),
       experienceYears: z.number().describe('Years of experience'),
@@ -53,6 +55,7 @@ const prompt = ai.definePrompt({
   prompt: `You are an AI job recommendation engine for GulfHired, a platform connecting Indian workers with jobs in the Gulf region. Your goal is to generate a list of 4-6 highly relevant job recommendations based on the job seeker's profile. Make the jobs sound plausible and attractive for the Gulf market.
 
 Job Seeker Profile:
+- Name: {{profile.basics.name}}
 - Desired Role: {{profile.basics.desiredJobTitle}}
 - Experience Level: {{profile.basics.experienceYears}} years
 - Preferred Locations: {{profile.basics.locationPreferences}}

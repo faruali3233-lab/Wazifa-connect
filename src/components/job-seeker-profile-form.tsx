@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -141,6 +142,7 @@ export function JobSeekerProfileForm() {
     
     const profileData: SeekerProfile = {
        basics: {
+        name: values.yourFullName,
         desiredJobTitle: desiredJobTitle || "Worker",
         locationPreferences: "Gulf Region",
         experienceYears: values.age - 18, // Placeholder logic

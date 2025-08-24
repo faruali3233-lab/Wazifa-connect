@@ -17,6 +17,7 @@ export interface User {
 
 export interface SeekerProfile {
   basics: {
+    name: string;
     desiredJobTitle: string;
     locationPreferences: string;
     experienceYears: number;
