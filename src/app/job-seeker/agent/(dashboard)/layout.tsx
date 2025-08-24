@@ -17,7 +17,7 @@ import {
   SidebarMenuButton,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { LayoutDashboard, Users, UserCheck, Briefcase, HandCoins, MessageSquare, BarChart, Settings, FileText, LifeBuoy, CalendarClock } from 'lucide-react';
+import { LayoutDashboard, Users, UserCheck, Briefcase, HandCoins, MessageSquare, BarChart, Settings, FileText, LifeBuoy, CalendarClock, UserSquare } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
@@ -37,6 +37,7 @@ const getPageTitle = (pathname: string) => {
     const routeName = pathname.split('/').pop()?.replace(/-/g, ' ') || 'dashboard';
     if (routeName === 'documents kyc') return 'Documents & KYC';
     if (routeName === 'help') return 'Help / Support';
+    if (routeName === 'my profile') return 'My Profile';
     return routeName.replace(/\b\w/g, l => l.toUpperCase());
 }
 
@@ -76,6 +77,7 @@ export default function AgentDashboardLayout({ children }: { children: ReactNode
                     <NavItem href="/job-seeker/agent/messages" icon={<MessageSquare />} currentPath={pathname}>Messages</NavItem>
                     <NavItem href="/job-seeker/agent/payments" icon={<HandCoins />} currentPath={pathname}>Payments</NavItem>
                     <NavItem href="/job-seeker/agent/documents-kyc" icon={<FileText />} currentPath={pathname}>Documents & KYC</NavItem>
+                    <NavItem href="/job-seeker/agent/my-profile" icon={<UserSquare />} currentPath={pathname}>My Profile</NavItem>
                     <NavItem href="/job-seeker/agent/settings" icon={<Settings />} currentPath={pathname}>Settings</NavItem>
                     <NavItem href="/job-seeker/agent/help" icon={<LifeBuoy />} currentPath={pathname}>Help / Support</NavItem>
                 </SidebarMenu>
