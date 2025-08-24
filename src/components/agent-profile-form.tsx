@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CalendarIcon, UploadCloud, ShieldCheck } from "lucide-react";
+import { CalendarIcon, UploadCloud } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
@@ -24,7 +24,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
-const hasFile = (v: any) => (v instanceof FileList && v.length > 0) || (Array.isArray(v) && v.length > 0) || v instanceof File;
+const hasFile = (v: any) => (v instanceof FileList && v.length > 0) || v instanceof File;
 
 const agentProfileSchema = z.object({
   fullName: z.string().min(2, "Full name is required."),
@@ -84,9 +84,9 @@ export default function AgentProfileForm() {
       const reader = new FileReader();
       reader.onloadend = () => {
         setPhotoPreview(reader.result as string);
-        form.setValue("profilePhoto", e.target.files);
       };
       reader.readAsDataURL(file);
+      form.setValue("profilePhoto", e.target.files);
     }
   };
 
@@ -140,10 +140,7 @@ export default function AgentProfileForm() {
                         </Avatar>
                       </FormLabel>
                       <FormControl>
-                         <Input id="photo-upload" type="file" className="hidden" accept=".jpg,.jpeg,.png" onChange={(e) => {
-                             field.onChange(e.target.files);
-                             handlePhotoChange(e);
-                         }} />
+                         <Input id="photo-upload" type="file" className="hidden" accept=".jpg,.jpeg,.png" onChange={handlePhotoChange} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -323,5 +320,3 @@ export default function AgentProfileForm() {
     </Card>
   );
 }
-
-    
