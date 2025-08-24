@@ -2,7 +2,6 @@
 "use client";
 
 import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
-import type { JobRecommendationsInput } from '@/ai/flows/job-recommendations';
 
 export type UserRole = "jobSeeker" | "recruiter" | "agent" | "subAgent" | "unselected" | "admin";
 
@@ -16,7 +15,18 @@ export interface User {
   role: UserRole;
 }
 
-export type SeekerProfile = JobRecommendationsInput['profile'];
+export interface SeekerProfile {
+  basics: {
+    desiredJobTitle: string;
+    locationPreferences: string;
+    experienceYears: number;
+  };
+  skills: string[];
+  experience: string[];
+  education: string[];
+  preferences: string;
+  resumeUrl: string; // Used to store passport/ID upload status
+}
 
 export interface RecruiterProfile {
   yourName: string;

@@ -8,14 +8,14 @@ type Job = JobRecommendationsOutput["recommendations"][0];
 
 export function JobCard({ job }: { job: Job }) {
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="flex flex-col hover:shadow-lg transition-shadow">
       <CardHeader>
-        <CardTitle>{job.jobTitle}</CardTitle>
+        <CardTitle className="line-clamp-2">{job.jobTitle}</CardTitle>
         <CardDescription className="flex items-center gap-2 pt-1">
             <Building className="h-4 w-4" /> {job.company}
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-grow">
         <p className="text-sm text-muted-foreground line-clamp-3">{job.description}</p>
         <div className="flex items-center gap-2 mt-4">
             <MapPin className="h-4 w-4 text-muted-foreground" />
