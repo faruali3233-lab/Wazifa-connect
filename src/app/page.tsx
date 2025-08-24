@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { LoginForm } from "@/components/login-form";
+import { ALL_COUNTRY_CODES } from '@/lib/constants';
 
 export default function LoginPage() {
   const { user, isProfileComplete } = useAuth();
@@ -12,13 +13,27 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
-      const dashboardPath = user.role === 'jobSeeker' ? '/job-seeker/dashboard' : '/recruiter/dashboard';
-      const homePath = user.role === 'jobSeeker' ? '/job-seeker/home' : '/recruiter/home';
-      
-      if (isProfileComplete) {
-        router.replace(dashboardPath);
-      } else {
+      const selectedCountry = ALL_COUNTRY_CODES.find(c => c.value === user.countryCode);
+      const isRecruiter = selectedCountry?.role === 'recruiter';
+
+      if (isRecruiter) {
+        const homePath = isProfileComplete ? '/recruiter/dashboard' : '/recruiter/home';
         router.replace(homePath);
+      } else {
+        // Job Seeker, Agent, Sub-agent flow
+        if (user.role === 'unselected') {
+           router.replace('/job-seeker/home');
+        } else if (isProfileComplete) {
+            const dashboardPath = `/job-seeker/${user.role}-dashboard`;
+            router.replace(dashboardPath);
+        } else {
+            const profilePath = `/job-seeker/${user.role}-profile`;
+             if (user.role === 'jobSeeker') {
+                router.replace('/job-seeker/profile');
+             } else {
+                router.replace(profilePath);
+             }
+        }
       }
     }
   }, [user, isProfileComplete, router]);

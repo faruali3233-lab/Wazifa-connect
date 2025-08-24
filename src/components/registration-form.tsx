@@ -57,20 +57,21 @@ export function RegistrationForm() {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     const selectedCountry = ALL_COUNTRY_CODES.find(c => c.value === values.countryCode);
-    if (!selectedCountry) return; // Should not happen
+    if (!selectedCountry) return;
 
+    // Log in without setting a role initially
     login({
         id: values.userId,
         phone: values.phone,
         countryCode: values.countryCode,
-        role: selectedCountry.role,
     });
     
     toast({
       title: t('register_toast_success_title'),
       description: t('register_toast_success_description'),
     });
-
+    
+    // Redirect to the appropriate starting page
     const homePath = selectedCountry.role === "jobSeeker" ? "/job-seeker/home" : "/recruiter/home";
     router.push(homePath);
   };

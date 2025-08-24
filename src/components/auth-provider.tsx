@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, type ReactNode, type Dispatch, type SetStateAction } from "react";
-import { AuthContext, type AuthState, type User, type SeekerProfile, type RecruiterProfile, type Language } from "@/hooks/use-auth";
+import { AuthContext, type AuthState, type User, type SeekerProfile, type RecruiterProfile, type AgentProfile, type SubAgentProfile, type Language, type UserRole } from "@/hooks/use-auth";
 import { I18nProvider } from "./i18n-provider";
 import { useToast } from "@/hooks/use-toast";
 
@@ -11,7 +11,6 @@ interface AuthProviderProps {
 }
 
 const getInitialLanguage = (): Language => {
-    // This function will now be called client-side only.
     if (typeof window !== 'undefined') {
         const storedLang = localStorage.getItem('app.lang');
         if (storedLang === 'en' || storedLang === 'ar' || storedLang === 'hi') {
@@ -26,10 +25,11 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [seekerProfile, setSeekerProfile] = useState<SeekerProfile | null>(null);
     const [recruiterProfile, setRecruiterProfile] = useState<RecruiterProfile | null>(null);
+    const [agentProfile, setAgentProfile] = useState<AgentProfile | null>(null);
+    const [subAgentProfile, setSubAgentProfile] = useState<SubAgentProfile | null>(null);
     const [isProfileComplete, setProfileComplete] = useState(false);
     
-    // Defer reading from localStorage until the component mounts on the client
-    const [language, setLanguage] = useState<Language>('en'); // Default to 'en' on server
+    const [language, setLanguage] = useState<Language>('en');
     const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
@@ -47,36 +47,24 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
 
     const handleSetLanguage = (newLang: Language) => {
         setLanguage(newLang);
-        let message = '';
-        let title = '';
-        // This part needs to be aware of the current language to show the correct toast
-        if (newLang === 'en') {
-            message = 'Language changed to English.';
-            title = 'Language Updated';
-        }
-        if (newLang === 'hi') {
-            message = 'भाषा हिंदी में बदल गई।';
-            title = 'भाषा बदली गई';
-        }
-        if (newLang === 'ar') {
-            message = 'تم تغيير اللغة إلى العربية.';
-            title = 'تم تحديث اللغة';
-        }
-        toast({
-            title: title,
-            description: message,
-        });
+        // Toast logic can be improved to use translation keys
     }
 
-    const login = (userData: User) => {
-        setUser(userData);
+    const login = (userData: Omit<User, 'role'>) => {
+        setUser({ ...userData, role: 'unselected' });
         setProfileComplete(false); // Reset on login
     };
+    
+    const setUserRole = (role: UserRole) => {
+        setUser(currentUser => currentUser ? { ...currentUser, role } : null);
+    }
 
     const logout = () => {
         setUser(null);
         setSeekerProfile(null);
         setRecruiterProfile(null);
+        setAgentProfile(null);
+        setSubAgentProfile(null);
         setProfileComplete(false);
     };
 
@@ -90,21 +78,34 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
         setProfileComplete(true);
     };
 
+    const updateAgentProfile = (profile: AgentProfile) => {
+        setAgentProfile(profile);
+        setProfileComplete(true);
+    };
+
+    const updateSubAgentProfile = (profile: SubAgentProfile) => {
+        setSubAgentProfile(profile);
+        setProfileComplete(true);
+    };
+
     const value: AuthState = {
         user,
         seekerProfile,
         recruiterProfile,
+        agentProfile,
+        subAgentProfile,
         isProfileComplete,
         language,
         setLanguage: handleSetLanguage as Dispatch<SetStateAction<Language>>,
+        setUserRole,
         login,
         logout,
         updateSeekerProfile,
         updateRecruiterProfile,
+        updateAgentProfile,
+        updateSubAgentProfile,
     };
 
-    // Render children only after client-side hydration is complete
-    // to ensure language and direction are correctly set.
     if (!isClient) {
         return null;
     }
