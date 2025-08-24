@@ -14,7 +14,7 @@ import CopyButton from "@/components/copy-button";
 const InfoRow = ({ label, value }: { label: string, value: React.ReactNode }) => (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 border-b">
         <p className="text-sm font-medium text-muted-foreground">{label}</p>
-        <p className="text-sm text-foreground">{value || "N/A"}</p>
+        <div className="text-sm text-foreground">{value || "N/A"}</div>
     </div>
 );
 
