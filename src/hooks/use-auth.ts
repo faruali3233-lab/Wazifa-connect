@@ -58,6 +58,7 @@ export interface AgentProfile {
   candidatePoolSize?: "0-50" | "50-200" | "200+";
   terms: boolean;
   name: string; // For dashboard display
+  kycStatus?: 'Verified' | 'Pending' | 'Rejected';
 }
 
 export interface SubAgentProfile {
