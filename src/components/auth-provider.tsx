@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, type ReactNode, type Dispatch, type SetStateAction } from "react";
-import { AuthContext, type AuthState, type User, type SeekerProfile, type RecruiterProfile, type AgentProfile, type SubAgentProfile, type Language, type UserRole } from "@/hooks/use-auth";
+import { AuthContext, type AuthState, type User, type SeekerProfile, type RecruiterProfile, type SubAgentProfile, type Language, type UserRole } from "@/hooks/use-auth";
 import { I18nProvider } from "./i18n-provider";
 import { useToast } from "@/hooks/use-toast";
 
@@ -25,7 +25,6 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [seekerProfile, setSeekerProfile] = useState<SeekerProfile | null>(null);
     const [recruiterProfile, setRecruiterProfile] = useState<RecruiterProfile | null>(null);
-    const [agentProfile, setAgentProfile] = useState<AgentProfile | null>(null);
     const [subAgentProfile, setSubAgentProfile] = useState<SubAgentProfile | null>(null);
     const [isProfileComplete, setProfileComplete] = useState(false);
     
@@ -63,7 +62,6 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
         setUser(null);
         setSeekerProfile(null);
         setRecruiterProfile(null);
-        setAgentProfile(null);
         setSubAgentProfile(null);
         setProfileComplete(false);
     };
@@ -78,11 +76,6 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
         setProfileComplete(true);
     };
 
-    const updateAgentProfile = (profile: AgentProfile) => {
-        setAgentProfile(profile);
-        setProfileComplete(true);
-    };
-
     const updateSubAgentProfile = (profile: SubAgentProfile) => {
         setSubAgentProfile(profile);
         setProfileComplete(true);
@@ -92,7 +85,6 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
         user,
         seekerProfile,
         recruiterProfile,
-        agentProfile,
         subAgentProfile,
         isProfileComplete,
         language,
@@ -102,7 +94,6 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
         logout,
         updateSeekerProfile,
         updateRecruiterProfile,
-        updateAgentProfile,
         updateSubAgentProfile,
     };
 

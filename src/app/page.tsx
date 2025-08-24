@@ -28,17 +28,13 @@ export default function LoginPage() {
          router.replace('/job-seeker/home');
       } else if (isProfileComplete) {
           let dashboardPath = '/job-seeker/dashboard'; // default for jobSeeker
-          if (user.role === 'agent') {
-            dashboardPath = '/job-seeker/agent/dashboard';
-          } else if (user.role === 'subAgent') {
+          if (user.role === 'subAgent') {
             dashboardPath = '/job-seeker/sub-agent-dashboard';
           }
           router.replace(dashboardPath);
       } else { // Profile is not complete
           let profilePath = '/job-seeker/profile'; // default for jobSeeker
-          if (user.role === 'agent') {
-            profilePath = '/job-seeker/agent/profile';
-          } else if (user.role === 'subAgent') {
+          if (user.role === 'subAgent') {
             profilePath = '/job-seeker/sub-agent-profile';
           }
           router.replace(profilePath);
