@@ -99,7 +99,8 @@ export default function RecruiterDashboardLayout({ children }: { children: React
   if (!isProfileComplete && (pathname === '/recruiter/welcome' || pathname === '/recruiter/profile')) {
       return (
          <div className="min-h-screen flex flex-col bg-white">
-            <header className="p-4 border-b flex justify-end">
+            <header className="p-4 border-b flex justify-end items-center gap-4">
+                <LanguageSwitcher />
                 <Button variant="ghost" onClick={() => { logout(); router.push('/'); }}>Logout</Button>
             </header>
             <main className="flex-1 bg-gray-50/50">

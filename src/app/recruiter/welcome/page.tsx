@@ -39,7 +39,7 @@ export default function RecruiterWelcomePage() {
     <div className="bg-white">
       {/* Hero Section */}
       <section className="container mx-auto px-6 py-24">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="text-center max-w-3xl mx-auto">
           <div className="space-y-6">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground">
               {t('recruiter_home_title')}
@@ -50,17 +50,6 @@ export default function RecruiterWelcomePage() {
             <Button size="lg" onClick={handleCompleteProfile}>
               {t('recruiter_home_cta_button')} <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-          </div>
-          <div className="relative w-full max-w-[600px] aspect-square">
-            <Image 
-              src="/images/recruiter-hero.png"
-              alt="Three skilled Indian workers ready for hire"
-              fill
-              priority
-              className="rounded-lg shadow-lg object-cover"
-              sizes="(min-width: 1024px) 600px, 100vw"
-              data-ai-hint="skilled indian workers"
-            />
           </div>
         </div>
       </section>
