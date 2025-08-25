@@ -37,6 +37,7 @@ import {
     Bell,
     PlusCircle,
     ChevronDown,
+    Wrench,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -61,7 +62,7 @@ const getPageTitle = (pathname: string) => {
     if (routeName === 'kyc') return 'KYC & Compliance';
     if (routeName === 'system-health') return 'System Health';
     if (routeName === 'audit-security') return 'Audit & Security';
-    if (routeName === 'job-seekers' || routeName === 'agents' || routeName === 'sub-agents' || routeName === 'recruiters') {
+    if (routeName === 'job-seekers' || routeName === 'agents' || routeName === 'sub-agents' || routeName === 'recruiters' || routeName === 'maintenance') {
         const parent = pathname.split('/')[2];
         return `${parent.charAt(0).toUpperCase() + parent.slice(1)} - ${routeName.charAt(0).toUpperCase() + routeName.slice(1)}`;
     }
@@ -103,6 +104,49 @@ const UserNav = ({ currentPath }: { currentPath: string }) => {
                     <SidebarMenuSubItem>
                          <Link href="/admin/users/recruiters" className="w-full">
                            <SidebarMenuSubButton isActive={currentPath === '/admin/users/recruiters'}>Recruiters</SidebarMenuSubButton>
+                        </Link>
+                    </SidebarMenuSubItem>
+                </SidebarMenuSub>
+            </CollapsibleContent>
+        </Collapsible>
+    )
+}
+
+const MaintenanceNav = ({ currentPath }: { currentPath: string }) => {
+    const [isOpen, setIsOpen] = useState(currentPath.startsWith('/admin/maintenance'));
+
+    return (
+        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+            <CollapsibleTrigger asChild>
+                <SidebarMenuButton 
+                    className="w-full"
+                    isActive={currentPath.startsWith('/admin/maintenance')} 
+                    icon={<Wrench />}
+                >
+                    <span>Maintenance</span>
+                    <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", isOpen && "rotate-180")} />
+                </SidebarMenuButton>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+                <SidebarMenuSub>
+                    <SidebarMenuSubItem>
+                        <Link href="/admin/maintenance/job-seekers" className="w-full">
+                            <SidebarMenuSubButton isActive={currentPath === '/admin/maintenance/job-seekers'}>Job Seekers</SidebarMenuSubButton>
+                        </Link>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                        <Link href="/admin/maintenance/agents" className="w-full">
+                           <SidebarMenuSubButton isActive={currentPath === '/admin/maintenance/agents'}>Agents</SidebarMenuSubButton>
+                        </Link>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                         <Link href="/admin/maintenance/sub-agents" className="w-full">
+                            <SidebarMenuSubButton isActive={currentPath === '/admin/maintenance/sub-agents'}>Sub-Agents</SidebarMenuSubButton>
+                        </Link>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                         <Link href="/admin/maintenance/recruiters" className="w-full">
+                           <SidebarMenuSubButton isActive={currentPath === '/admin/maintenance/recruiters'}>Recruiters</SidebarMenuSubButton>
                         </Link>
                     </SidebarMenuSubItem>
                 </SidebarMenuSub>
@@ -161,6 +205,9 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
                     <NavItem href="/admin/payments" icon={<HandCoins />} currentPath={pathname}>Payments</NavItem>
                     <NavItem href="/admin/messaging" icon={<MessageSquare />} currentPath={pathname}>Messaging</NavItem>
                     <NavItem href="/admin/reports" icon={<BarChart3 />} currentPath={pathname}>Reports</NavItem>
+                    <SidebarMenuItem>
+                        <MaintenanceNav currentPath={pathname} />
+                    </SidebarMenuItem>
                     <NavItem href="/admin/system-health" icon={<HeartPulse />} currentPath={pathname}>System Health</NavItem>
                     <NavItem href="/admin/audit-security" icon={<DatabaseZap />} currentPath={pathname}>Audit/Security</NavItem>
                     <NavItem href="/admin/settings" icon={<Settings />} currentPath={pathname}>Settings</NavItem>
