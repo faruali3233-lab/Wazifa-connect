@@ -50,7 +50,7 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
         // Toast logic can be improved to use translation keys
     }
 
-    const login = (userData: Omit<User, 'role'>, role: UserRole = 'unselected') => {
+    const login = (userData: User, role: UserRole = 'unselected') => {
         if (userData.id === 'jobseeker' && userData.password === 'password') {
             const mockUser: User = { ...userData, role: 'jobSeeker' };
             const mockProfile: SeekerProfile = {
@@ -63,6 +63,23 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
             };
             setUser(mockUser);
             setSeekerProfile(mockProfile);
+            setProfileComplete(true);
+        } else if (userData.id === 'agent' && userData.password === 'password') {
+            const mockUser: User = { ...userData, role: 'agent' };
+             const mockAgentProfile: AgentProfile = {
+                name: "Sanjay Singh",
+                email: "sanjay.singh@agent.com",
+                phone: "9876543211",
+                countryCode: "+91",
+                agencyName: "Singh Recruitment",
+                agencyAddress: "123 Main St, Mumbai, India",
+                profilePhotoUrl: "https://placehold.co/100x100.png",
+                governmentIdUrl: "verified",
+                referralCode: "REF-AG123-XYZ",
+                uniqueAgentId: "AG-12345678"
+            };
+            setUser(mockUser);
+            setAgentProfile(mockAgentProfile);
             setProfileComplete(true);
         } else {
             setUser({ ...userData, role });

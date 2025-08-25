@@ -15,6 +15,7 @@ export interface User {
   countryCode: string;
   // Role will be set after the initial login/registration
   role: UserRole;
+  password?: string;
 }
 
 export interface SeekerProfile {
@@ -87,7 +88,7 @@ export interface AuthState {
   language: Language;
   setLanguage: Dispatch<SetStateAction<Language>>;
   setUserRole: (role: UserRole) => void;
-  login: (user: Omit<User, 'role'>, role?: UserRole) => void;
+  login: (user: User, role?: UserRole) => void;
   logout: () => void;
   updateSeekerProfile: (profile: SeekerProfile) => void;
   updateRecruiterProfile: (profile: RecruiterProfile) => void;

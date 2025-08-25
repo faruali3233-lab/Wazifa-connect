@@ -36,7 +36,9 @@ export default function JobSeekerHomePage() {
     if (role === 'subAgent') {
       profilePath = '/job-seeker/sub-agent/profile';
     } else if (role === 'agent') {
-        profilePath = '/job-seeker/agent/profile';
+        // Agent profile completion is bypassed, go to dashboard
+        router.push('/job-seeker/agent/dashboard');
+        return;
     }
     router.push(profilePath);
   };

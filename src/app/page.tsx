@@ -41,7 +41,8 @@ export default function LoginPage() {
           if (user.role === 'subAgent') {
             profilePath = '/job-seeker/sub-agent/profile';
           } else if (user.role === 'agent') {
-            profilePath = '/job-seeker/agent/profile';
+            // Agent profile completion is now bypassed
+            router.replace('/job-seeker/agent/dashboard');
           }
           router.replace(profilePath);
       }
