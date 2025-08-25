@@ -1,7 +1,7 @@
 
 "use client";
 
-import { type ReactNode, useEffect } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import Link from 'next/link';
@@ -16,6 +16,9 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarInset,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { 
     LayoutDashboard, 
@@ -33,12 +36,15 @@ import {
     Search,
     Bell,
     PlusCircle,
+    ChevronDown,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { cn } from '@/lib/utils';
 
 const NavItem = ({ href, icon, children, currentPath }: { href: string; icon: React.ReactNode; children: React.ReactNode; currentPath: string; }) => (
     <SidebarMenuItem>
@@ -55,8 +61,56 @@ const getPageTitle = (pathname: string) => {
     if (routeName === 'kyc') return 'KYC & Compliance';
     if (routeName === 'system-health') return 'System Health';
     if (routeName === 'audit-security') return 'Audit & Security';
+    if (routeName === 'job-seekers' || routeName === 'agents' || routeName === 'sub-agents' || routeName === 'recruiters') {
+        const parent = pathname.split('/')[2];
+        return `${parent.charAt(0).toUpperCase() + parent.slice(1)} - ${routeName.charAt(0).toUpperCase() + routeName.slice(1)}`;
+    }
     return routeName.charAt(0).toUpperCase() + routeName.slice(1);
 }
+
+const UserNav = ({ currentPath }: { currentPath: string }) => {
+    const [isOpen, setIsOpen] = useState(currentPath.startsWith('/admin/users'));
+
+    return (
+        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+            <CollapsibleTrigger asChild>
+                <SidebarMenuButton 
+                    className="w-full"
+                    isActive={currentPath.startsWith('/admin/users')} 
+                    icon={<Users />}
+                >
+                    <span>Users</span>
+                    <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", isOpen && "rotate-180")} />
+                </SidebarMenuButton>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+                <SidebarMenuSub>
+                    <SidebarMenuSubItem>
+                        <Link href="/admin/users/job-seekers" className="w-full">
+                            <SidebarMenuSubButton isActive={currentPath === '/admin/users/job-seekers'}>Job Seekers</SidebarMenuSubButton>
+                        </Link>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                        <Link href="/admin/users/agents" className="w-full">
+                           <SidebarMenuSubButton isActive={currentPath === '/admin/users/agents'}>Agents</SidebarMenuSubButton>
+                        </Link>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                         <Link href="/admin/users/sub-agents" className="w-full">
+                            <SidebarMenuSubButton isActive={currentPath === '/admin/users/sub-agents'}>Sub-Agents</SidebarMenuSubButton>
+                        </Link>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                         <Link href="/admin/users/recruiters" className="w-full">
+                           <SidebarMenuSubButton isActive={currentPath === '/admin/users/recruiters'}>Recruiters</SidebarMenuSubButton>
+                        </Link>
+                    </SidebarMenuSubItem>
+                </SidebarMenuSub>
+            </CollapsibleContent>
+        </Collapsible>
+    )
+}
+
 
 export default function AdminDashboardLayout({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth();
@@ -98,7 +152,9 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
             <SidebarContent>
                 <SidebarMenu>
                     <NavItem href="/admin/overview" icon={<LayoutDashboard />} currentPath={pathname}>Overview</NavItem>
-                    <NavItem href="/admin/users" icon={<Users />} currentPath={pathname}>Users</NavItem>
+                    <SidebarMenuItem>
+                        <UserNav currentPath={pathname} />
+                    </SidebarMenuItem>
                     <NavItem href="/admin/kyc" icon={<ShieldCheck />} currentPath={pathname}>KYC</NavItem>
                     <NavItem href="/admin/jobs" icon={<Briefcase />} currentPath={pathname}>Jobs</NavItem>
                     <NavItem href="/admin/pipelines" icon={<Workflow />} currentPath={pathname}>Pipelines</NavItem>
