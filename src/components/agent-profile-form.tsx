@@ -21,14 +21,14 @@ import { Textarea } from "./ui/textarea";
 
 const agentProfileSchema = z.object({
   fullName: z.string().min(2, "Full name is required."),
-  profilePhoto: z.any().refine((files) => files?.length > 0, "Profile photo is required."),
+  profilePhoto: z.any().optional(),
   agencyName: z.string().min(2, "Agency name is required."),
   agencyAddress: z.string().min(10, "A detailed agency address is required."),
-  email: z.string().email("A valid email is required."),
+  email: z.string().email("A valid email is required.").optional().or(z.literal('')),
   dob: z.string().optional(),
   licenseNumber: z.string().optional(),
   gstNumber: z.string().optional(),
-  governmentId: z.any().refine((files) => files?.length > 0, "Government ID is required."),
+  governmentId: z.any().optional(),
   complianceCheckbox: z.boolean().refine((val) => val === true, "You must agree to the terms."),
   digitalSignature: z.string().min(2, "Please type your full name as a digital signature."),
 });
@@ -72,6 +72,25 @@ export function AgentProfileForm() {
       reader.readAsDataURL(file);
     }
   };
+  
+    const handleDobChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        const digitsOnly = value.replace(/\D/g, '');
+        let formatted = '';
+
+        if (digitsOnly.length > 0) {
+        formatted = digitsOnly.substring(0, 4);
+        }
+        if (digitsOnly.length > 4) {
+        formatted += '/' + digitsOnly.substring(4, 6);
+        }
+        if (digitsOnly.length > 6) {
+        formatted += '/' + digitsOnly.substring(6, 8);
+        }
+        
+        form.setValue('dob', formatted);
+    };
+
 
   const onSubmit = (values: z.infer<typeof agentProfileSchema>) => {
     const profileData: AgentProfile = {
@@ -142,7 +161,13 @@ export function AgentProfileForm() {
                         <FormItem>
                           <FormLabel>Date of Birth</FormLabel>
                           <FormControl>
-                            <Input type="text" placeholder="YYYY-MM-DD" {...field} />
+                            <Input 
+                                placeholder="YYYY/MM/DD"
+                                {...field}
+                                value={field.value || ''}
+                                onChange={handleDobChange}
+                                maxLength={10}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -151,7 +176,7 @@ export function AgentProfileForm() {
                         <FormItem><FormLabel>Agency Name <span className="text-destructive">*</span></FormLabel><FormControl><Input placeholder="Your recruitment agency name" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="agencyAddress" render={({ field }) => (
-                        <FormItem><FormLabel>Agency Address <span className="text-destructive">*</span></FormLabel><FormControl><Textarea rows={3} placeholder="Your full agency address" {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Agency Address <span className="text-destructive">*</span></FormLabel><FormControl><Textarea rows={3} placeholder="Your full agency address" {...field} /></FormControl><FormMessage /></FormMessage>
                     )} />
                     
                     <FormField control={form.control} name="licenseNumber" render={({ field }) => (
