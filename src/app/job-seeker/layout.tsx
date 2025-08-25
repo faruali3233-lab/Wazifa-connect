@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Footer } from '@/components/footer';
 
 export default function JobSeekerLayout({ children }: { children: ReactNode }) {
-  const { user, isProfileComplete } = useAuth();
+  const { user, isProfileComplete, seekerProfile } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -21,22 +21,17 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
     
     // This layout should not handle admin or recruiter roles.
     // They have their own layouts.
-    if (user && (user.role === 'recruiter' || user.role === 'admin')) {
+    if (user && (user.role === 'recruiter' || user.role === 'admin' || user.role === 'agent' || user.role === 'subAgent')) {
        return;
     }
 
-    // This layout handles jobSeeker, subAgent, and unselected roles for +91 users
+    // This layout handles jobSeeker and unselected roles for +91 users
     if (user && user.countryCode === '+91') {
       if (user.role === 'unselected' && pathname !== '/job-seeker/home') {
           router.replace('/job-seeker/home');
-      } else if (user.role !== 'unselected' && !isProfileComplete) {
-          const profileMap = {
-              jobSeeker: '/job-seeker/profile',
-              subAgent: '/job-seeker/sub-agent-profile',
-          };
-          const rolePath = profileMap[user.role as keyof typeof profileMap];
-          if (rolePath && pathname !== rolePath) {
-            router.replace(rolePath);
+      } else if (user.role === 'jobSeeker' && !isProfileComplete) {
+          if (pathname !== '/job-seeker/profile') {
+            router.replace('/job-seeker/profile');
           }
       }
     }
@@ -45,7 +40,7 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
   
   // If the user role is one handled by another layout, render a loader
   // to prevent flicker while the correct layout takes over.
-  if (!user || user.role === 'recruiter' || user.role === 'admin') {
+  if (!user || user.role === 'recruiter' || user.role === 'admin' || user.role === 'agent' || user.role === 'subAgent') {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto p-8"><Skeleton className="h-screen w-full" /></div>
@@ -53,13 +48,31 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <Header />
-      <main className="flex-1">
-        {children}
-      </main>
-      <Footer />
-    </div>
-  );
+  // If profile is not complete, just show the form
+  if (user.role === 'jobSeeker' && !isProfileComplete) {
+      return (
+         <div className="min-h-screen flex flex-col bg-white">
+            <Header />
+            <main className="flex-1 bg-gray-50/50">
+                {children}
+            </main>
+            <Footer />
+         </div>
+      )
+  }
+
+  // If on the home page, don't show the dashboard layout
+  if (pathname === '/job-seeker/home') {
+       return (
+        <div className="min-h-screen flex flex-col bg-white">
+          <Header />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer />
+        </div>
+      );
+  }
+
+  return <>{children}</>;
 }

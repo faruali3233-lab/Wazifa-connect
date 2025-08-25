@@ -32,6 +32,8 @@ export default function LoginPage() {
             dashboardPath = '/job-seeker/sub-agent/dashboard';
           } else if (user.role === 'agent') {
             dashboardPath = '/job-seeker/agent/dashboard';
+          } else if (user.role === 'jobSeeker') {
+            dashboardPath = '/job-seeker/dashboard';
           }
           router.replace(dashboardPath);
       } else { // Profile is not complete

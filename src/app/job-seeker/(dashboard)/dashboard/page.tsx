@@ -51,11 +51,6 @@ export default function JobSeekerDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user === null) {
-      router.replace('/');
-      return;
-    }
-    
     setLoading(true);
     if (isProfileComplete && seekerProfile) {
       getJobRecommendations({ profile: seekerProfile })
@@ -79,16 +74,10 @@ export default function JobSeekerDashboard() {
   };
 
   const progress = calculateProgress();
-
-  if (loading) {
-    return <div className="container mx-auto p-8"><Skeleton className="h-screen w-full" /></div>;
-  }
   
   return (
-    <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold tracking-tight mb-8">Welcome, {seekerProfile?.basics.name.split(' ')[0] || 'Job Seeker'}!</h1>
-      
-       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+    <div className="space-y-8">
+       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Interviews Scheduled</CardTitle>
