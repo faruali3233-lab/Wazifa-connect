@@ -73,24 +73,23 @@ export function AgentProfileForm() {
     }
   };
   
-    const handleDobChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        const digitsOnly = value.replace(/\D/g, '');
-        let formatted = '';
+  const handleDobChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const digitsOnly = value.replace(/\D/g, '');
+    let formatted = '';
 
-        if (digitsOnly.length > 0) {
-        formatted = digitsOnly.substring(0, 4);
-        }
-        if (digitsOnly.length > 4) {
-        formatted += '/' + digitsOnly.substring(4, 6);
-        }
-        if (digitsOnly.length > 6) {
-        formatted += '/' + digitsOnly.substring(6, 8);
-        }
-        
-        form.setValue('dob', formatted);
-    };
-
+    if (digitsOnly.length > 0) {
+      formatted = digitsOnly.substring(0, 4);
+    }
+    if (digitsOnly.length > 4) {
+      formatted += '/' + digitsOnly.substring(4, 6);
+    }
+    if (digitsOnly.length > 6) {
+      formatted += '/' + digitsOnly.substring(6, 8);
+    }
+    
+    form.setValue('dob', formatted);
+  };
 
   const onSubmit = (values: z.infer<typeof agentProfileSchema>) => {
     const profileData: AgentProfile = {
