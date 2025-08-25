@@ -26,7 +26,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 const NavItem = ({ href, icon, children, currentPath }: { href: string; icon: React.ReactNode; children: React.ReactNode; currentPath: string; }) => (
     <SidebarMenuItem>
         <Link href={href}>
-            <SidebarMenuButton isActive={currentPath.endsWith(href)} icon={icon}>
+            <SidebarMenuButton isActive={currentPath === href} icon={icon}>
                 {children}
             </SidebarMenuButton>
         </Link>
@@ -34,23 +34,27 @@ const NavItem = ({ href, icon, children, currentPath }: { href: string; icon: Re
 );
 
 const getPageTitle = (pathname: string) => {
+    if (pathname.includes('/job-seeker/applications')) return 'My Applications';
     const routeName = pathname.split('/').pop()?.replace(/-/g, ' ') || 'dashboard';
     return routeName.replace(/\b\w/g, l => l.toUpperCase());
 }
 
 export default function JobSeekerDashboardLayout({ children }: { children: ReactNode }) {
-  const { logout, seekerProfile, isProfileComplete } = useAuth();
+  const { user, logout, seekerProfile, isProfileComplete } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!isProfileComplete) {
-        router.replace('/job-seeker/profile');
+    if (user && user.role === 'jobSeeker' && !isProfileComplete) {
+       // Allow demo user to bypass profile completion gate
+       if (user.id !== 'jobseeker') {
+            router.replace('/job-seeker/profile');
+       }
     }
-  }, [isProfileComplete, router]);
+  }, [isProfileComplete, router, user]);
 
 
-  if (!seekerProfile) {
+  if (!seekerProfile && user?.id !== 'jobseeker') {
       return (
         <div className="flex items-center justify-center min-h-screen">
             <Skeleton className="h-screen w-screen" />
@@ -58,6 +62,8 @@ export default function JobSeekerDashboardLayout({ children }: { children: React
       );
   }
   
+  const name = seekerProfile?.basics.name || "Job Seeker";
+
   return (
     <SidebarProvider>
         <Sidebar>
@@ -82,10 +88,10 @@ export default function JobSeekerDashboardLayout({ children }: { children: React
             <SidebarFooter>
                 <div className="flex items-center gap-3 p-3 border-t">
                     <Avatar>
-                        <AvatarFallback>{seekerProfile?.basics.name.charAt(0) || 'J'}</AvatarFallback>
+                        <AvatarFallback>{name.charAt(0) || 'J'}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                        <p className="text-sm font-semibold">{seekerProfile?.basics.name}</p>
+                        <p className="text-sm font-semibold">{name}</p>
                     </div>
                     <Button variant="ghost" size="icon" onClick={() => { logout(); router.push('/'); }}>
                         <LogOut />

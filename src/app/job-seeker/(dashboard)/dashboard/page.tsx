@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { JobCard } from '@/components/job-card';
 import { FileText, Star, BrainCircuit, AlertTriangle, Briefcase, BarChart3, UserCheck, Mail } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts"
 
 const chartData = [
   { stage: "Applied", value: 12, fill: "var(--color-applied)" },
@@ -51,6 +51,23 @@ export default function JobSeekerDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (user && user.id === 'jobseeker' && !seekerProfile) {
+        // Mock profile for demo user
+        const mockProfile = {
+            basics: { name: 'Ravi Kumar', desiredJobTitle: 'Heavy Duty Driver', locationPreferences: 'Dubai', experienceYears: 5 },
+            skills: ['Driving', 'Logistics'],
+            experience: ['5 years as truck driver'],
+            education: ['High School Diploma'],
+            preferences: 'Likes working day shifts',
+            resumeUrl: 'placeholder.pdf',
+        };
+        // @ts-ignore
+        updateSeekerProfile(mockProfile);
+    }
+  }, [user]);
+
+
+  useEffect(() => {
     setLoading(true);
     if (isProfileComplete && seekerProfile) {
       getJobRecommendations({ profile: seekerProfile })
@@ -64,6 +81,7 @@ export default function JobSeekerDashboard() {
 
   const calculateProgress = () => {
     if (!seekerProfile) return 10;
+     if (user?.id === 'jobseeker') return 100;
     let score = 0;
     if (seekerProfile.basics.desiredJobTitle) score += 20;
     if (seekerProfile.skills.length > 0) score += 20;
@@ -78,7 +96,7 @@ export default function JobSeekerDashboard() {
   return (
     <div className="space-y-8">
        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Interviews Scheduled</CardTitle>
             <UserCheck className="w-4 h-4 text-muted-foreground" />
@@ -88,7 +106,7 @@ export default function JobSeekerDashboard() {
             <p className="text-xs text-muted-foreground">+1 since last week</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Applications Sent</CardTitle>
             <Briefcase className="w-4 h-4 text-muted-foreground" />
@@ -98,7 +116,7 @@ export default function JobSeekerDashboard() {
              <p className="text-xs text-muted-foreground">3 submitted this week</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Profile Views</CardTitle>
             <BarChart3 className="w-4 h-4 text-muted-foreground" />
@@ -108,7 +126,7 @@ export default function JobSeekerDashboard() {
             <p className="text-xs text-muted-foreground">Viewed by 5 recruiters</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Unread Messages</CardTitle>
             <Mail className="w-4 h-4 text-muted-foreground" />
@@ -122,7 +140,7 @@ export default function JobSeekerDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-          {isProfileComplete ? (
+          {isProfileComplete || user?.id === 'jobseeker' ? (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2"><BrainCircuit /> AI-Powered Job Recommendations</CardTitle>
@@ -143,7 +161,11 @@ export default function JobSeekerDashboard() {
                     ))}
                   </div>
                 ) : (
-                  <p>No recommendations found at the moment. Try updating your profile with more details.</p>
+                  <div className="text-center py-12 text-muted-foreground">
+                    <p>No recommendations found at the moment.</p>
+                    <p className="text-sm">Try updating your profile with more details for better matches.</p>
+                     <Button variant="outline" className="mt-4" onClick={() => router.push('/job-seeker/profile')}>Update Profile</Button>
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -170,14 +192,16 @@ export default function JobSeekerDashboard() {
               <CardDescription>Your application funnel for the last 30 days.</CardDescription>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-                <BarChart accessibilityLayer data={chartData}>
-                  <CartesianGrid vertical={false} />
-                  <XAxis dataKey="stage" tickLine={false} tickMargin={10} axisLine={false} />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="value" radius={4} />
-                </BarChart>
+              <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
+                <ResponsiveContainer width="100%" height={250}>
+                    <BarChart accessibilityLayer data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: -10 }}>
+                      <CartesianGrid vertical={false} />
+                      <XAxis dataKey="stage" tickLine={false} tickMargin={10} axisLine={false} />
+                      <YAxis tickLine={false} axisLine={false} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="value" radius={8} />
+                    </BarChart>
+                </ResponsiveContainer>
               </ChartContainer>
             </CardContent>
             <CardFooter>
@@ -193,7 +217,7 @@ export default function JobSeekerDashboard() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-4">
-                <Progress value={progress} className="w-full" />
+                <Progress value={progress} className="w-full h-3" />
                 <span className="font-bold text-primary">{progress}%</span>
               </div>
               <p className="text-sm text-muted-foreground">
@@ -202,7 +226,7 @@ export default function JobSeekerDashboard() {
                   : "Complete your profile to increase your visibility."}
               </p>
               <Button variant="outline" className="w-full" onClick={() => router.push('/job-seeker/profile')}>
-                {progress === 100 ? 'Edit Profile' : 'Complete Profile'}
+                {progress === 100 ? 'View & Edit Profile' : 'Complete Profile'}
               </Button>
             </CardContent>
           </Card>
@@ -210,8 +234,11 @@ export default function JobSeekerDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2"><FileText /> Application Status</CardTitle>
             </CardHeader>
-            <CardContent className="text-center text-muted-foreground">
+            <CardContent className="text-center text-muted-foreground py-8">
               <p>Your applied jobs will appear here.</p>
+               <Button variant="secondary" size="sm" className="mt-4" onClick={() => router.push('/job-seeker/applications')}>
+                    View All Applications
+                </Button>
             </CardContent>
           </Card>
         </div>
