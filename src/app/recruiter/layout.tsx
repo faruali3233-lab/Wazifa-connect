@@ -3,7 +3,7 @@
 
 import { type ReactNode, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth, type Language } from '@/hooks/use-auth';
 import Link from 'next/link';
 import {
   SidebarProvider,
@@ -17,10 +17,12 @@ import {
   SidebarMenuButton,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { LayoutDashboard, Briefcase, Users, MessageSquare, Settings, FileText, BarChart3, UserCircle, LogOut } from 'lucide-react';
+import { LayoutDashboard, Briefcase, Users, MessageSquare, Settings, FileText, BarChart3, UserCircle, LogOut, Globe } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation } from '@/components/i18n-provider';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 const NavItem = ({ href, icon, children, currentPath }: { href: string; icon: React.ReactNode; children: React.ReactNode; currentPath: string; }) => (
     <SidebarMenuItem>
@@ -37,6 +39,30 @@ const getPageTitle = (pathname: string) => {
     if (routeName === 'new') return 'Post a New Job';
     return routeName.charAt(0).toUpperCase() + routeName.slice(1);
 }
+
+const LanguageSwitcher = () => {
+    const { t } = useTranslation();
+    const { setLanguage } = useAuth();
+    
+    const handleLanguageChange = (newLang: Language) => {
+        setLanguage(newLang);
+    };
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label={t('lang_label')}>
+                    <Globe className="w-5 h-5" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleLanguageChange('en')}>English (EN)</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleLanguageChange('hi')}>हिंदी (HI)</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleLanguageChange('ar')}>العربية (AR)</DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+};
 
 export default function RecruiterDashboardLayout({ children }: { children: ReactNode }) {
   const { user, logout, recruiterProfile, isProfileComplete } = useAuth();
@@ -129,7 +155,10 @@ export default function RecruiterDashboardLayout({ children }: { children: React
                     <SidebarTrigger />
                     <h1 className="text-xl font-bold">{getPageTitle(pathname)}</h1>
                 </div>
-                <Button onClick={() => router.push('/recruiter/jobs/new')}>Post a New Job</Button>
+                <div className="flex items-center gap-2">
+                    <LanguageSwitcher />
+                    <Button onClick={() => router.push('/recruiter/jobs/new')}>Post a New Job</Button>
+                </div>
             </header>
             <main className="flex-1 p-6 bg-gray-50/50">
                 {children}
