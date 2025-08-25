@@ -75,7 +75,6 @@ export default function AgentDashboardLayout({ children }: { children: ReactNode
                     <NavItem href="/job-seeker/agent/candidate-pool" icon={<Users />} currentPath={pathname}>Candidate Pool</NavItem>
                     <NavItem href="/job-seeker/agent/sub-agents" icon={<Users />} currentPath={pathname}>Sub-Agents</NavItem>
                     <NavItem href="/job-seeker/agent/submissions" icon={<BarChart />} currentPath={pathname}>Submissions</NavItem>
-                    <NavItem href="/job-seeker/agent/interviews" icon={<CalendarClock />} currentPath={pathname}>Interviews</NavItem>
                     <NavItem href="/job-seeker/agent/messages" icon={<MessageSquare />} currentPath={pathname}>Messages</NavItem>
                     <NavItem href="/job-seeker/agent/payments" icon={<HandCoins />} currentPath={pathname}>Payments</NavItem>
                     <NavItem href="/job-seeker/agent/documents" icon={<FileText />} currentPath={pathname}>Documents</NavItem>
