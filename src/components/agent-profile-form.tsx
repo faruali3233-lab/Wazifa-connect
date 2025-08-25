@@ -175,7 +175,7 @@ export function AgentProfileForm() {
                         <FormItem><FormLabel>Agency Name <span className="text-destructive">*</span></FormLabel><FormControl><Input placeholder="Your recruitment agency name" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="agencyAddress" render={({ field }) => (
-                        <FormItem><FormLabel>Agency Address <span className="text-destructive">*</span></FormLabel><FormControl><Textarea rows={3} placeholder="Your full agency address" {...field} /></FormControl><FormMessage /></FormMessage>
+                        <FormItem><FormLabel>Agency Address <span className="text-destructive">*</span></FormLabel><FormControl><Textarea rows={3} placeholder="Your full agency address" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
                     
                     <FormField control={form.control} name="licenseNumber" render={({ field }) => (
