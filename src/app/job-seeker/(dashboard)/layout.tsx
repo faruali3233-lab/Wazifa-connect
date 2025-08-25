@@ -17,7 +17,7 @@ import {
   SidebarMenuButton,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { LayoutDashboard, User, Briefcase, MessageSquare, Settings } from 'lucide-react';
+import { LayoutDashboard, User, Briefcase, MessageSquare, Settings, HandCoins } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
@@ -82,6 +82,7 @@ export default function JobSeekerDashboardLayout({ children }: { children: React
                     <NavItem href="/job-seeker/profile" icon={<User />} currentPath={pathname}>My Profile</NavItem>
                     <NavItem href="/job-seeker/applications" icon={<Briefcase />} currentPath={pathname}>My Applications</NavItem>
                     <NavItem href="/job-seeker/messages" icon={<MessageSquare />} currentPath={pathname}>Messages</NavItem>
+                    <NavItem href="/job-seeker/payments" icon={<HandCoins />} currentPath={pathname}>Payments</NavItem>
                     <NavItem href="/job-seeker/settings" icon={<Settings />} currentPath={pathname}>Settings</NavItem>
                 </SidebarMenu>
             </SidebarContent>
