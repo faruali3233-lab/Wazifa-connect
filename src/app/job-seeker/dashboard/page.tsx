@@ -51,6 +51,10 @@ export default function JobSeekerDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (user === null) {
+      router.replace('/');
+      return;
+    }
     if (isProfileComplete && seekerProfile) {
       setLoading(true);
       getJobRecommendations({ profile: seekerProfile })
@@ -60,11 +64,7 @@ export default function JobSeekerDashboard() {
     } else {
         setLoading(false);
     }
-  }, [isProfileComplete, seekerProfile]);
-
-  if (!user) {
-    return <div className="container mx-auto p-8"><Skeleton className="h-64 w-full" /></div>;
-  }
+  }, [isProfileComplete, seekerProfile, user, router]);
 
   const calculateProgress = () => {
     if (!seekerProfile) return 10;
@@ -79,6 +79,10 @@ export default function JobSeekerDashboard() {
 
   const progress = calculateProgress();
 
+  if (!user || loading) {
+    return <div className="container mx-auto p-8"><Skeleton className="h-screen w-full" /></div>;
+  }
+  
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold tracking-tight mb-8">Welcome, {seekerProfile?.basics.name.split(' ')[0] || 'Job Seeker'}!</h1>
