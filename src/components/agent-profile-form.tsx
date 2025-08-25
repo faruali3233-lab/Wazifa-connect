@@ -48,6 +48,9 @@ export function AgentProfileForm() {
       agencyAddress: "",
       licenseNumber: "",
       gstNumber: "",
+      dob: "",
+      profilePhoto: undefined,
+      governmentId: undefined,
       complianceCheckbox: false,
       digitalSignature: ""
     },
