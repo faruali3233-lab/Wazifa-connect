@@ -13,11 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CalendarIcon, UploadCloud } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+import { UploadCloud } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -30,7 +27,7 @@ const agentProfileSchema = z.object({
   fullName: z.string().min(2, "Full name is required."),
   profilePhoto: z.any().refine(hasFile, "Profile photo is required."),
   email: z.string().email("A valid email is required."),
-  dob: z.date().optional(),
+  dob: z.string().optional(),
   officeAddress: z.string().min(5, "Office address is required."),
   licenseNumber: z.string().min(3, "License number is required."),
   agencyType: z.enum(["individual", "company"], { required_error: "Please select an agency type." }),
@@ -105,7 +102,7 @@ export default function AgentProfileForm() {
       businessLicenseUrl: hasFile(values.businessLicense) ? "file_provided" : undefined,
       name: values.fullName,
       kycStatus: 'Pending',
-      dob: values.dob,
+      dob: values.dob ? new Date(values.dob) : undefined,
       officeAddress: values.officeAddress,
       licenseNumber: values.licenseNumber,
       agencyType: values.agencyType,
@@ -174,17 +171,12 @@ export default function AgentProfileForm() {
                       <FormDescription>Auto-filled from your login information.</FormDescription>
                   </FormItem>
                    <FormField control={form.control} name="dob" render={({ field }) => (
-                      <FormItem className="flex flex-col"><FormLabel>Date of Birth / Incorporation Date</FormLabel>
-                          <Popover><PopoverTrigger asChild>
-                              <FormControl>
-                              <Button variant={"outline"} className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
-                                  {field.value ? format(field.value, "PPP") : (<span>Pick a date</span>)}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                              </FormControl>
-                          </PopoverTrigger><PopoverContent className="w-auto p-0" align="start">
-                              <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1950-01-01")} initialFocus />
-                          </PopoverContent></Popover><FormMessage />
+                      <FormItem>
+                        <FormLabel>Date of Birth / Incorporation Date</FormLabel>
+                        <FormControl>
+                          <Input type="text" placeholder="YYYY-MM-DD" {...field} />
+                        </FormControl>
+                        <FormMessage />
                       </FormItem>
                   )} />
               </div>

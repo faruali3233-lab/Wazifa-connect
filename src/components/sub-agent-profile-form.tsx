@@ -13,11 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { CalendarIcon, UploadCloud, ShieldCheck, UserCheck } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Calendar } from "./ui/calendar";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { UploadCloud, ShieldCheck } from "lucide-react";
 import { Checkbox } from "./ui/checkbox";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 
@@ -25,7 +21,7 @@ const subAgentProfileSchema = z.object({
   fullName: z.string().min(2, "Full name is required."),
   profilePhoto: z.any().refine((files) => files?.length > 0, "Profile photo is required."),
   email: z.string().email("A valid email is required.").optional().or(z.literal('')),
-  dob: z.date().optional(),
+  dob: z.string().optional(),
   governmentId: z.any().refine((files) => files?.length > 0, "Government ID is required."),
   agentReferralLink: z.string().min(5, "Agent referral link/code is required."),
   agentLoginId: z.string().min(3, "Agent Login ID is required."),
@@ -107,6 +103,7 @@ export function SubAgentProfileForm() {
       signedAgreementUrl: values.signedAgreement ? "file_provided" : "",
       parentAgentName: verifiedAgent,
       name: values.fullName,
+      dob: values.dob ? new Date(values.dob) : undefined,
     };
     
     updateSubAgentProfile(profileData);
@@ -164,17 +161,12 @@ export function SubAgentProfileForm() {
                         <FormDescription>Auto-filled from your login information.</FormDescription>
                     </FormItem>
                      <FormField control={form.control} name="dob" render={({ field }) => (
-                        <FormItem className="flex flex-col"><FormLabel>Date of Birth</FormLabel>
-                            <Popover><PopoverTrigger asChild>
-                                <FormControl>
-                                <Button variant={"outline"} className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
-                                    {field.value ? format(field.value, "PPP") : (<span>Pick a date</span>)}
-                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                                </FormControl>
-                            </PopoverTrigger><PopoverContent className="w-auto p-0" align="start">
-                                <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1950-01-01")} initialFocus />
-                            </PopoverContent></Popover><FormMessage />
+                        <FormItem>
+                          <FormLabel>Date of Birth</FormLabel>
+                          <FormControl>
+                            <Input type="text" placeholder="YYYY-MM-DD" {...field} />
+                          </FormControl>
+                          <FormMessage />
                         </FormItem>
                     )} />
                      <FormField control={form.control} name="governmentId" render={({ field }) => (
