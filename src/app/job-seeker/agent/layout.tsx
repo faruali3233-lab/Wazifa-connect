@@ -9,7 +9,7 @@ import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 
 export default function AgentRootLayout({ children }: { children: ReactNode }) {
-  const { user, isProfileComplete, agentProfile } = useAuth();
+  const { user, isProfileComplete } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
