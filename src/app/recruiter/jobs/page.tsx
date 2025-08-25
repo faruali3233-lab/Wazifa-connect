@@ -1,8 +1,12 @@
 
+"use client";
+
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { PlusCircle } from "lucide-react";
 
 const mockJobs = [
     { id: 'JOB-001', title: 'Heavy Duty Driver', location: 'Dubai, UAE', salary: 'AED 4,500', status: 'Live', apps: 12, created: '2024-08-15' },
@@ -11,11 +15,19 @@ const mockJobs = [
 ];
 
 export default function RecruiterJobsPage() {
+    const router = useRouter();
+
     return (
         <Card>
-            <CardHeader>
-                <CardTitle>Manage Jobs</CardTitle>
-                <CardDescription>Post new jobs and manage your existing listings.</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>Manage Jobs</CardTitle>
+                    <CardDescription>Post new jobs and manage your existing listings.</CardDescription>
+                </div>
+                 <Button onClick={() => router.push('/recruiter/jobs/new')}>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Post New Job
+                </Button>
             </CardHeader>
             <CardContent>
                  <div className="border rounded-md">

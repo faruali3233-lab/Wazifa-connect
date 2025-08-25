@@ -76,7 +76,7 @@ const LanguageSwitcher = () => {
 };
 
 export default function RecruiterDashboardLayout({ children }: { children: ReactNode }) {
-  const { user, logout, recruiterProfile, isProfileComplete, language } = useAuth();
+  const { user, logout, recruiterProfile, isProfileComplete } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const { t } = useTranslation();
@@ -126,7 +126,7 @@ export default function RecruiterDashboardLayout({ children }: { children: React
 
   return (
     <SidebarProvider>
-        <Sidebar side={language === 'ar' ? 'right' : 'left'}>
+        <Sidebar>
             <SidebarHeader>
                  <div className="flex items-center gap-2 p-2">
                     <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
