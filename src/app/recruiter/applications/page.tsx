@@ -1,10 +1,9 @@
-
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-const stages = ["Applied", "Interested", "Medical", "Wakala", "Phase-1 Pay", "Ticket", "Final Pay", "Ready to Fly", "Hired"];
+const stages = ["Applied", "Interested", "Medical", "Wakala", "Ticket", "Ready to Fly", "Hired"];
 
 const mockApplications = [
     { id: 1, name: "Ravi K.", job: "Heavy Duty Driver", stage: "Applied" },
