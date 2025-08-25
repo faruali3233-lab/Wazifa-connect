@@ -25,7 +25,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const NavItem = ({ href, icon, children, currentPath }: { href: string; icon: React.ReactNode; children: React.ReactNode; currentPath: string; }) => (
     <SidebarMenuItem>
-        <Link href={href} passHref legacyBehavior>
+        <Link href={href}>
             <SidebarMenuButton isActive={currentPath.endsWith(href)} icon={icon}>
                 {children}
             </SidebarMenuButton>
@@ -65,11 +65,11 @@ export default function JobSeekerDashboardLayout({ children }: { children: React
             </SidebarHeader>
             <SidebarContent>
                 <SidebarMenu>
-                    <NavItem href="/dashboard" icon={<LayoutDashboard />} currentPath={pathname}>Dashboard</NavItem>
-                    <NavItem href="/profile" icon={<User />} currentPath={pathname}>My Profile</NavItem>
-                    <NavItem href="/applications" icon={<Briefcase />} currentPath={pathname}>My Applications</NavItem>
-                    <NavItem href="/messages" icon={<MessageSquare />} currentPath={pathname}>Messages</NavItem>
-                    <NavItem href="/settings" icon={<Settings />} currentPath={pathname}>Settings</NavItem>
+                    <NavItem href="/job-seeker/dashboard" icon={<LayoutDashboard />} currentPath={pathname}>Dashboard</NavItem>
+                    <NavItem href="/job-seeker/profile" icon={<User />} currentPath={pathname}>My Profile</NavItem>
+                    <NavItem href="/job-seeker/applications" icon={<Briefcase />} currentPath={pathname}>My Applications</NavItem>
+                    <NavItem href="/job-seeker/messages" icon={<MessageSquare />} currentPath={pathname}>Messages</NavItem>
+                    <NavItem href="/job-seeker/settings" icon={<Settings />} currentPath={pathname}>Settings</NavItem>
                 </SidebarMenu>
             </SidebarContent>
             <SidebarFooter>
