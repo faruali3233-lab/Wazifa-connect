@@ -24,17 +24,21 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from '@/components/i18n-provider';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
-const NavItem = ({ href, icon, children, currentPath }: { href: string; icon: React.ReactNode; children: React.ReactNode; currentPath: string; }) => (
-    <SidebarMenuItem>
-        <Link href={href}>
-            <SidebarMenuButton isActive={currentPath.startsWith(href)} icon={icon}>
-                {children}
-            </SidebarMenuButton>
-        </Link>
-    </SidebarMenuItem>
-);
+const NavItem = ({ href, icon, children, currentPath, exact = false }: { href: string; icon: React.ReactNode; children: React.ReactNode; currentPath: string; exact?: boolean; }) => {
+    const isActive = exact ? currentPath === href : currentPath.startsWith(href);
+    return (
+        <SidebarMenuItem>
+            <Link href={href}>
+                <SidebarMenuButton isActive={isActive} icon={icon}>
+                    {children}
+                </SidebarMenuButton>
+            </Link>
+        </SidebarMenuItem>
+    )
+};
 
 const getPageTitle = (pathname: string, t: (key: any) => string) => {
+    if (pathname === '/recruiter') return t('recruiter_dashboard_title' as any);
     const routeName = pathname.split('/').pop()?.replace(/-/g, ' ') || 'dashboard';
     if (routeName === 'new') return t('recruiter_jobs_new_title' as any);
     if (routeName === 'dashboard') return t('recruiter_dashboard_title' as any);
@@ -134,7 +138,7 @@ export default function RecruiterDashboardLayout({ children }: { children: React
             </SidebarHeader>
             <SidebarContent>
                 <SidebarMenu>
-                    <NavItem href="/recruiter/dashboard" icon={<LayoutDashboard />} currentPath={pathname}>{t('recruiter_dashboard_nav_dashboard' as any)}</NavItem>
+                    <NavItem href="/recruiter" icon={<LayoutDashboard />} currentPath={pathname} exact={true}>{t('recruiter_dashboard_nav_dashboard' as any)}</NavItem>
                     <NavItem href="/recruiter/jobs" icon={<Briefcase />} currentPath={pathname}>{t('recruiter_dashboard_nav_jobs' as any)}</NavItem>
                     <NavItem href="/recruiter/applications" icon={<Users />} currentPath={pathname}>{t('recruiter_dashboard_nav_applications' as any)}</NavItem>
                     <NavItem href="/recruiter/messages" icon={<MessageSquare />} currentPath={pathname}>{t('recruiter_dashboard_nav_messages' as any)}</NavItem>
