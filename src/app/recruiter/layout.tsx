@@ -34,9 +34,16 @@ const NavItem = ({ href, icon, children, currentPath }: { href: string; icon: Re
     </SidebarMenuItem>
 );
 
-const getPageTitle = (pathname: string) => {
+const getPageTitle = (pathname: string, t: (key: any) => string) => {
     const routeName = pathname.split('/').pop()?.replace(/-/g, ' ') || 'dashboard';
-    if (routeName === 'new') return 'Post a New Job';
+    if (routeName === 'new') return t('recruiter_jobs_new_title' as any);
+    if (routeName === 'dashboard') return t('recruiter_dashboard_title' as any);
+    if (routeName === 'jobs') return t('recruiter_jobs_title' as any);
+    if (routeName === 'applications') return t('recruiter_applications_title' as any);
+    if (routeName === 'messages') return t('recruiter_messages_title' as any);
+    if (routeName === 'documents') return t('recruiter_documents_title' as any);
+    if (routeName === 'reports') return t('recruiter_reports_title' as any);
+    if (routeName === 'settings') return t('recruiter_settings_title' as any);
     return routeName.charAt(0).toUpperCase() + routeName.slice(1);
 }
 
@@ -65,9 +72,10 @@ const LanguageSwitcher = () => {
 };
 
 export default function RecruiterDashboardLayout({ children }: { children: ReactNode }) {
-  const { user, logout, recruiterProfile, isProfileComplete } = useAuth();
+  const { user, logout, recruiterProfile, isProfileComplete, language } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (user === null) {
@@ -114,25 +122,25 @@ export default function RecruiterDashboardLayout({ children }: { children: React
 
   return (
     <SidebarProvider>
-        <Sidebar>
+        <Sidebar side={language === 'ar' ? 'right' : 'left'}>
             <SidebarHeader>
                  <div className="flex items-center gap-2 p-2">
                     <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect width="32" height="32" rx="8" fill="#005430"/>
                         <path d="M10 13C10 11.3431 11.3431 10 13 10H19C20.6569 10 22 11.3431 22 13V22H10V13Z" fill="white"/>
                     </svg>
-                    <span className="text-lg font-semibold text-primary">GulfHired Recruiter</span>
+                    <span className="text-lg font-semibold text-primary">{t('recruiter_dashboard_title' as any)}</span>
                 </div>
             </SidebarHeader>
             <SidebarContent>
                 <SidebarMenu>
-                    <NavItem href="/recruiter/dashboard" icon={<LayoutDashboard />} currentPath={pathname}>Dashboard</NavItem>
-                    <NavItem href="/recruiter/jobs" icon={<Briefcase />} currentPath={pathname}>Jobs</NavItem>
-                    <NavItem href="/recruiter/applications" icon={<Users />} currentPath={pathname}>Applications</NavItem>
-                    <NavItem href="/recruiter/messages" icon={<MessageSquare />} currentPath={pathname}>Messages</NavItem>
-                    <NavItem href="/recruiter/documents" icon={<FileText />} currentPath={pathname}>Documents</NavItem>
-                    <NavItem href="/recruiter/reports" icon={<BarChart3 />} currentPath={pathname}>Reports</NavItem>
-                    <NavItem href="/recruiter/settings" icon={<Settings />} currentPath={pathname}>Settings</NavItem>
+                    <NavItem href="/recruiter/dashboard" icon={<LayoutDashboard />} currentPath={pathname}>{t('recruiter_dashboard_nav_dashboard' as any)}</NavItem>
+                    <NavItem href="/recruiter/jobs" icon={<Briefcase />} currentPath={pathname}>{t('recruiter_dashboard_nav_jobs' as any)}</NavItem>
+                    <NavItem href="/recruiter/applications" icon={<Users />} currentPath={pathname}>{t('recruiter_dashboard_nav_applications' as any)}</NavItem>
+                    <NavItem href="/recruiter/messages" icon={<MessageSquare />} currentPath={pathname}>{t('recruiter_dashboard_nav_messages' as any)}</NavItem>
+                    <NavItem href="/recruiter/documents" icon={<FileText />} currentPath={pathname}>{t('recruiter_dashboard_nav_documents' as any)}</NavItem>
+                    <NavItem href="/recruiter/reports" icon={<BarChart3 />} currentPath={pathname}>{t('recruiter_dashboard_nav_reports' as any)}</NavItem>
+                    <NavItem href="/recruiter/settings" icon={<Settings />} currentPath={pathname}>{t('recruiter_dashboard_nav_settings' as any)}</NavItem>
                 </SidebarMenu>
             </SidebarContent>
             <SidebarFooter>
@@ -154,11 +162,11 @@ export default function RecruiterDashboardLayout({ children }: { children: React
             <header className="flex items-center justify-between p-4 border-b">
                 <div className="flex items-center gap-4">
                     <SidebarTrigger />
-                    <h1 className="text-xl font-bold">{getPageTitle(pathname)}</h1>
+                    <h1 className="text-xl font-bold">{getPageTitle(pathname, t)}</h1>
                 </div>
                 <div className="flex items-center gap-2">
                     <LanguageSwitcher />
-                    <Button onClick={() => router.push('/recruiter/jobs/new')}>Post a New Job</Button>
+                    <Button onClick={() => router.push('/recruiter/jobs/new')}>{t('recruiter_dashboard_post_job_button' as any)}</Button>
                 </div>
             </header>
             <main className="flex-1 p-6 bg-gray-50/50">
