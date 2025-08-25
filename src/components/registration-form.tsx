@@ -63,6 +63,7 @@ export function RegistrationForm() {
 
     login({
         id: values.userId,
+        password: 'password', // Using a mock password
         phone: values.phone,
         countryCode: values.countryCode,
     }, initialRole);

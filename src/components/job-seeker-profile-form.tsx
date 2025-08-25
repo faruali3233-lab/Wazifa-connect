@@ -172,7 +172,7 @@ export function JobSeekerProfileForm() {
       experience: values.educationExperience?.split('|').map(s => s.trim()) || [],
       education: values.educationExperience?.split('|').map(s => s.trim()) || [],
       preferences: `Religion: ${values.religion}, Age: ${values.age}`,
-      resumeUrl: "", // This would come from passport/doc upload in reality
+      resumeUrl: "", // This would come from passport/ID upload in reality
       kycStatus: 'pending',
       aadhaarLast4: values.aadhaarNumber.slice(-4),
       kycSubmissionDate: new Date().toISOString(),
