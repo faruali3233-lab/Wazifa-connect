@@ -1,90 +1,140 @@
+
 "use client";
 
-import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
+import { useAuth } from '@/hooks/use-auth';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { ArrowRight, Briefcase, CalendarClock, UserPlus, Users, FilePlus, Receipt, UserRoundCheck, ClipboardCheck, Activity } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { AgentSubmissionsPipeline } from '@/components/agent-submissions';
 
-export type UserRole = "jobSeeker" | "recruiter" | "subAgent" | "unselected" | "admin";
+const kpiData = [
+    { title: "Assigned Requirements", value: 4, icon: <Briefcase />, href: "/job-seeker/agent/jobs" },
+    { title: "Active Candidates", value: 12, icon: <Users />, href: "/job-seeker/agent/candidate-pool" },
+    { title: "Submissions This Month", value: 8, icon: <ClipboardCheck />, href: "/job-seeker/agent/submissions" },
+    { title: "Interviews Scheduled", value: 2, icon: <CalendarClock />, href: "/job-seeker/agent/interviews" },
+    { title: "Payments Pending Review", value: 1, icon: <Receipt />, href: "/job-seeker/agent/payments?status=pending" },
+];
 
-export type Language = 'en' | 'ar' | 'hi';
+const quickActions = [
+    { title: "Add Candidate", icon: <UserPlus /> },
+    { title: "Invite Sub-Agent", icon: <UserRoundCheck /> },
+    { title: "Upload Ticket/Travel Docs", icon: <FilePlus /> },
+];
 
-export type KycStatus = "pending" | "approved" | "rejected" | "not_started";
+const mockJobs = [
+    { id: 1, title: "Heavy Duty Driver", city: "Dubai", country: "UAE", salary: "4500 AED", urgency: "Urgent", headcount: 5 },
+    { id: 2, title: "Construction Painter", city: "Riyadh", country: "KSA", salary: "3000 SAR", urgency: "Normal", headcount: 10 },
+];
 
-export interface User {
-  id: string;
-  phone: string;
-  countryCode: string;
-  // Role will be set after the initial login/registration
-  role: UserRole;
-}
+const activityFeed = [
+    { text: "Recruiter 'Al-Futtaim' posted a new job for 'Heavy Duty Driver'", time: "2h ago" },
+    { text: "Seeker 'Ravi K.' paid the interest fee for 'Construction Painter'", time: "5h ago" },
+    { text: "Medical report uploaded for 'Aisha B.' for job 'Household Cook'", time: "1d ago" },
+];
 
-export interface SeekerProfile {
-  basics: {
-    name: string;
-    desiredJobTitle: string;
-    locationPreferences: string;
-    experienceYears: number;
-  };
-  skills: string[];
-  experience: string[];
-  education: string[];
-  preferences: string;
-  resumeUrl: string; // Used to store passport/ID upload status
-  kycStatus?: KycStatus;
-  aadhaarLast4?: string;
-  kycSubmissionDate?: string;
-  kycRejectionReason?: string;
-}
+export default function AgentDashboardPage() {
+  const { agentProfile } = useAuth();
+  const router = useRouter();
 
-export interface RecruiterProfile {
-  yourName: string;
-  yourEmail: string;
-  yourCountry: string;
-  yourCity: string;
-  companyName: string;
-  companyWebsite: string;
-  companyDescription: string;
-  profilePhotoUrl: string;
-}
+  return (
+    <div className="space-y-6">
+      
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+          {kpiData.map((kpi, index) => (
+              <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push(kpi.href)}>
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                      <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
+                      <div className="text-muted-foreground">{kpi.icon}</div>
+                  </CardHeader>
+                  <CardContent>
+                      <div className="text-2xl font-bold">{kpi.value}</div>
+                  </CardContent>
+              </Card>
+          ))}
+      </div>
 
-export interface SubAgentProfile {
-  fullName: string;
-  profilePhotoUrl: string;
-  phone: string;
-  countryCode: string;
-  email?: string;
-  dob?: Date;
-  governmentIdUrl: string; // URL after upload
-  agentReferralLink: string;
-  agentLoginId: string;
-  parentAgentName: string;
-  signedAgreementUrl?: string; // URL after upload
-  complianceCheckbox: boolean;
-  digitalSignature: string;
-  name: string; // For dashboard display
-}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Quick Actions</CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {quickActions.map((action, index) => (
+                        <Button key={index} variant="outline" size="lg" className="justify-start gap-4 p-6">
+                            {action.icon}
+                            <span>{action.title}</span>
+                        </Button>
+                    ))}
+                </CardContent>
+            </Card>
 
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                        <CardTitle>New Recruiter Requirements</CardTitle>
+                        <CardDescription>Jobs posted by recruiters that match your candidates.</CardDescription>
+                    </div>
+                    <Button variant="link" onClick={() => router.push('/job-seeker/agent/jobs')}>View all</Button>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                    {mockJobs.map(job => (
+                        <Card key={job.id} className="p-4">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h4 className="font-semibold">{job.title}</h4>
+                                    <p className="text-sm text-muted-foreground">{job.city}, {job.country} • {job.salary}</p>
+                                </div>
+                                <div className="flex flex-col items-end gap-2">
+                                     {job.urgency === 'Urgent' && <Badge variant="destructive">Urgent</Badge>}
+                                    <Button size="sm">Suggest Candidates</Button>
+                                </div>
+                            </div>
+                        </Card>
+                    ))}
+                </CardContent>
+            </Card>
 
-export interface AuthState {
-  user: User | null;
-  seekerProfile: SeekerProfile | null;
-  recruiterProfile: RecruiterProfile | null;
-  subAgentProfile: SubAgentProfile | null;
-  isProfileComplete: boolean;
-  language: Language;
-  setLanguage: Dispatch<SetStateAction<Language>>;
-  setUserRole: (role: UserRole) => void;
-  login: (user: Omit<User, 'role'>, role?: UserRole) => void;
-  logout: () => void;
-  updateSeekerProfile: (profile: SeekerProfile) => void;
-  updateRecruiterProfile: (profile: RecruiterProfile) => void;
-  updateSubAgentProfile: (profile: SubAgentProfile) => void;
-}
+        </div>
 
-export const AuthContext = createContext<AuthState | null>(null);
+        <div className="space-y-6">
+            <Card>
+                <CardHeader><CardTitle>Activity Feed</CardTitle></CardHeader>
+                <CardContent>
+                  <ul className="space-y-4">
+                      {activityFeed.map((item, index) => (
+                          <li key={index} className="flex items-center gap-3">
+                              <div className="p-2 bg-muted rounded-full">
+                                  <Activity className="h-4 w-4 text-muted-foreground"/>
+                              </div>
+                              <div className="text-sm">
+                                  <p>{item.text}</p>
+                                  <p className="text-xs text-muted-foreground">{item.time}</p>
+                              </div>
+                          </li>
+                      ))}
+                  </ul>
+                </CardContent>
+            </Card>
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
+            <Card>
+                <CardHeader><CardTitle>Payments & Compliance</CardTitle></CardHeader>
+                 <CardContent>
+                    <div className="p-4 rounded-lg border bg-amber-50 border-amber-200">
+                        <p className="font-semibold">1 Receipt from Sub-Agents</p>
+                        <p className="text-sm text-muted-foreground">Awaiting your verification.</p>
+                        <Button variant="link" size="sm" className="p-0 h-auto mt-1" onClick={() => router.push('/job-seeker/agent/payments?status=pending')}>Review Now</Button>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+
+      </div>
+      
+      <AgentSubmissionsPipeline />
+
+    </div>
+  );
 }

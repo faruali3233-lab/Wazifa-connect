@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth, type UserRole } from '@/hooks/use-auth';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User, UserCheck } from 'lucide-react';
+import { User, UserCheck, UserCog } from 'lucide-react';
 
 const RoleCard = ({ icon, title, description, onClick }: { icon: React.ReactNode, title: string, description: string, onClick: () => void }) => (
   <Card className="hover:shadow-xl hover:border-primary transition-all cursor-pointer group" onClick={onClick}>
@@ -35,6 +35,8 @@ export default function JobSeekerHomePage() {
     let profilePath = '/job-seeker/profile';
     if (role === 'subAgent') {
       profilePath = '/job-seeker/sub-agent/profile';
+    } else if (role === 'agent') {
+        profilePath = '/job-seeker/agent/profile';
     }
     router.push(profilePath);
   };
@@ -48,12 +50,18 @@ export default function JobSeekerHomePage() {
         </p>
       </div>
 
-      <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-xl mx-auto">
+      <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
         <RoleCard
           icon={<User className="h-6 w-6" />}
           title="Job Seeker"
           description="Find your next job opportunity in the Gulf region."
           onClick={() => handleRoleSelection('jobSeeker')}
+        />
+        <RoleCard
+          icon={<UserCog className="h-6 w-6" />}
+          title="Agent"
+          description="Source and manage candidates for recruiters."
+          onClick={() => handleRoleSelection('agent')}
         />
         <RoleCard
           icon={<UserCheck className="h-6 w-6" />}

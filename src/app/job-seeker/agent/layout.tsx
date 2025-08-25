@@ -1,90 +1,55 @@
+
 "use client";
 
-import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
+import { useEffect, type ReactNode } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { useAuth } from '@/hooks/use-auth';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 
-export type UserRole = "jobSeeker" | "recruiter" | "subAgent" | "unselected" | "admin";
+export default function AgentRootLayout({ children }: { children: ReactNode }) {
+  const { user, isProfileComplete } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
 
-export type Language = 'en' | 'ar' | 'hi';
+  useEffect(() => {
+    if (user === null) {
+      router.replace('/');
+      return;
+    }
+    
+    if (user && user.role !== 'agent') {
+      return;
+    }
+    
+    if (user && user.role === 'agent' && !isProfileComplete) {
+        if (pathname !== '/job-seeker/agent/profile') {
+            router.replace('/job-seeker/agent/profile');
+        }
+    }
+  }, [user, isProfileComplete, router, pathname]);
 
-export type KycStatus = "pending" | "approved" | "rejected" | "not_started";
-
-export interface User {
-  id: string;
-  phone: string;
-  countryCode: string;
-  // Role will be set after the initial login/registration
-  role: UserRole;
-}
-
-export interface SeekerProfile {
-  basics: {
-    name: string;
-    desiredJobTitle: string;
-    locationPreferences: string;
-    experienceYears: number;
-  };
-  skills: string[];
-  experience: string[];
-  education: string[];
-  preferences: string;
-  resumeUrl: string; // Used to store passport/ID upload status
-  kycStatus?: KycStatus;
-  aadhaarLast4?: string;
-  kycSubmissionDate?: string;
-  kycRejectionReason?: string;
-}
-
-export interface RecruiterProfile {
-  yourName: string;
-  yourEmail: string;
-  yourCountry: string;
-  yourCity: string;
-  companyName: string;
-  companyWebsite: string;
-  companyDescription: string;
-  profilePhotoUrl: string;
-}
-
-export interface SubAgentProfile {
-  fullName: string;
-  profilePhotoUrl: string;
-  phone: string;
-  countryCode: string;
-  email?: string;
-  dob?: Date;
-  governmentIdUrl: string; // URL after upload
-  agentReferralLink: string;
-  agentLoginId: string;
-  parentAgentName: string;
-  signedAgreementUrl?: string; // URL after upload
-  complianceCheckbox: boolean;
-  digitalSignature: string;
-  name: string; // For dashboard display
-}
-
-
-export interface AuthState {
-  user: User | null;
-  seekerProfile: SeekerProfile | null;
-  recruiterProfile: RecruiterProfile | null;
-  subAgentProfile: SubAgentProfile | null;
-  isProfileComplete: boolean;
-  language: Language;
-  setLanguage: Dispatch<SetStateAction<Language>>;
-  setUserRole: (role: UserRole) => void;
-  login: (user: Omit<User, 'role'>, role?: UserRole) => void;
-  logout: () => void;
-  updateSeekerProfile: (profile: SeekerProfile) => void;
-  updateRecruiterProfile: (profile: RecruiterProfile) => void;
-  updateSubAgentProfile: (profile: SubAgentProfile) => void;
-}
-
-export const AuthContext = createContext<AuthState | null>(null);
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+  if (!user || user.role !== 'agent') {
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+          <Skeleton className="h-screen w-screen" />
+        </div>
+    );
   }
-  return context;
+
+  // If profile is not complete and we are on the profile page, show just the form without the dashboard layout
+  if (!isProfileComplete && pathname === '/job-seeker/agent/profile') {
+      return (
+         <div className="min-h-screen flex flex-col bg-white">
+            <Header />
+            <main className="flex-1 bg-gray-50/50">
+                {children}
+            </main>
+            <Footer />
+         </div>
+      )
+  }
+  
+  return <>{children}</>;
 }

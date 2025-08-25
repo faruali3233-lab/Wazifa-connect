@@ -1,90 +1,54 @@
+
 "use client";
 
-import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
-export type UserRole = "jobSeeker" | "recruiter" | "subAgent" | "unselected" | "admin";
+const mockReceipts = [
+    { id: "R-001", subAgent: "Sanjay Patel (SA-01)", candidate: "Aisha Begum", amount: "₹10,000", purpose: "Service Fee", status: "Pending" }
+];
 
-export type Language = 'en' | 'ar' | 'hi';
-
-export type KycStatus = "pending" | "approved" | "rejected" | "not_started";
-
-export interface User {
-  id: string;
-  phone: string;
-  countryCode: string;
-  // Role will be set after the initial login/registration
-  role: UserRole;
-}
-
-export interface SeekerProfile {
-  basics: {
-    name: string;
-    desiredJobTitle: string;
-    locationPreferences: string;
-    experienceYears: number;
-  };
-  skills: string[];
-  experience: string[];
-  education: string[];
-  preferences: string;
-  resumeUrl: string; // Used to store passport/ID upload status
-  kycStatus?: KycStatus;
-  aadhaarLast4?: string;
-  kycSubmissionDate?: string;
-  kycRejectionReason?: string;
-}
-
-export interface RecruiterProfile {
-  yourName: string;
-  yourEmail: string;
-  yourCountry: string;
-  yourCity: string;
-  companyName: string;
-  companyWebsite: string;
-  companyDescription: string;
-  profilePhotoUrl: string;
-}
-
-export interface SubAgentProfile {
-  fullName: string;
-  profilePhotoUrl: string;
-  phone: string;
-  countryCode: string;
-  email?: string;
-  dob?: Date;
-  governmentIdUrl: string; // URL after upload
-  agentReferralLink: string;
-  agentLoginId: string;
-  parentAgentName: string;
-  signedAgreementUrl?: string; // URL after upload
-  complianceCheckbox: boolean;
-  digitalSignature: string;
-  name: string; // For dashboard display
-}
-
-
-export interface AuthState {
-  user: User | null;
-  seekerProfile: SeekerProfile | null;
-  recruiterProfile: RecruiterProfile | null;
-  subAgentProfile: SubAgentProfile | null;
-  isProfileComplete: boolean;
-  language: Language;
-  setLanguage: Dispatch<SetStateAction<Language>>;
-  setUserRole: (role: UserRole) => void;
-  login: (user: Omit<User, 'role'>, role?: UserRole) => void;
-  logout: () => void;
-  updateSeekerProfile: (profile: SeekerProfile) => void;
-  updateRecruiterProfile: (profile: RecruiterProfile) => void;
-  updateSubAgentProfile: (profile: SubAgentProfile) => void;
-}
-
-export const AuthContext = createContext<AuthState | null>(null);
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
+export default function AgentPaymentsPage() {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Payments & Compliance</CardTitle>
+                <CardDescription>Verify receipts from sub-agents and view the status of seeker-to-admin payments.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Tabs defaultValue="receipts">
+                    <TabsList>
+                        <TabsTrigger value="receipts">Receipts from Sub-Agents</TabsTrigger>
+                        <TabsTrigger value="seeker_payments">Seeker Payments</TabsTrigger>
+                        <TabsTrigger value="commissions">Commissions</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="receipts" className="mt-6">
+                        <div className="border rounded-lg">
+                           {mockReceipts.map(receipt => (
+                               <div key={receipt.id} className="grid grid-cols-5 items-center p-4 border-b last:border-b-0">
+                                   <div className="col-span-2">
+                                        <p className="font-medium">{receipt.candidate}</p>
+                                        <p className="text-sm text-muted-foreground">From: {receipt.subAgent}</p>
+                                   </div>
+                                    <div>
+                                        <p className="font-semibold">{receipt.amount}</p>
+                                        <p className="text-xs text-muted-foreground">{receipt.purpose}</p>
+                                    </div>
+                                    <div>
+                                        <Badge variant={receipt.status === "Pending" ? "destructive" : "default"}>{receipt.status}</Badge>
+                                    </div>
+                                    <div className="flex justify-end gap-2">
+                                        <Button variant="outline" size="sm">View Receipt</Button>
+                                        <Button size="sm">Verify</Button>
+                                    </div>
+                               </div>
+                           ))}
+                        </div>
+                    </TabsContent>
+                </Tabs>
+            </CardContent>
+        </Card>
+    );
 }

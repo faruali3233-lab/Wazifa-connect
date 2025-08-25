@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, UserPlus } from "lucide-react";
 import CopyButton from "@/components/copy-button";
+import { useAuth } from "@/hooks/use-auth";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const mockSubAgents = [
     { id: 'SA-01', name: 'Sanjay Patel', candidates: 15, submissions: 8, selectRate: "25%", status: "Active" },
@@ -16,7 +18,12 @@ const mockSubAgents = [
 ];
 
 export default function AgentSubAgentsPage() {
-    const subAgentReferralCode = "REF-AG4829-Xy2Z";
+    const { agentProfile } = useAuth();
+    
+    if (!agentProfile) {
+        return <Skeleton className="h-96 w-full" />
+    }
+
     return (
         <div className="space-y-6">
             <Card>
@@ -25,9 +32,9 @@ export default function AgentSubAgentsPage() {
                         <CardTitle>Manage Sub-Agents</CardTitle>
                         <CardDescription>Invite and manage your network of sub-agents.</CardDescription>
                          <div className="flex items-center gap-2 mt-4">
-                           <span className="text-sm font-medium text-muted-foreground">Your Referral Code:</span>
-                           <Badge variant="outline">{subAgentReferralCode}</Badge>
-                           <CopyButton textToCopy={subAgentReferralCode} />
+                           <span className="text-sm font-medium text-muted-foreground">Your Sub-Agent Referral Code:</span>
+                           <Badge variant="outline">{agentProfile.referralCode}</Badge>
+                           <CopyButton textToCopy={agentProfile.referralCode} />
                         </div>
                     </div>
                     <Button><UserPlus className="mr-2 h-4 w-4" /> Invite Sub-Agent</Button>
@@ -75,5 +82,3 @@ export default function AgentSubAgentsPage() {
         </div>
     );
 }
-
-    

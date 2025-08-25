@@ -1,90 +1,50 @@
-"use client";
 
-import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FilePlus, UploadCloud } from "lucide-react";
 
-export type UserRole = "jobSeeker" | "recruiter" | "subAgent" | "unselected" | "admin";
+export default function AgentDocumentsPage() {
+    return (
+        <div className="space-y-6">
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                        <CardTitle>Candidate Document Vault</CardTitle>
+                        <CardDescription>Manage and upload required documents for your candidates.</CardDescription>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                     <Tabs defaultValue="all">
+                        <TabsList>
+                            <TabsTrigger value="all">All Documents</TabsTrigger>
+                            <TabsTrigger value="passports">Passports/IDs</TabsTrigger>
+                            <TabsTrigger value="medical">Medical Reports</TabsTrigger>
+                            <TabsTrigger value="wakalas">Wakalas</TabsTrigger>
+                            <TabsTrigger value="travel">Tickets & Travel Docs</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="all" className="mt-4">
+                            <div className="text-center text-muted-foreground py-12">
+                                <p>Candidate documents will appear here.</p>
+                                <Button variant="secondary" className="mt-4"><FilePlus className="mr-2 h-4 w-4" /> Upload Document</Button>
+                            </div>
+                        </TabsContent>
+                    </Tabs>
+                </CardContent>
+            </Card>
 
-export type Language = 'en' | 'ar' | 'hi';
-
-export type KycStatus = "pending" | "approved" | "rejected" | "not_started";
-
-export interface User {
-  id: string;
-  phone: string;
-  countryCode: string;
-  // Role will be set after the initial login/registration
-  role: UserRole;
-}
-
-export interface SeekerProfile {
-  basics: {
-    name: string;
-    desiredJobTitle: string;
-    locationPreferences: string;
-    experienceYears: number;
-  };
-  skills: string[];
-  experience: string[];
-  education: string[];
-  preferences: string;
-  resumeUrl: string; // Used to store passport/ID upload status
-  kycStatus?: KycStatus;
-  aadhaarLast4?: string;
-  kycSubmissionDate?: string;
-  kycRejectionReason?: string;
-}
-
-export interface RecruiterProfile {
-  yourName: string;
-  yourEmail: string;
-  yourCountry: string;
-  yourCity: string;
-  companyName: string;
-  companyWebsite: string;
-  companyDescription: string;
-  profilePhotoUrl: string;
-}
-
-export interface SubAgentProfile {
-  fullName: string;
-  profilePhotoUrl: string;
-  phone: string;
-  countryCode: string;
-  email?: string;
-  dob?: Date;
-  governmentIdUrl: string; // URL after upload
-  agentReferralLink: string;
-  agentLoginId: string;
-  parentAgentName: string;
-  signedAgreementUrl?: string; // URL after upload
-  complianceCheckbox: boolean;
-  digitalSignature: string;
-  name: string; // For dashboard display
-}
-
-
-export interface AuthState {
-  user: User | null;
-  seekerProfile: SeekerProfile | null;
-  recruiterProfile: RecruiterProfile | null;
-  subAgentProfile: SubAgentProfile | null;
-  isProfileComplete: boolean;
-  language: Language;
-  setLanguage: Dispatch<SetStateAction<Language>>;
-  setUserRole: (role: UserRole) => void;
-  login: (user: Omit<User, 'role'>, role?: UserRole) => void;
-  logout: () => void;
-  updateSeekerProfile: (profile: SeekerProfile) => void;
-  updateRecruiterProfile: (profile: RecruiterProfile) => void;
-  updateSubAgentProfile: (profile: SubAgentProfile) => void;
-}
-
-export const AuthContext = createContext<AuthState | null>(null);
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                        <CardTitle>Upload Ticket & Travel Docs</CardTitle>
+                        <CardDescription>Upload these to unlock the final payment for the seeker.</CardDescription>
+                    </div>
+                     <Button><UploadCloud className="mr-2 h-4 w-4" /> Upload</Button>
+                </CardHeader>
+                <CardContent>
+                     <p className="text-sm text-center text-muted-foreground py-8">Select a candidate from the submissions pipeline to upload their travel documents.</p>
+                </CardContent>
+            </Card>
+        </div>
+    );
 }
