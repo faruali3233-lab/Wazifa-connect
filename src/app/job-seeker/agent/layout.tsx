@@ -19,20 +19,20 @@ export default function AgentRootLayout({ children }: { children: ReactNode }) {
       return;
     }
     
+    // This layout is only for agents. If not an agent, do nothing and let other layouts handle it.
     if (user && user.role !== 'agent') {
-      return; // Other layouts will handle this user
+      return; 
     }
     
-    // Redirect to profile page if profile is not complete and user is not already there
-    if (user && user.role === 'agent' && !isProfileComplete) {
-        if (pathname !== '/job-seeker/agent/profile') {
-            router.replace('/job-seeker/agent/profile');
-        }
+    // If user is an agent but profile is incomplete, redirect them to the profile page
+    // if they aren't already there.
+    if (user.role === 'agent' && !isProfileComplete && pathname !== '/job-seeker/agent/profile') {
+        router.replace('/job-seeker/agent/profile');
     }
   }, [user, isProfileComplete, router, pathname]);
 
-  // This is a loading state. If the user object isn't loaded yet,
-  // or if the user is not an agent, we show a skeleton loader.
+
+  // Show a loading skeleton if auth state is not resolved or if the user is not an agent.
   if (!user || user.role !== 'agent') {
     return (
         <div className="flex items-center justify-center min-h-screen">
@@ -41,8 +41,8 @@ export default function AgentRootLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  // If the profile is incomplete and we are on the profile page,
-  // render the children (the form) within a simple layout.
+  // If the profile is incomplete, we are on the profile page.
+  // Show the form with a simple header/footer, not the full dashboard layout.
   if (!isProfileComplete && pathname === '/job-seeker/agent/profile') {
       return (
          <div className="min-h-screen flex flex-col bg-white">
@@ -55,7 +55,7 @@ export default function AgentRootLayout({ children }: { children: ReactNode }) {
       );
   }
   
-  // If the profile is complete, or for any other agent-related pages, render the children.
-  // The dashboard layout will be nested within this.
+  // If profile is complete, the dashboard layout is handled by its own layout file.
+  // This root layout just passes the children through.
   return <>{children}</>;
 }
