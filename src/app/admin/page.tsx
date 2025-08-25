@@ -1,9 +1,10 @@
 
 "use client";
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { UserDirectory } from "@/components/user-directory";
 
-export default function AdminDashboard() {
+export default function AdminDashboardPage() {
   return (
     <div className="space-y-6">
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -41,14 +42,14 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      <Card>
-          <CardHeader>
-            <CardTitle>Admin Overview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Welcome to the Admin Dashboard. Use the navigation on the left to manage different aspects of the GulfHired platform.</p>
-            <p className="mt-4">More widgets and data visualizations will be added here soon.</p>
-          </CardContent>
+       <Card>
+        <CardHeader>
+            <CardTitle>User Directory</CardTitle>
+            <CardDescription>View, manage, and verify all users on the platform.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <UserDirectory />
+        </CardContent>
       </Card>
     </div>
   );
