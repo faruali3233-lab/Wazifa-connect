@@ -51,13 +51,23 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
     }
 
     const login = (userData: Omit<User, 'role'>, role: UserRole = 'unselected') => {
-        const mockUser: User = { id: 'agent', password: 'password', role: 'agent', phone: '9876543211', countryCode: '+91' };
-        if(userData.id === 'agent'){
+        if (userData.id === 'jobseeker' && userData.password === 'password') {
+            const mockUser: User = { ...userData, role: 'jobSeeker' };
+            const mockProfile: SeekerProfile = {
+                basics: { name: 'Ravi Kumar', desiredJobTitle: 'Heavy Duty Driver', locationPreferences: 'Dubai', experienceYears: 5 },
+                skills: ['Driving', 'Logistics'],
+                experience: ['5 years as truck driver'],
+                education: ['High School Diploma'],
+                preferences: 'Likes working day shifts',
+                resumeUrl: 'placeholder.pdf',
+            };
             setUser(mockUser);
+            setSeekerProfile(mockProfile);
+            setProfileComplete(true);
         } else {
             setUser({ ...userData, role });
+            setProfileComplete(false); // Reset on login
         }
-        setProfileComplete(false); // Reset on login
     };
     
     const setUserRole = (role: UserRole) => {

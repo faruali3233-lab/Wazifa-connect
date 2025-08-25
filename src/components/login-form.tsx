@@ -23,7 +23,7 @@ const formSchema = z.object({
 
 // Mock user data for demonstration
 const MOCK_USERS: { [key: string]: { password?: string, role: UserRole, phone: string, countryCode: string } } = {
-  'jobseeker': { password: 'password', role: 'unselected', phone: '9876543210', countryCode: '+91' },
+  'jobseeker': { password: 'password', role: 'jobSeeker', phone: '9876543210', countryCode: '+91' },
   'recruiter': { password: 'password', role: 'recruiter', phone: '501234567', countryCode: '+971' },
   'agent': { password: 'password', role: 'agent', phone: '9876543211', countryCode: '+91' },
   'subagent': { password: 'password', role: 'subAgent', phone: '9876543212', countryCode: '+91' },
@@ -51,6 +51,7 @@ export function LoginForm() {
     if (user && user.password === values.password) {
         login({
             id: values.userId,
+            password: values.password,
             phone: user.phone,
             countryCode: user.countryCode,
         }, user.role);
