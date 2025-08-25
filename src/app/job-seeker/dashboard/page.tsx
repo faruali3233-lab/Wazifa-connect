@@ -79,7 +79,7 @@ export default function JobSeekerDashboard() {
 
   const progress = calculateProgress();
 
-  if (!user || loading) {
+  if (loading) {
     return <div className="container mx-auto p-8"><Skeleton className="h-screen w-full" /></div>;
   }
   
@@ -229,3 +229,5 @@ export default function JobSeekerDashboard() {
     </div>
   );
 }
+
+    
