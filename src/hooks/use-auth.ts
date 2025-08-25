@@ -3,7 +3,7 @@
 
 import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
 
-export type UserRole = "jobSeeker" | "recruiter" | "agent" | "subAgent" | "unselected" | "admin";
+export type UserRole = "jobSeeker" | "recruiter" | "agent" | "subAgent" | "unselected";
 
 export type Language = 'en' | 'ar' | 'hi';
 
