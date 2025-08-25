@@ -12,9 +12,9 @@ import { format } from "date-fns";
 import CopyButton from "@/components/copy-button";
 
 const InfoRow = ({ label, value }: { label: string, value: React.ReactNode }) => (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 border-b">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 border-b last:border-0">
         <p className="text-sm font-medium text-muted-foreground">{label}</p>
-        <div className="text-sm text-foreground">{value || "N/A"}</div>
+        <div className="text-sm font-semibold text-foreground text-right">{value || "N/A"}</div>
     </div>
 );
 
@@ -40,7 +40,6 @@ export default function MyProfilePage() {
         );
     }
     
-    // Mocked data as it's not in the profile form yet
     const agentUniqueId = "AG-48291357";
     const subAgentReferralCode = "REF-AG4829-Xy2Z";
 
@@ -93,9 +92,15 @@ export default function MyProfilePage() {
                  <Card>
                     <CardHeader><CardTitle>Unique Identifiers</CardTitle></CardHeader>
                     <CardContent>
-                        <InfoRow label="Agent Unique ID" value={<Badge variant="outline">{agentUniqueId}</Badge>} />
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 border-b">
-                            <p className="text-sm font-medium text-muted-foreground">Sub Agent Referral Code</p>
+                            <p className="text-sm font-medium text-muted-foreground">Agent Unique ID</p>
+                            <div className="flex items-center gap-2">
+                                <Badge variant="outline">{agentUniqueId}</Badge>
+                               <CopyButton textToCopy={agentUniqueId} />
+                            </div>
+                        </div>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3">
+                            <p className="text-sm font-medium text-muted-foreground">Sub-Agent Referral Code</p>
                             <div className="flex items-center gap-2">
                                <Badge variant="outline">{subAgentReferralCode}</Badge>
                                <CopyButton textToCopy={subAgentReferralCode} />
@@ -107,3 +112,5 @@ export default function MyProfilePage() {
         </div>
     )
 }
+
+    

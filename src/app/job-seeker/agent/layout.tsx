@@ -5,9 +5,11 @@ import { useEffect, type ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 
 export default function AgentRootLayout({ children }: { children: ReactNode }) {
-  const { user, isProfileComplete, agentProfile } = useAuth();
+  const { user, isProfileComplete } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -44,12 +46,16 @@ export default function AgentRootLayout({ children }: { children: ReactNode }) {
   if (!isProfileComplete && pathname === '/job-seeker/agent/profile') {
       return (
          <div className="min-h-screen flex flex-col bg-white">
+            <Header />
             <main className="flex-1 bg-gray-50/50">
                 {children}
             </main>
+            <Footer />
          </div>
       )
   }
   
   return <>{children}</>;
 }
+
+    
