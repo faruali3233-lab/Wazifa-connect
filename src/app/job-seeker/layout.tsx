@@ -32,8 +32,6 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
       } else if (user.role === 'jobSeeker') {
         if (!isProfileComplete && pathname !== '/job-seeker/profile') {
           router.replace('/job-seeker/profile');
-        } else if (isProfileComplete && seekerProfile?.kycStatus !== 'approved' && pathname !== '/job-seeker/review') {
-          router.replace('/job-seeker/review');
         }
       }
     }

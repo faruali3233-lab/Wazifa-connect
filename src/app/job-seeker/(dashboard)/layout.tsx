@@ -39,19 +39,18 @@ const getPageTitle = (pathname: string) => {
 }
 
 export default function JobSeekerDashboardLayout({ children }: { children: ReactNode }) {
-  const { logout, seekerProfile } = useAuth();
+  const { logout, seekerProfile, isProfileComplete } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    // Gate dashboard access based on KYC status
-    if (seekerProfile && seekerProfile.kycStatus !== 'approved') {
-        router.replace('/job-seeker/review');
+    if (!isProfileComplete) {
+        router.replace('/job-seeker/profile');
     }
-  }, [seekerProfile, router]);
+  }, [isProfileComplete, router]);
 
 
-  if (!seekerProfile || seekerProfile.kycStatus !== 'approved') {
+  if (!seekerProfile) {
       return (
         <div className="flex items-center justify-center min-h-screen">
             <Skeleton className="h-screen w-screen" />
