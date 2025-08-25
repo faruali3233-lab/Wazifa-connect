@@ -64,7 +64,7 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
             </SidebarHeader>
             <SidebarContent>
                 <SidebarMenu>
-                    <NavItem href="/admin" icon={<LayoutDashboard />} currentPath={pathname}>Overview</NavItem>
+                    <NavItem href="/admin/dashboard" icon={<LayoutDashboard />} currentPath={pathname}>Overview</NavItem>
                     <NavItem href="/admin/users" icon={<Users />} currentPath={pathname}>User Management</NavItem>
                     <NavItem href="/admin/kyc" icon={<ShieldCheck />} currentPath={pathname}>KYC & Compliance</NavItem>
                     <NavItem href="/admin/jobs" icon={<Briefcase />} currentPath={pathname}>Jobs & Pipelines</NavItem>
