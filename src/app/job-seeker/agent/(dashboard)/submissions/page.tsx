@@ -1,63 +1,90 @@
-
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
 
-const stages = ["Submitted", "Shortlisted", "Selected", "Offer", "Ticketed", "Hired"];
+export type UserRole = "jobSeeker" | "recruiter" | "subAgent" | "unselected" | "admin";
 
-const mockSubmissions = [
-    { id: 1, candidate: "Ravi Kumar", job: "Heavy Duty Driver", stage: "Selected", owner: "You" },
-    { id: 2, candidate: "Aisha Begum", job: "Household Cook", stage: "Submitted", owner: "SA-01" },
-    { id: 3, candidate: "Manoj Verma", job: "Construction Painter", stage: "Shortlisted", owner: "You" },
-    { id: 4, candidate: "Sunita Singh", job: "Nanny", stage: "Ticketed", owner: "SA-02" },
-    { id: 5, candidate: "Arjun Reddy", job: "AC Technician", stage: "Submitted", owner: "SA-01" },
-     { id: 6, candidate: "Priya Sharma", job: "Heavy Duty Driver", stage: "Hired", owner: "You" },
-];
+export type Language = 'en' | 'ar' | 'hi';
 
-export default function AgentSubmissionsPage() {
-  return (
-    <div className="flex flex-col h-full">
-      <div className="p-6">
-        <CardHeader className="p-0 mb-4">
-            <CardTitle className="flex items-center gap-2 text-3xl">
-                Submissions Pipeline
-            </CardTitle>
-            <CardDescription>
-                Track candidates submitted by you and your sub-agents through the hiring process.
-            </CardDescription>
-        </CardHeader>
-      </div>
+export type KycStatus = "pending" | "approved" | "rejected" | "not_started";
 
-      <div className="flex-1 overflow-x-auto">
-        <div className="inline-grid grid-flow-col auto-cols-max gap-4 p-6 pt-0">
-          {stages.map(stage => (
-            <div key={stage} className="w-72 bg-muted/50 rounded-lg">
-              <h3 className="font-semibold p-3 border-b">{stage} ({mockSubmissions.filter(a => a.stage === stage).length})</h3>
-              <div className="p-3 space-y-3 overflow-y-auto">
-                {mockSubmissions
-                  .filter(app => app.stage === stage)
-                  .map(app => (
-                    <Card key={app.id} className="hover:shadow-md transition-shadow">
-                      <CardContent className="p-3">
-                        <p className="font-semibold text-sm">{app.candidate}</p>
-                        <p className="text-xs text-muted-foreground">{app.job}</p>
-                        <Badge variant="secondary" className="mt-2">Owner: {app.owner}</Badge>
-                      </CardContent>
-                    </Card>
-                ))}
-                 {mockSubmissions.filter(a => a.stage === stage).length === 0 && (
-                    <div className="text-center py-10 text-xs text-muted-foreground">
-                        <p>No submissions in this stage.</p>
-                    </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+export interface User {
+  id: string;
+  phone: string;
+  countryCode: string;
+  // Role will be set after the initial login/registration
+  role: UserRole;
 }
 
-    
+export interface SeekerProfile {
+  basics: {
+    name: string;
+    desiredJobTitle: string;
+    locationPreferences: string;
+    experienceYears: number;
+  };
+  skills: string[];
+  experience: string[];
+  education: string[];
+  preferences: string;
+  resumeUrl: string; // Used to store passport/ID upload status
+  kycStatus?: KycStatus;
+  aadhaarLast4?: string;
+  kycSubmissionDate?: string;
+  kycRejectionReason?: string;
+}
+
+export interface RecruiterProfile {
+  yourName: string;
+  yourEmail: string;
+  yourCountry: string;
+  yourCity: string;
+  companyName: string;
+  companyWebsite: string;
+  companyDescription: string;
+  profilePhotoUrl: string;
+}
+
+export interface SubAgentProfile {
+  fullName: string;
+  profilePhotoUrl: string;
+  phone: string;
+  countryCode: string;
+  email?: string;
+  dob?: Date;
+  governmentIdUrl: string; // URL after upload
+  agentReferralLink: string;
+  agentLoginId: string;
+  parentAgentName: string;
+  signedAgreementUrl?: string; // URL after upload
+  complianceCheckbox: boolean;
+  digitalSignature: string;
+  name: string; // For dashboard display
+}
+
+
+export interface AuthState {
+  user: User | null;
+  seekerProfile: SeekerProfile | null;
+  recruiterProfile: RecruiterProfile | null;
+  subAgentProfile: SubAgentProfile | null;
+  isProfileComplete: boolean;
+  language: Language;
+  setLanguage: Dispatch<SetStateAction<Language>>;
+  setUserRole: (role: UserRole) => void;
+  login: (user: Omit<User, 'role'>, role?: UserRole) => void;
+  logout: () => void;
+  updateSeekerProfile: (profile: SeekerProfile) => void;
+  updateRecruiterProfile: (profile: RecruiterProfile) => void;
+  updateSubAgentProfile: (profile: SubAgentProfile) => void;
+}
+
+export const AuthContext = createContext<AuthState | null>(null);
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}

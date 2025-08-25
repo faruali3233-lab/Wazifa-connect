@@ -1,94 +1,90 @@
-
 "use client";
 
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { CheckCircle, Clock } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
 
-const mockReceipts = [
-    { from: 'SA-01', candidate: 'Aisha Begum', amount: '₹10,000', purpose: 'Service Fee', status: 'Pending' },
-    { from: 'SA-02', candidate: 'Sunita Singh', amount: '₹5,000', purpose: 'Medical', status: 'Verified' }
-];
+export type UserRole = "jobSeeker" | "recruiter" | "subAgent" | "unselected" | "admin";
 
-const mockSeekerPayments = [
-    { candidate: 'Ravi Kumar', job: 'Heavy Duty Driver', stage: 'Interest Fee', status: 'Paid' },
-    { candidate: 'Manoj Verma', job: 'Construction Painter', stage: 'Phase-1', status: 'Paid' },
-    { candidate: 'Aisha Begum', job: 'Household Cook', stage: 'Interest Fee', status: 'Pending' },
-];
+export type Language = 'en' | 'ar' | 'hi';
 
-export default function AgentPaymentsPage() {
-    return (
-        <Tabs defaultValue="receipts">
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h1 className="text-3xl font-bold">Payments & Compliance</h1>
-                    <p className="text-muted-foreground">Verify sub-agent receipts and track seeker payment statuses.</p>
-                </div>
-                <TabsList>
-                    <TabsTrigger value="receipts">Sub-Agent Receipts</TabsTrigger>
-                    <TabsTrigger value="seeker_payments">Seeker Payments</TabsTrigger>
-                </TabsList>
-            </div>
-            <TabsContent value="receipts">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Receipts from Sub-Agents</CardTitle>
-                        <CardDescription>Verify payments uploaded by your sub-agents.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        {mockReceipts.map((receipt, index) => (
-                             <Card key={index} className="p-4">
-                                 <div className="flex flex-wrap items-center justify-between gap-4">
-                                     <div>
-                                        <p className="font-semibold">{receipt.candidate} <span className="font-normal text-muted-foreground">via {receipt.from}</span></p>
-                                        <p className="text-sm text-muted-foreground">{receipt.purpose}</p>
-                                     </div>
-                                     <div className="flex items-center gap-4">
-                                        <p className="text-lg font-bold">{receipt.amount}</p>
-                                         <Badge variant={receipt.status === 'Verified' ? 'default' : 'secondary'} className="gap-1">
-                                            {receipt.status === 'Verified' ? <CheckCircle className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
-                                            {receipt.status}
-                                         </Badge>
-                                        <Button variant="outline" size="sm">View</Button>
-                                        {receipt.status === 'Pending' && <Button size="sm">Verify</Button>}
-                                     </div>
-                                 </div>
-                             </Card>
-                        ))}
-                    </CardContent>
-                </Card>
-            </TabsContent>
-            <TabsContent value="seeker_payments">
-                 <Card>
-                    <CardHeader>
-                        <CardTitle>Seeker Payments to Admin (Read-Only)</CardTitle>
-                        <CardDescription>Track the status of mandatory payments made by your candidates to the platform.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                         {mockSeekerPayments.map((payment, index) => (
-                             <Card key={index} className="p-4">
-                                 <div className="flex flex-wrap items-center justify-between gap-4">
-                                     <div>
-                                        <p className="font-semibold">{payment.candidate}</p>
-                                        <p className="text-sm text-muted-foreground">{payment.job}</p>
-                                     </div>
-                                     <div className="flex items-center gap-4">
-                                        <p className="text-sm font-medium">{payment.stage}</p>
-                                         <Badge variant={payment.status === 'Paid' ? 'default' : 'destructive'} className="gap-1">
-                                            {payment.status === 'Paid' ? <CheckCircle className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
-                                            {payment.status}
-                                         </Badge>
-                                     </div>
-                                 </div>
-                             </Card>
-                        ))}
-                    </CardContent>
-                </Card>
-            </TabsContent>
-        </Tabs>
-    );
+export type KycStatus = "pending" | "approved" | "rejected" | "not_started";
+
+export interface User {
+  id: string;
+  phone: string;
+  countryCode: string;
+  // Role will be set after the initial login/registration
+  role: UserRole;
 }
 
-    
+export interface SeekerProfile {
+  basics: {
+    name: string;
+    desiredJobTitle: string;
+    locationPreferences: string;
+    experienceYears: number;
+  };
+  skills: string[];
+  experience: string[];
+  education: string[];
+  preferences: string;
+  resumeUrl: string; // Used to store passport/ID upload status
+  kycStatus?: KycStatus;
+  aadhaarLast4?: string;
+  kycSubmissionDate?: string;
+  kycRejectionReason?: string;
+}
+
+export interface RecruiterProfile {
+  yourName: string;
+  yourEmail: string;
+  yourCountry: string;
+  yourCity: string;
+  companyName: string;
+  companyWebsite: string;
+  companyDescription: string;
+  profilePhotoUrl: string;
+}
+
+export interface SubAgentProfile {
+  fullName: string;
+  profilePhotoUrl: string;
+  phone: string;
+  countryCode: string;
+  email?: string;
+  dob?: Date;
+  governmentIdUrl: string; // URL after upload
+  agentReferralLink: string;
+  agentLoginId: string;
+  parentAgentName: string;
+  signedAgreementUrl?: string; // URL after upload
+  complianceCheckbox: boolean;
+  digitalSignature: string;
+  name: string; // For dashboard display
+}
+
+
+export interface AuthState {
+  user: User | null;
+  seekerProfile: SeekerProfile | null;
+  recruiterProfile: RecruiterProfile | null;
+  subAgentProfile: SubAgentProfile | null;
+  isProfileComplete: boolean;
+  language: Language;
+  setLanguage: Dispatch<SetStateAction<Language>>;
+  setUserRole: (role: UserRole) => void;
+  login: (user: Omit<User, 'role'>, role?: UserRole) => void;
+  logout: () => void;
+  updateSeekerProfile: (profile: SeekerProfile) => void;
+  updateRecruiterProfile: (profile: RecruiterProfile) => void;
+  updateSubAgentProfile: (profile: SubAgentProfile) => void;
+}
+
+export const AuthContext = createContext<AuthState | null>(null);
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}

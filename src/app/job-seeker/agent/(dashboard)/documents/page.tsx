@@ -1,81 +1,90 @@
-
 "use client";
 
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { UploadCloud } from "lucide-react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
 
-const mockDocs = [
-    { candidate: 'Ravi Kumar', docType: 'Ticket', uploadedBy: 'You', date: '2024-08-20' },
-    { candidate: 'Manoj Verma', docType: 'Wakala', uploadedBy: 'Recruiter', date: '2024-08-18' },
-];
+export type UserRole = "jobSeeker" | "recruiter" | "subAgent" | "unselected" | "admin";
 
-export default function AgentDocumentsKycPage() {
-    return (
-        <div className="space-y-6">
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                    <div>
-                        <CardTitle>Candidate Documents Vault</CardTitle>
-                        <CardDescription>Upload and manage travel documents for your candidates.</CardDescription>
-                    </div>
-                    <Button>
-                        <UploadCloud className="mr-2 h-4 w-4" />
-                        Upload Ticket/Docs
-                    </Button>
-                </CardHeader>
-                <CardContent>
-                    <div className="border rounded-md">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Candidate</TableHead>
-                                    <TableHead>Document Type</TableHead>
-                                    <TableHead>Uploaded By</TableHead>
-                                    <TableHead>Date</TableHead>
-                                    <TableHead>Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {mockDocs.map((doc, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell className="font-medium">{doc.candidate}</TableCell>
-                                        <TableCell>{doc.docType}</TableCell>
-                                        <TableCell>{doc.uploadedBy}</TableCell>
-                                        <TableCell>{doc.date}</TableCell>
-                                        <TableCell>
-                                            <Button variant="outline" size="sm">View/Replace</Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                                 {mockDocs.length === 0 && (
-                                     <TableRow>
-                                        <TableCell colSpan={5} className="h-24 text-center">
-                                            No documents uploaded yet.
-                                        </TableCell>
-                                    </TableRow>
-                                 )}
-                            </TableBody>
-                        </Table>
-                    </div>
-                </CardContent>
-            </Card>
+export type Language = 'en' | 'ar' | 'hi';
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>My Agency KYC Documents</CardTitle>
-                     <CardDescription>Manage your own business and compliance documents.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                     <div className="text-center text-muted-foreground py-12">
-                        <p>Your KYC documents (License, ID) are managed from your profile.</p>
-                        <Button variant="secondary" className="mt-4">Go to My Profile</Button>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
-    );
+export type KycStatus = "pending" | "approved" | "rejected" | "not_started";
+
+export interface User {
+  id: string;
+  phone: string;
+  countryCode: string;
+  // Role will be set after the initial login/registration
+  role: UserRole;
 }
 
-    
+export interface SeekerProfile {
+  basics: {
+    name: string;
+    desiredJobTitle: string;
+    locationPreferences: string;
+    experienceYears: number;
+  };
+  skills: string[];
+  experience: string[];
+  education: string[];
+  preferences: string;
+  resumeUrl: string; // Used to store passport/ID upload status
+  kycStatus?: KycStatus;
+  aadhaarLast4?: string;
+  kycSubmissionDate?: string;
+  kycRejectionReason?: string;
+}
+
+export interface RecruiterProfile {
+  yourName: string;
+  yourEmail: string;
+  yourCountry: string;
+  yourCity: string;
+  companyName: string;
+  companyWebsite: string;
+  companyDescription: string;
+  profilePhotoUrl: string;
+}
+
+export interface SubAgentProfile {
+  fullName: string;
+  profilePhotoUrl: string;
+  phone: string;
+  countryCode: string;
+  email?: string;
+  dob?: Date;
+  governmentIdUrl: string; // URL after upload
+  agentReferralLink: string;
+  agentLoginId: string;
+  parentAgentName: string;
+  signedAgreementUrl?: string; // URL after upload
+  complianceCheckbox: boolean;
+  digitalSignature: string;
+  name: string; // For dashboard display
+}
+
+
+export interface AuthState {
+  user: User | null;
+  seekerProfile: SeekerProfile | null;
+  recruiterProfile: RecruiterProfile | null;
+  subAgentProfile: SubAgentProfile | null;
+  isProfileComplete: boolean;
+  language: Language;
+  setLanguage: Dispatch<SetStateAction<Language>>;
+  setUserRole: (role: UserRole) => void;
+  login: (user: Omit<User, 'role'>, role?: UserRole) => void;
+  logout: () => void;
+  updateSeekerProfile: (profile: SeekerProfile) => void;
+  updateRecruiterProfile: (profile: RecruiterProfile) => void;
+  updateSubAgentProfile: (profile: SubAgentProfile) => void;
+}
+
+export const AuthContext = createContext<AuthState | null>(null);
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}

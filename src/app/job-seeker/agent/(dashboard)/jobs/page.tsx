@@ -1,82 +1,90 @@
-
 "use client";
 
-import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search } from "lucide-react";
+import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
 
-const mockJobs = [
-    { id: 1, title: "Heavy Duty Driver", recruiter: "Al-Futtaim Logistics", location: "Dubai, UAE", salary: "AED 4,500", urgency: "Urgent", quota: 5, submitted: 2 },
-    { id: 2, title: "Household Cook", recruiter: "Private Villa", location: "Riyadh, KSA", salary: "SAR 3,000", urgency: "Normal", quota: 1, submitted: 1 },
-    { id: 3, title: "Construction Painter", recruiter: "Emaar Properties", location: "Abu Dhabi, UAE", salary: "Negotiable", urgency: "Closing Soon", quota: 10, submitted: 5 },
-    { id: 4, title: "AC Technician", recruiter: "Carrier", location: "Doha, Qatar", salary: "QAR 4,000", urgency: "Normal", quota: 3, submitted: 0 },
-];
+export type UserRole = "jobSeeker" | "recruiter" | "subAgent" | "unselected" | "admin";
 
-export default function AgentJobsPage() {
-    return (
-        <div className="space-y-6">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Recruiter Requirements</CardTitle>
-                    <CardDescription>Browse job postings from recruiters and submit your candidates.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="flex flex-wrap gap-4 mb-6">
-                        <div className="relative flex-1 min-w-[200px]">
-                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                            <Input placeholder="Search by title, role..." className="pl-8" />
-                        </div>
-                        <Select>
-                            <SelectTrigger className="w-full md:w-[180px]">
-                                <SelectValue placeholder="Filter by city" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="dubai">Dubai</SelectItem>
-                                <SelectItem value="riyadh">Riyadh</SelectItem>
-                                <SelectItem value="abu-dhabi">Abu Dhabi</SelectItem>
-                                <SelectItem value="doha">Doha</SelectItem>
-                            </SelectContent>
-                        </Select>
-                         <Select>
-                            <SelectTrigger className="w-full md:w-[180px]">
-                                <SelectValue placeholder="Filter by urgency" />
-                            </SelectTrigger>
-                             <SelectContent>
-                                <SelectItem value="urgent">Urgent</SelectItem>
-                                <SelectItem value="closing-soon">Closing Soon</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
+export type Language = 'en' | 'ar' | 'hi';
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {mockJobs.map(job => (
-                            <Card key={job.id} className="flex flex-col">
-                                <CardHeader>
-                                    <div className="flex justify-between items-start">
-                                        <CardTitle className="text-lg">{job.title}</CardTitle>
-                                        {job.urgency !== "Normal" && <Badge variant={job.urgency === 'Urgent' ? 'destructive' : 'secondary'}>{job.urgency}</Badge>}
-                                    </div>
-                                    <CardDescription>{job.recruiter} - {job.location}</CardDescription>
-                                </CardHeader>
-                                <CardContent className="flex-grow space-y-2">
-                                    <p className="font-bold text-primary">{job.salary}</p>
-                                    <p className="text-sm text-muted-foreground">Hiring Quota: <span className="font-semibold text-foreground">{job.quota}</span></p>
-                                    <p className="text-sm text-muted-foreground">Your Submissions: <span className="font-semibold text-foreground">{job.submitted}</span></p>
-                                </CardContent>
-                                <CardFooter className="flex gap-2">
-                                    <Button className="flex-1">Suggest Candidates</Button>
-                                    <Button variant="outline">Details</Button>
-                                </CardFooter>
-                            </Card>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
-    );
+export type KycStatus = "pending" | "approved" | "rejected" | "not_started";
+
+export interface User {
+  id: string;
+  phone: string;
+  countryCode: string;
+  // Role will be set after the initial login/registration
+  role: UserRole;
 }
 
-    
+export interface SeekerProfile {
+  basics: {
+    name: string;
+    desiredJobTitle: string;
+    locationPreferences: string;
+    experienceYears: number;
+  };
+  skills: string[];
+  experience: string[];
+  education: string[];
+  preferences: string;
+  resumeUrl: string; // Used to store passport/ID upload status
+  kycStatus?: KycStatus;
+  aadhaarLast4?: string;
+  kycSubmissionDate?: string;
+  kycRejectionReason?: string;
+}
+
+export interface RecruiterProfile {
+  yourName: string;
+  yourEmail: string;
+  yourCountry: string;
+  yourCity: string;
+  companyName: string;
+  companyWebsite: string;
+  companyDescription: string;
+  profilePhotoUrl: string;
+}
+
+export interface SubAgentProfile {
+  fullName: string;
+  profilePhotoUrl: string;
+  phone: string;
+  countryCode: string;
+  email?: string;
+  dob?: Date;
+  governmentIdUrl: string; // URL after upload
+  agentReferralLink: string;
+  agentLoginId: string;
+  parentAgentName: string;
+  signedAgreementUrl?: string; // URL after upload
+  complianceCheckbox: boolean;
+  digitalSignature: string;
+  name: string; // For dashboard display
+}
+
+
+export interface AuthState {
+  user: User | null;
+  seekerProfile: SeekerProfile | null;
+  recruiterProfile: RecruiterProfile | null;
+  subAgentProfile: SubAgentProfile | null;
+  isProfileComplete: boolean;
+  language: Language;
+  setLanguage: Dispatch<SetStateAction<Language>>;
+  setUserRole: (role: UserRole) => void;
+  login: (user: Omit<User, 'role'>, role?: UserRole) => void;
+  logout: () => void;
+  updateSeekerProfile: (profile: SeekerProfile) => void;
+  updateRecruiterProfile: (profile: RecruiterProfile) => void;
+  updateSubAgentProfile: (profile: SubAgentProfile) => void;
+}
+
+export const AuthContext = createContext<AuthState | null>(null);
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}

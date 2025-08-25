@@ -3,7 +3,7 @@
 
 import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
 
-export type UserRole = "jobSeeker" | "recruiter" | "agent" | "subAgent" | "unselected" | "admin";
+export type UserRole = "jobSeeker" | "recruiter" | "subAgent" | "unselected" | "admin";
 
 export type Language = 'en' | 'ar' | 'hi';
 
@@ -46,28 +46,6 @@ export interface RecruiterProfile {
   profilePhotoUrl: string;
 }
 
-export interface AgentProfile {
-    fullName: string;
-    email: string;
-    phone: string;
-    countryCode: string;
-    profilePhotoUrl: string;
-    governmentIdUrl: string;
-    businessLicenseUrl?: string;
-    name: string;
-    kycStatus: 'Pending' | 'Verified' | 'Rejected';
-    dob?: Date;
-    officeAddress: string;
-    licenseNumber: string;
-    agencyType: 'individual' | 'company';
-    yearsOfExperience: string;
-    regions: string[];
-    gstNumber?: string;
-    languages?: string[];
-    candidatePoolSize?: string;
-    terms: boolean;
-}
-
 export interface SubAgentProfile {
   fullName: string;
   profilePhotoUrl: string;
@@ -90,7 +68,6 @@ export interface AuthState {
   user: User | null;
   seekerProfile: SeekerProfile | null;
   recruiterProfile: RecruiterProfile | null;
-  agentProfile: AgentProfile | null;
   subAgentProfile: SubAgentProfile | null;
   isProfileComplete: boolean;
   language: Language;
@@ -100,7 +77,6 @@ export interface AuthState {
   logout: () => void;
   updateSeekerProfile: (profile: SeekerProfile) => void;
   updateRecruiterProfile: (profile: RecruiterProfile) => void;
-  updateAgentProfile: (profile: AgentProfile) => void;
   updateSubAgentProfile: (profile: SubAgentProfile) => void;
 }
 

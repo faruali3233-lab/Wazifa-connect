@@ -1,115 +1,90 @@
-
 "use client";
 
-import { type ReactNode } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth';
-import Link from 'next/link';
-import {
-  SidebarProvider,
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarFooter,
-  SidebarTrigger,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarInset,
-} from '@/components/ui/sidebar';
-import { LayoutDashboard, Users, UserCheck, Briefcase, HandCoins, MessageSquare, BarChart, Settings, FileText, LifeBuoy, CalendarClock, UserSquare } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { LogOut } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
 
-const NavItem = ({ href, icon, children, currentPath }: { href: string; icon: React.ReactNode; children: React.ReactNode; currentPath: string; }) => (
-    <SidebarMenuItem>
-        <Link href={href}>
-            <SidebarMenuButton isActive={currentPath === href} icon={icon}>
-                {children}
-            </SidebarMenuButton>
-        </Link>
-    </SidebarMenuItem>
-);
+export type UserRole = "jobSeeker" | "recruiter" | "subAgent" | "unselected" | "admin";
 
-const getPageTitle = (pathname: string) => {
-    const routeName = pathname.split('/').pop()?.replace(/-/g, ' ') || 'dashboard';
-    if (routeName === 'documents kyc') return 'Documents & KYC';
-    if (routeName === 'help') return 'Help / Support';
-    if (routeName === 'my profile') return 'My Profile';
-    return routeName.replace(/\b\w/g, l => l.toUpperCase());
+export type Language = 'en' | 'ar' | 'hi';
+
+export type KycStatus = "pending" | "approved" | "rejected" | "not_started";
+
+export interface User {
+  id: string;
+  phone: string;
+  countryCode: string;
+  // Role will be set after the initial login/registration
+  role: UserRole;
 }
 
-export default function AgentDashboardLayout({ children }: { children: ReactNode }) {
-  const { logout, agentProfile } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
+export interface SeekerProfile {
+  basics: {
+    name: string;
+    desiredJobTitle: string;
+    locationPreferences: string;
+    experienceYears: number;
+  };
+  skills: string[];
+  experience: string[];
+  education: string[];
+  preferences: string;
+  resumeUrl: string; // Used to store passport/ID upload status
+  kycStatus?: KycStatus;
+  aadhaarLast4?: string;
+  kycSubmissionDate?: string;
+  kycRejectionReason?: string;
+}
 
-  if (!agentProfile) {
-      return (
-        <div className="flex items-center justify-center min-h-screen">
-            <Skeleton className="h-screen w-screen" />
-        </div>
-      );
+export interface RecruiterProfile {
+  yourName: string;
+  yourEmail: string;
+  yourCountry: string;
+  yourCity: string;
+  companyName: string;
+  companyWebsite: string;
+  companyDescription: string;
+  profilePhotoUrl: string;
+}
+
+export interface SubAgentProfile {
+  fullName: string;
+  profilePhotoUrl: string;
+  phone: string;
+  countryCode: string;
+  email?: string;
+  dob?: Date;
+  governmentIdUrl: string; // URL after upload
+  agentReferralLink: string;
+  agentLoginId: string;
+  parentAgentName: string;
+  signedAgreementUrl?: string; // URL after upload
+  complianceCheckbox: boolean;
+  digitalSignature: string;
+  name: string; // For dashboard display
+}
+
+
+export interface AuthState {
+  user: User | null;
+  seekerProfile: SeekerProfile | null;
+  recruiterProfile: RecruiterProfile | null;
+  subAgentProfile: SubAgentProfile | null;
+  isProfileComplete: boolean;
+  language: Language;
+  setLanguage: Dispatch<SetStateAction<Language>>;
+  setUserRole: (role: UserRole) => void;
+  login: (user: Omit<User, 'role'>, role?: UserRole) => void;
+  logout: () => void;
+  updateSeekerProfile: (profile: SeekerProfile) => void;
+  updateRecruiterProfile: (profile: RecruiterProfile) => void;
+  updateSubAgentProfile: (profile: SubAgentProfile) => void;
+}
+
+export const AuthContext = createContext<AuthState | null>(null);
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
   }
-  
-  return (
-    <SidebarProvider>
-        <Sidebar>
-            <SidebarHeader>
-                 <div className="flex items-center gap-2 p-2">
-                    <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="32" height="32" rx="8" fill="#005430"/>
-                        <path d="M10 13C10 11.3431 11.3431 10 13 10H19C20.6569 10 22 11.3431 22 13V22H10V13Z" fill="white"/>
-                    </svg>
-                    <span className="text-lg font-semibold text-primary">GulfHired Agent</span>
-                </div>
-            </SidebarHeader>
-            <SidebarContent>
-                <SidebarMenu>
-                    <NavItem href="/job-seeker/agent/dashboard" icon={<LayoutDashboard />} currentPath={pathname}>Dashboard</NavItem>
-                    <NavItem href="/job-seeker/agent/jobs" icon={<Briefcase />} currentPath={pathname}>Jobs</NavItem>
-                    <NavItem href="/job-seeker/agent/candidate-pool" icon={<Users />} currentPath={pathname}>Candidate Pool</NavItem>
-                    <NavItem href="/job-seeker/agent/sub-agents" icon={<UserCheck />} currentPath={pathname}>Sub Agents</NavItem>
-                    <NavItem href="/job-seeker/agent/submissions" icon={<BarChart />} currentPath={pathname}>Submissions</NavItem>
-                    <NavItem href="/job-seeker/agent/interviews" icon={<CalendarClock />} currentPath={pathname}>Interviews</NavItem>
-                    <NavItem href="/job-seeker/agent/messages" icon={<MessageSquare />} currentPath={pathname}>Messages</NavItem>
-                    <NavItem href="/job-seeker/agent/payments" icon={<HandCoins />} currentPath={pathname}>Payments</NavItem>
-                    <NavItem href="/job-seeker/agent/documents-kyc" icon={<FileText />} currentPath={pathname}>Documents & KYC</NavItem>
-                    <NavItem href="/job-seeker/agent/my-profile" icon={<UserSquare />} currentPath={pathname}>My Profile</NavItem>
-                    <NavItem href="/job-seeker/agent/settings" icon={<Settings />} currentPath={pathname}>Settings</NavItem>
-                    <NavItem href="/job-seeker/agent/help" icon={<LifeBuoy />} currentPath={pathname}>Help / Support</NavItem>
-                </SidebarMenu>
-            </SidebarContent>
-            <SidebarFooter>
-                <div className="flex items-center gap-3 p-3 border-t">
-                    <Avatar>
-                        <AvatarImage src={agentProfile?.profilePhotoUrl} />
-                        <AvatarFallback>{agentProfile?.name?.charAt(0) || 'A'}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                        <p className="text-sm font-semibold">{agentProfile?.name}</p>
-                        <p className="text-xs text-muted-foreground">{agentProfile?.email}</p>
-                    </div>
-                    <Button variant="ghost" size="icon" onClick={() => { logout(); router.push('/'); }}>
-                        <LogOut />
-                    </Button>
-                </div>
-            </SidebarFooter>
-        </Sidebar>
-        <SidebarInset>
-            <header className="flex items-center justify-between p-4 border-b">
-                <SidebarTrigger />
-                <h1 className="text-2xl font-bold">
-                   {getPageTitle(pathname)}
-                </h1>
-                <div></div>
-            </header>
-            <main className="flex-1 p-6 bg-gray-50/50">
-                {children}
-            </main>
-        </SidebarInset>
-    </SidebarProvider>
-  );
+  return context;
 }

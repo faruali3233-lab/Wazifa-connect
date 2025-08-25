@@ -1,116 +1,90 @@
-
 "use client";
 
-import { useAuth } from "@/hooks/use-auth";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useRouter } from "next/navigation";
-import { Skeleton } from "@/components/ui/skeleton";
-import { format } from "date-fns";
-import CopyButton from "@/components/copy-button";
+import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
 
-const InfoRow = ({ label, value }: { label: string, value: React.ReactNode }) => (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 border-b last:border-0">
-        <p className="text-sm font-medium text-muted-foreground">{label}</p>
-        <div className="text-sm font-semibold text-foreground text-right">{value || "N/A"}</div>
-    </div>
-);
+export type UserRole = "jobSeeker" | "recruiter" | "subAgent" | "unselected" | "admin";
 
-const kycVariant = (status: string | undefined) => {
-    switch (status) {
-        case "Verified": return "default";
-        case "Pending": return "secondary";
-        case "Rejected": return "destructive";
-        default: return "outline";
-    }
+export type Language = 'en' | 'ar' | 'hi';
+
+export type KycStatus = "pending" | "approved" | "rejected" | "not_started";
+
+export interface User {
+  id: string;
+  phone: string;
+  countryCode: string;
+  // Role will be set after the initial login/registration
+  role: UserRole;
 }
 
-export default function MyProfilePage() {
-    const { agentProfile } = useAuth();
-    const router = useRouter();
-
-    if (!agentProfile) {
-        return (
-            <div className="space-y-6">
-                <Card><CardHeader><Skeleton className="h-8 w-1/2" /></CardHeader><CardContent><Skeleton className="h-48 w-full" /></CardContent></Card>
-                <Card><CardHeader><Skeleton className="h-8 w-1/2" /></CardHeader><CardContent><Skeleton className="h-32 w-full" /></CardContent></Card>
-            </div>
-        );
-    }
-    
-    const agentUniqueId = "AG-48291357";
-    const subAgentReferralCode = "REF-AG4829-Xy2Z";
-
-    return (
-        <div className="space-y-6">
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                    <div>
-                        <CardTitle>My Profile</CardTitle>
-                        <CardDescription>This is your verified agent information and referral codes.</CardDescription>
-                    </div>
-                    <Button onClick={() => router.push('/job-seeker/agent/profile')}>Edit Profile</Button>
-                </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="md:col-span-1 flex flex-col items-center text-center">
-                        <Avatar className="h-32 w-32 mb-4">
-                            <AvatarImage src={agentProfile.profilePhotoUrl} />
-                            <AvatarFallback>{agentProfile.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <h2 className="text-xl font-bold">{agentProfile.name}</h2>
-                        <p className="text-muted-foreground">{agentProfile.email}</p>
-                        <Badge variant={kycVariant(agentProfile.kycStatus)} className="mt-2 text-base">
-                            KYC: {agentProfile.kycStatus}
-                        </Badge>
-                    </div>
-                    <div className="md:col-span-2">
-                        <h3 className="font-semibold text-lg mb-2 border-b pb-2">Identity Information</h3>
-                        <InfoRow label="Full Name" value={agentProfile.fullName} />
-                        <InfoRow label="Email Address" value={agentProfile.email} />
-                        <InfoRow label="Phone Number" value={`${agentProfile.countryCode} ${agentProfile.phone}`} />
-                        <InfoRow label="Date of Birth / Incorporation" value={agentProfile.dob ? format(agentProfile.dob, "PPP") : "N/A"} />
-                    </div>
-                </CardContent>
-            </Card>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                    <CardHeader><CardTitle>Business / Agency Info</CardTitle></CardHeader>
-                    <CardContent>
-                        <InfoRow label="Agency Type" value={agentProfile.agencyType} />
-                        <InfoRow label="Office Address" value={agentProfile.officeAddress} />
-                        <InfoRow label="License Number" value={agentProfile.licenseNumber} />
-                        <InfoRow label="Years of Experience" value={agentProfile.yearsOfExperience} />
-                        <InfoRow label="Regions of Operation" value={agentProfile.regions.join(', ')} />
-                        <InfoRow label="Languages Spoken" value={agentProfile.languages?.join(', ') || "N/A"} />
-                        <InfoRow label="Candidate Pool Size" value={agentProfile.candidatePoolSize} />
-                         <InfoRow label="GST/VAT Number" value={agentProfile.gstNumber} />
-                    </CardContent>
-                </Card>
-                 <Card>
-                    <CardHeader><CardTitle>Unique Identifiers</CardTitle></CardHeader>
-                    <CardContent>
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 border-b">
-                            <p className="text-sm font-medium text-muted-foreground">Agent Unique ID</p>
-                            <div className="flex items-center gap-2">
-                                <Badge variant="outline">{agentUniqueId}</Badge>
-                               <CopyButton textToCopy={agentUniqueId} />
-                            </div>
-                        </div>
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3">
-                            <p className="text-sm font-medium text-muted-foreground">Sub-Agent Referral Code</p>
-                            <div className="flex items-center gap-2">
-                               <Badge variant="outline">{subAgentReferralCode}</Badge>
-                               <CopyButton textToCopy={subAgentReferralCode} />
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-        </div>
-    )
+export interface SeekerProfile {
+  basics: {
+    name: string;
+    desiredJobTitle: string;
+    locationPreferences: string;
+    experienceYears: number;
+  };
+  skills: string[];
+  experience: string[];
+  education: string[];
+  preferences: string;
+  resumeUrl: string; // Used to store passport/ID upload status
+  kycStatus?: KycStatus;
+  aadhaarLast4?: string;
+  kycSubmissionDate?: string;
+  kycRejectionReason?: string;
 }
 
-    
+export interface RecruiterProfile {
+  yourName: string;
+  yourEmail: string;
+  yourCountry: string;
+  yourCity: string;
+  companyName: string;
+  companyWebsite: string;
+  companyDescription: string;
+  profilePhotoUrl: string;
+}
+
+export interface SubAgentProfile {
+  fullName: string;
+  profilePhotoUrl: string;
+  phone: string;
+  countryCode: string;
+  email?: string;
+  dob?: Date;
+  governmentIdUrl: string; // URL after upload
+  agentReferralLink: string;
+  agentLoginId: string;
+  parentAgentName: string;
+  signedAgreementUrl?: string; // URL after upload
+  complianceCheckbox: boolean;
+  digitalSignature: string;
+  name: string; // For dashboard display
+}
+
+
+export interface AuthState {
+  user: User | null;
+  seekerProfile: SeekerProfile | null;
+  recruiterProfile: RecruiterProfile | null;
+  subAgentProfile: SubAgentProfile | null;
+  isProfileComplete: boolean;
+  language: Language;
+  setLanguage: Dispatch<SetStateAction<Language>>;
+  setUserRole: (role: UserRole) => void;
+  login: (user: Omit<User, 'role'>, role?: UserRole) => void;
+  logout: () => void;
+  updateSeekerProfile: (profile: SeekerProfile) => void;
+  updateRecruiterProfile: (profile: RecruiterProfile) => void;
+  updateSubAgentProfile: (profile: SubAgentProfile) => void;
+}
+
+export const AuthContext = createContext<AuthState | null>(null);
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}
