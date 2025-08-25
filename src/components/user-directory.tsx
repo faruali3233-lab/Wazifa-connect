@@ -17,13 +17,14 @@ import {
 } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Download, Eye } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { formatDistanceToNow } from "date-fns";
 
 const mockUsers = {
   jobSeekers: [
-    { id: 'JS001', name: 'Ravi Kumar', country: 'India', kyc: 'Verified', profile: 100, lastActive: '2h ago' },
-    { id: 'JS002', name: 'Aarav Sharma', country: 'India', kyc: 'Pending', profile: 75, lastActive: '1d ago' },
+    { id: 'JS001', name: 'Ravi Kumar', country: 'India', kyc: 'Verified', profile: 100, lastActive: '2h ago', aadhaarLast4: '1234', submissionTime: new Date(Date.now() - 2 * 60 * 60 * 1000) },
+    { id: 'JS002', name: 'Aarav Sharma', country: 'India', kyc: 'Pending', profile: 75, lastActive: '1d ago', aadhaarLast4: '5678', submissionTime: new Date(Date.now() - 24 * 60 * 60 * 1000) },
   ],
   recruiters: [
     { id: 'REC01', name: 'Ahmed Al-Fahim', country: 'UAE', kyc: 'Verified', profile: 100, lastActive: '5m ago' },
@@ -36,6 +37,50 @@ const mockUsers = {
      { id: 'SUB01', name: 'Vijay Singh', country: 'India', kyc: 'Needs Review', profile: 80, lastActive: '3d ago' },
   ],
 };
+
+const KycQueueTable = ({ users }: { users: any[] }) => (
+  <Table>
+    <TableHeader>
+      <TableRow>
+        <TableHead>Candidate ID</TableHead>
+        <TableHead>Name</TableHead>
+        <TableHead>Aadhaar (Last 4)</TableHead>
+        <TableHead>Submitted</TableHead>
+        <TableHead>Actions</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      {users.filter(u => u.kyc === 'Pending').map((user) => (
+        <TableRow key={user.id}>
+          <TableCell>{user.id}</TableCell>
+          <TableCell className="font-medium">{user.name}</TableCell>
+          <TableCell className="font-mono">{user.aadhaarLast4}</TableCell>
+          <TableCell>{formatDistanceToNow(user.submissionTime, { addSuffix: true })}</TableCell>
+          <TableCell>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                        <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                    <DropdownMenuItem>
+                        <Eye className="mr-2 h-4 w-4" /> View Aadhaar (Front)
+                    </DropdownMenuItem>
+                     <DropdownMenuItem>
+                        <Eye className="mr-2 h-4 w-4" /> View Aadhaar (Back)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="text-green-600 focus:text-green-700">Approve</DropdownMenuItem>
+                    <DropdownMenuItem className="text-destructive focus:text-destructive/90">Reject</DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+          </TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+);
+
 
 const UserTable = ({ users }: { users: any[] }) => (
   <Table>
@@ -84,7 +129,11 @@ const UserTable = ({ users }: { users: any[] }) => (
 );
 
 
-export function UserDirectory() {
+export function UserDirectory({ showKycQueue = false }: { showKycQueue?: boolean }) {
+  if(showKycQueue) {
+    return <KycQueueTable users={mockUsers.jobSeekers} />
+  }
+
   return (
     <Tabs defaultValue="jobSeekers">
       <TabsList className="grid w-full grid-cols-4">

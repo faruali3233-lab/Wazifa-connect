@@ -7,6 +7,8 @@ export type UserRole = "jobSeeker" | "recruiter" | "agent" | "subAgent" | "unsel
 
 export type Language = 'en' | 'ar' | 'hi';
 
+export type KycStatus = "pending" | "approved" | "rejected" | "not_started";
+
 export interface User {
   id: string;
   phone: string;
@@ -27,6 +29,10 @@ export interface SeekerProfile {
   education: string[];
   preferences: string;
   resumeUrl: string; // Used to store passport/ID upload status
+  kycStatus?: KycStatus;
+  aadhaarLast4?: string;
+  kycSubmissionDate?: string;
+  kycRejectionReason?: string;
 }
 
 export interface RecruiterProfile {

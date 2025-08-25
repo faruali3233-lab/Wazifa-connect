@@ -29,14 +29,16 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
     if (user && user.countryCode === '+91') {
       if (user.role === 'unselected' && pathname !== '/job-seeker/home') {
           router.replace('/job-seeker/home');
-      } else if (user.role === 'jobSeeker' && !isProfileComplete) {
-          if (pathname !== '/job-seeker/profile') {
-            router.replace('/job-seeker/profile');
-          }
+      } else if (user.role === 'jobSeeker') {
+        if (!isProfileComplete && pathname !== '/job-seeker/profile') {
+          router.replace('/job-seeker/profile');
+        } else if (isProfileComplete && seekerProfile?.kycStatus !== 'approved' && pathname !== '/job-seeker/review') {
+          router.replace('/job-seeker/review');
+        }
       }
     }
 
-  }, [user, isProfileComplete, router, pathname]);
+  }, [user, isProfileComplete, seekerProfile, router, pathname]);
   
   // If the user role is one handled by another layout, render a loader
   // to prevent flicker while the correct layout takes over.
@@ -61,8 +63,8 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
       )
   }
 
-  // If on the home page, don't show the dashboard layout
-  if (pathname === '/job-seeker/home') {
+  // If on the home page or review page, don't show the dashboard layout
+  if (pathname === '/job-seeker/home' || pathname === '/job-seeker/review') {
        return (
         <div className="min-h-screen flex flex-col bg-white">
           <Header />

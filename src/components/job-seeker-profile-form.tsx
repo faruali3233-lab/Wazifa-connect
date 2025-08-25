@@ -8,7 +8,7 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useAuth, type SeekerProfile } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
@@ -16,11 +16,12 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UploadCloud } from "lucide-react";
+import { UploadCloud, ShieldCheck } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Link from "next/link";
 import { Checkbox } from "./ui/checkbox";
 import { useTranslation } from "./i18n-provider";
+import { Alert, AlertTitle } from "./ui/alert";
 
 const profileSchema = z.object({
   yourFullName: z.string().min(2, "Full name is required.").max(80, "Full name is too long."),
@@ -36,6 +37,11 @@ const profileSchema = z.object({
   passport: z.any().refine(files => files?.length > 0, "Passport is required."),
   fullPhoto: z.any().optional(),
   workVideo: z.any().optional(),
+  // Aadhaar Fields
+  aadhaarNumber: z.string().refine(val => /^\d{12}$/.test(val), "Must be a 12-digit number."),
+  aadhaarFront: z.any().refine(files => files?.length > 0, "Aadhaar front is required."),
+  aadhaarBack: z.any().refine(files => files?.length > 0, "Aadhaar back is required."),
+  aadhaarConsent: z.boolean().refine(val => val === true, "You must consent to Aadhaar verification."),
 }).refine(data => {
   if (data.gulfExperience === "experienced") {
     return data.yearsInGulf !== undefined && data.yearsInGulf >= 0 && (data.countriesWorked?.length ?? 0) > 0;
@@ -114,11 +120,16 @@ export function JobSeekerProfileForm() {
       passport: undefined,
       fullPhoto: undefined,
       workVideo: undefined,
+      aadhaarNumber: "",
+      aadhaarFront: undefined,
+      aadhaarBack: undefined,
+      aadhaarConsent: false,
     },
   });
 
   const watchGulfExperience = form.watch("gulfExperience");
   const watchProfession = form.watch("profession");
+  const watchAadhaar = form.watch("aadhaarNumber");
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -137,6 +148,16 @@ export function JobSeekerProfileForm() {
     }
   };
 
+  const handleAadhaarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const onlyDigits = e.target.value.replace(/\D/g, '').slice(0, 12);
+      form.setValue('aadhaarNumber', onlyDigits);
+  }
+
+  const formatAadhaar = (num: string) => {
+    if (num.length <= 8) return "XXXX-XXXX-....";
+    return `XXXX-XXXX-${num.slice(8)}`;
+  };
+
   const onSubmit = (values: z.infer<typeof profileSchema>) => {
     const desiredJobTitle = values.profession === 'Other' ? values.otherProfession : values.profession;
     
@@ -152,35 +173,33 @@ export function JobSeekerProfileForm() {
       education: values.educationExperience?.split('|').map(s => s.trim()) || [],
       preferences: `Religion: ${values.religion}, Age: ${values.age}`,
       resumeUrl: "", // This would come from passport/doc upload in reality
+      kycStatus: 'pending',
+      aadhaarLast4: values.aadhaarNumber.slice(-4),
+      kycSubmissionDate: new Date().toISOString(),
     };
     
     updateSeekerProfile(profileData);
     toast({
-      title: t('jobSeeker_profile_toast_saved_title'),
-      description: t('jobSeeker_profile_toast_saved_description'),
+      title: "Profile Submitted for Review",
+      description: "You will be notified once your verification is complete.",
     });
-    router.push('/job-seeker/dashboard');
+    router.push('/job-seeker/review');
   };
   
     const calculateProgress = () => {
         const values = form.watch();
         let progress = 0;
-        if (values.yourFullName) progress += 10;
-        if (values.profession) progress += 15;
-        if (values.religion) progress += 10;
-        if (values.age) progress += 10;
-        if (values.gulfExperience) {
-            progress += 5; // Base for selection
-            if(values.gulfExperience === 'experienced' && values.yearsInGulf && values.countriesWorked && values.countriesWorked.length > 0) {
-                 progress += 10; // Conditional part
-            } else if (values.gulfExperience === 'fresher') {
-                progress += 10;
-            }
-        }
-        if (values.profilePhoto) progress += 20;
+        if (values.yourFullName) progress += 5;
+        if (values.profession) progress += 10;
+        if (values.religion) progress += 5;
+        if (values.age) progress += 5;
+        if (values.gulfExperience) progress += 5; 
+        if (values.profilePhoto) progress += 10;
         if (values.passport) progress += 10;
-        if (values.fullPhoto) progress += 5;
-        if (values.workVideo) progress += 5;
+        if(values.aadhaarNumber && values.aadhaarNumber.length === 12) progress += 15;
+        if(values.aadhaarFront) progress += 10;
+        if(values.aadhaarBack) progress += 10;
+        if(values.aadhaarConsent) progress += 5;
         
         return Math.min(100, progress);
     };
@@ -199,196 +218,268 @@ export function JobSeekerProfileForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
-                {/* Row 1 */}
-                <FormField control={form.control} name="profilePhoto" render={({ field }) => (
-                  <FormItem className="md:col-span-2 flex flex-col items-center">
-                    <FormLabel htmlFor="photo-upload" className="cursor-pointer">
-                      {t('jobSeeker_profile_photo_label')} <span className="text-primary">*</span>
-                       <Avatar className="h-32 w-32 mt-2">
-                        <AvatarImage src={photoPreview || undefined} alt="Profile photo preview" />
-                        <AvatarFallback className="bg-muted">
-                           <div className="flex flex-col items-center justify-center text-muted-foreground">
-                            <UploadCloud className="h-8 w-8" />
-                            <span>{t('jobSeeker_profile_upload_button')}</span>
-                           </div>
-                        </AvatarFallback>
-                      </Avatar>
-                    </FormLabel>
-                    <FormControl>
-                       <Input id="photo-upload" type="file" className="hidden" accept=".jpg,.jpeg,.png" onChange={handlePhotoChange} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-
-                {/* Row 2 */}
-                <FormField control={form.control} name="yourFullName" render={({ field }) => (
-                    <FormItem><FormLabel>{t('jobSeeker_profile_name_label')} <span className="text-primary">*</span></FormLabel><FormControl><Input placeholder={t('jobSeeker_profile_name_placeholder')} {...field} /></FormControl><FormMessage /></FormItem>
-                )} />
-                <FormField control={form.control} name="profession" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('jobSeeker_profile_profession_label')} <span className="text-primary">*</span></FormLabel>
-                     <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-12">
+            
+            {/* Personal Details */}
+            <div className="space-y-8">
+              <h3 className="text-lg font-medium border-b pb-2">Personal Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+                  <FormField control={form.control} name="profilePhoto" render={({ field }) => (
+                    <FormItem className="md:col-span-2 flex flex-col items-center">
+                      <FormLabel htmlFor="photo-upload" className="cursor-pointer">
+                        {t('jobSeeker_profile_photo_label')} <span className="text-primary">*</span>
+                        <Avatar className="h-32 w-32 mt-2">
+                          <AvatarImage src={photoPreview || undefined} alt="Profile photo preview" />
+                          <AvatarFallback className="bg-muted">
+                            <div className="flex flex-col items-center justify-center text-muted-foreground">
+                              <UploadCloud className="h-8 w-8" />
+                              <span>{t('jobSeeker_profile_upload_button')}</span>
+                            </div>
+                          </AvatarFallback>
+                        </Avatar>
+                      </FormLabel>
                       <FormControl>
-                        <SelectTrigger><SelectValue placeholder={t('jobSeeker_profile_profession_placeholder')} /></SelectTrigger>
+                        <Input id="photo-upload" type="file" className="hidden" accept=".jpg,.jpeg,.png" onChange={handlePhotoChange} />
                       </FormControl>
-                      <SelectContent>
-                        {Object.entries(professions).map(([group, options]) => (
-                            <SelectGroup key={group}>
-                                <FormLabel className="px-2 text-xs text-muted-foreground">{t(group as any)}</FormLabel>
-                                {options.map(option => <SelectItem key={option} value={option}>{t(option.replace(/[^a-zA-Z0-9]/g, '') as any, option)}</SelectItem>)}
-                            </SelectGroup>
-                        ))}
-                        <SelectGroup>
-                           <SelectItem value="Other">{t('jobSeeker_profile_profession_other')}</SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-
-                {/* Conditional Other Profession */}
-                {watchProfession === 'Other' && (
-                    <FormField control={form.control} name="otherProfession" render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>{t('jobSeeker_profile_other_profession_label')} <span className="text-primary">*</span></FormLabel>
-                            <FormControl><Input placeholder={t('jobSeeker_profile_other_profession_placeholder')} {...field} /></FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )} />
-                )}
-
-                <FormField control={form.control} name="religion" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('jobSeeker_profile_religion_label')} <span className="text-primary">*</span></FormLabel>
-                     <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
-                      <FormControl>
-                        <SelectTrigger><SelectValue placeholder={t('jobSeeker_profile_religion_placeholder')} /></SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="islam">{t('jobSeeker_profile_religion_islam')}</SelectItem>
-                        <SelectItem value="hinduism">{t('jobSeeker_profile_religion_hinduism')}</SelectItem>
-                        <SelectItem value="christianity">{t('jobSeeker_profile_religion_christianity')}</SelectItem>
-                        <SelectItem value="sikhism">{t('jobSeeker_profile_religion_sikhism')}</SelectItem>
-                        <SelectItem value="buddhism">{t('jobSeeker_profile_religion_buddhism')}</SelectItem>
-                        <SelectItem value="jainism">{t('jobSeeker_profile_religion_jainism')}</SelectItem>
-                        <SelectItem value="other">{t('jobSeeker_profile_religion_other')}</SelectItem>
-                        <SelectItem value="prefer_not_to_say">{t('jobSeeker_profile_religion_prefer_not_to_say')}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-
-                {/* Row 3 */}
-                <FormField control={form.control} name="age" render={({ field }) => (
-                    <FormItem><FormLabel>{t('jobSeeker_profile_age_label')} <span className="text-primary">*</span></FormLabel><FormControl><Input type="number" placeholder={t('jobSeeker_profile_age_placeholder')} {...field} /></FormControl><FormMessage /></FormItem>
-                )} />
-                <FormField control={form.control} name="gulfExperience" render={({ field }) => (
-                    <FormItem className="space-y-3">
-                        <FormLabel>{t('jobSeeker_profile_gulf_experience_label')} <span className="text-primary">*</span></FormLabel>
-                        <FormControl>
-                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex gap-4">
-                                <FormItem className="flex items-center space-x-2 space-y-0">
-                                    <FormControl><RadioGroupItem value="experienced" /></FormControl>
-                                    <FormLabel className="font-normal">{t('jobSeeker_profile_gulf_experience_experienced')}</FormLabel>
-                                </FormItem>
-                                <FormItem className="flex items-center space-x-2 space-y-0">
-                                    <FormControl><RadioGroupItem value="fresher" /></FormControl>
-                                    <FormLabel className="font-normal">{t('jobSeeker_profile_gulf_experience_fresher')}</FormLabel>
-                                </FormItem>
-                            </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
+                      <FormMessage />
                     </FormItem>
-                )} />
-
-                {/* Conditional Row */}
-                {watchGulfExperience === 'experienced' && (
-                    <>
-                        <FormField control={form.control} name="yearsInGulf" render={({ field }) => (
-                            <FormItem><FormLabel>{t('jobSeeker_profile_years_in_gulf_label')}</FormLabel><FormControl><Input type="number" placeholder={t('jobSeeker_profile_years_in_gulf_placeholder')} {...field} /></FormControl><FormMessage /></FormItem>
-                        )} />
-                        <FormField control={form.control} name="countriesWorked" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>{t('jobSeeker_profile_countries_worked_label')}</FormLabel>
-                                <div className="grid grid-cols-2 gap-2">
-                                {gulfCountries.map((country) => (
-                                    <FormField key={country} control={form.control} name="countriesWorked" render={({ field }) => {
-                                        return (
-                                            <FormItem key={country} className="flex flex-row items-start space-x-3 space-y-0">
-                                                <FormControl>
-                                                    <Checkbox
-                                                        checked={field.value?.includes(country)}
-                                                        onCheckedChange={(checked) => {
-                                                            return checked
-                                                                ? field.onChange([...(field.value || []), country])
-                                                                : field.onChange(field.value?.filter((value) => value !== country))
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <FormLabel className="text-sm font-normal">{country}</FormLabel>
-                                            </FormItem>
-                                        )
-                                    }}/>
-                                ))}
-                                </div>
-                                <FormMessage />
-                            </FormItem>
-                         )} />
-                    </>
-                )}
-
-                {/* Row 4 */}
-                 <div className="md:col-span-2">
-                    <FormField control={form.control} name="educationExperience" render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>{t('jobSeeker_profile_education_label')}</FormLabel>
-                            <FormControl><Textarea rows={3} placeholder={t('jobSeeker_profile_education_placeholder')} {...field} /></FormControl>
-                             <CardDescription className="text-xs">{t('jobSeeker_profile_education_helper')}</CardDescription>
-                            <FormMessage />
-                        </FormItem>
-                     )} />
-                 </div>
-                 
-                 {/* Row 5 - File Uploads */}
-                 <FormField control={form.control} name="passport" render={({ field }) => (
+                  )} />
+                  <FormField control={form.control} name="yourFullName" render={({ field }) => (
+                      <FormItem><FormLabel>{t('jobSeeker_profile_name_label')} <span className="text-primary">*</span></FormLabel><FormControl><Input placeholder={t('jobSeeker_profile_name_placeholder')} {...field} /></FormControl><FormMessage /></FormItem>
+                  )} />
+                  <FormField control={form.control} name="age" render={({ field }) => (
+                      <FormItem><FormLabel>{t('jobSeeker_profile_age_label')} <span className="text-primary">*</span></FormLabel><FormControl><Input type="number" placeholder={t('jobSeeker_profile_age_placeholder')} {...field} /></FormControl><FormMessage /></FormItem>
+                  )} />
+                  <FormField control={form.control} name="religion" render={({ field }) => (
                     <FormItem>
-                        <FormLabel>{t('jobSeeker_profile_passport_label')} <span className="text-primary">*</span></FormLabel>
+                      <FormLabel>{t('jobSeeker_profile_religion_label')} <span className="text-primary">*</span></FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
                         <FormControl>
-                            <Input type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => field.onChange(e.target.files)} />
+                          <SelectTrigger><SelectValue placeholder={t('jobSeeker_profile_religion_placeholder')} /></SelectTrigger>
                         </FormControl>
-                        <CardDescription className="text-xs">{t('jobSeeker_profile_passport_helper')}</CardDescription>
-                        <FormMessage />
+                        <SelectContent>
+                          <SelectItem value="islam">{t('jobSeeker_profile_religion_islam')}</SelectItem>
+                          <SelectItem value="hinduism">{t('jobSeeker_profile_religion_hinduism')}</SelectItem>
+                          <SelectItem value="christianity">{t('jobSeeker_profile_religion_christianity')}</SelectItem>
+                          <SelectItem value="sikhism">{t('jobSeeker_profile_religion_sikhism')}</SelectItem>
+                          <SelectItem value="buddhism">{t('jobSeeker_profile_religion_buddhism')}</SelectItem>
+                          <SelectItem value="jainism">{t('jobSeeker_profile_religion_jainism')}</SelectItem>
+                          <SelectItem value="other">{t('jobSeeker_profile_religion_other')}</SelectItem>
+                          <SelectItem value="prefer_not_to_say">{t('jobSeeker_profile_religion_prefer_not_to_say')}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
                     </FormItem>
-                 )} />
+                  )} />
+                  <div className="md:col-span-2">
+                      <FormField control={form.control} name="educationExperience" render={({ field }) => (
+                          <FormItem>
+                              <FormLabel>{t('jobSeeker_profile_education_label')}</FormLabel>
+                              <FormControl><Textarea rows={3} placeholder={t('jobSeeker_profile_education_placeholder')} {...field} /></FormControl>
+                              <CardDescription className="text-xs">{t('jobSeeker_profile_education_helper')}</CardDescription>
+                              <FormMessage />
+                          </FormItem>
+                      )} />
+                  </div>
+              </div>
+            </div>
 
-                 <FormField control={form.control} name="fullPhoto" render={({ field }) => (
+            {/* Professional Details */}
+            <div className="space-y-8">
+               <h3 className="text-lg font-medium border-b pb-2">Professional Details</h3>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+                  <FormField control={form.control} name="profession" render={({ field }) => (
                     <FormItem>
-                        <FormLabel>{t('jobSeeker_profile_full_photo_label')}</FormLabel>
+                      <FormLabel>{t('jobSeeker_profile_profession_label')} <span className="text-primary">*</span></FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                            <Input type="file" accept=".jpg,.jpeg,.png" onChange={(e) => field.onChange(e.target.files)} />
+                          <SelectTrigger><SelectValue placeholder={t('jobSeeker_profile_profession_placeholder')} /></SelectTrigger>
                         </FormControl>
-                        <CardDescription className="text-xs">{t('jobSeeker_profile_full_photo_helper')}</CardDescription>
-                        <FormMessage />
+                        <SelectContent>
+                          {Object.entries(professions).map(([group, options]) => (
+                              <SelectGroup key={group}>
+                                  <FormLabel className="px-2 text-xs text-muted-foreground">{t(group as any)}</FormLabel>
+                                  {options.map(option => <SelectItem key={option} value={option}>{t(option.replace(/[^a-zA-Z0-9]/g, '') as any, option)}</SelectItem>)}
+                              </SelectGroup>
+                          ))}
+                          <SelectGroup>
+                            <SelectItem value="Other">{t('jobSeeker_profile_profession_other')}</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
                     </FormItem>
-                 )} />
-                 
-                 <div className="md:col-span-2">
-                    <FormField control={form.control} name="workVideo" render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>{t('jobSeeker_profile_work_video_label')}</FormLabel>
+                  )} />
+                  {watchProfession === 'Other' && (
+                      <FormField control={form.control} name="otherProfession" render={({ field }) => (
+                          <FormItem>
+                              <FormLabel>{t('jobSeeker_profile_other_profession_label')} <span className="text-primary">*</span></FormLabel>
+                              <FormControl><Input placeholder={t('jobSeeker_profile_other_profession_placeholder')} {...field} /></FormControl>
+                              <FormMessage />
+                          </FormItem>
+                      )} />
+                  )}
+                  <FormField control={form.control} name="gulfExperience" render={({ field }) => (
+                      <FormItem className="space-y-3">
+                          <FormLabel>{t('jobSeeker_profile_gulf_experience_label')} <span className="text-primary">*</span></FormLabel>
+                          <FormControl>
+                              <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex gap-4">
+                                  <FormItem className="flex items-center space-x-2 space-y-0">
+                                      <FormControl><RadioGroupItem value="experienced" /></FormControl>
+                                      <FormLabel className="font-normal">{t('jobSeeker_profile_gulf_experience_experienced')}</FormLabel>
+                                  </FormItem>
+                                  <FormItem className="flex items-center space-x-2 space-y-0">
+                                      <FormControl><RadioGroupItem value="fresher" /></FormControl>
+                                      <FormLabel className="font-normal">{t('jobSeeker_profile_gulf_experience_fresher')}</FormLabel>
+                                  </FormItem>
+                              </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                      </FormItem>
+                  )} />
+                  {watchGulfExperience === 'experienced' && (
+                      <>
+                          <FormField control={form.control} name="yearsInGulf" render={({ field }) => (
+                              <FormItem><FormLabel>{t('jobSeeker_profile_years_in_gulf_label')}</FormLabel><FormControl><Input type="number" placeholder={t('jobSeeker_profile_years_in_gulf_placeholder')} {...field} /></FormControl><FormMessage /></FormItem>
+                          )} />
+                          <FormField control={form.control} name="countriesWorked" render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel>{t('jobSeeker_profile_countries_worked_label')}</FormLabel>
+                                  <div className="grid grid-cols-2 gap-2">
+                                  {gulfCountries.map((country) => (
+                                      <FormField key={country} control={form.control} name="countriesWorked" render={({ field }) => {
+                                          return (
+                                              <FormItem key={country} className="flex flex-row items-start space-x-3 space-y-0">
+                                                  <FormControl>
+                                                      <Checkbox
+                                                          checked={field.value?.includes(country)}
+                                                          onCheckedChange={(checked) => {
+                                                              return checked
+                                                                  ? field.onChange([...(field.value || []), country])
+                                                                  : field.onChange(field.value?.filter((value) => value !== country))
+                                                          }}
+                                                      />
+                                                  </FormControl>
+                                                  <FormLabel className="text-sm font-normal">{country}</FormLabel>
+                                              </FormItem>
+                                          )
+                                      }}/>
+                                  ))}
+                                  </div>
+                                  <FormMessage />
+                              </FormItem>
+                          )} />
+                      </>
+                  )}
+               </div>
+            </div>
+
+            {/* Documents */}
+            <div className="space-y-8">
+              <h3 className="text-lg font-medium border-b pb-2">Documents</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+                  <FormField control={form.control} name="passport" render={({ field }) => (
+                      <FormItem>
+                          <FormLabel>{t('jobSeeker_profile_passport_label')} <span className="text-primary">*</span></FormLabel>
+                          <FormControl>
+                              <Input type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => field.onChange(e.target.files)} />
+                          </FormControl>
+                          <CardDescription className="text-xs">{t('jobSeeker_profile_passport_helper')}</CardDescription>
+                          <FormMessage />
+                      </FormItem>
+                  )} />
+                  <FormField control={form.control} name="fullPhoto" render={({ field }) => (
+                      <FormItem>
+                          <FormLabel>{t('jobSeeker_profile_full_photo_label')}</FormLabel>
+                          <FormControl>
+                              <Input type="file" accept=".jpg,.jpeg,.png" onChange={(e) => field.onChange(e.target.files)} />
+                          </FormControl>
+                          <CardDescription className="text-xs">{t('jobSeeker_profile_full_photo_helper')}</CardDescription>
+                          <FormMessage />
+                      </FormItem>
+                  )} />
+                  <div className="md:col-span-2">
+                      <FormField control={form.control} name="workVideo" render={({ field }) => (
+                          <FormItem>
+                              <FormLabel>{t('jobSeeker_profile_work_video_label')}</FormLabel>
+                              <FormControl>
+                                  <Input type="file" accept=".mp4,.mov,.webm" onChange={(e) => field.onChange(e.target.files)} />
+                              </FormControl>
+                              <CardDescription className="text-xs">{t('jobSeeker_profile_work_video_helper')}</CardDescription>
+                              <FormMessage />
+                          </FormItem>
+                      )} />
+                  </div>
+              </div>
+            </div>
+
+            {/* Aadhaar Verification */}
+            <div className="space-y-8">
+              <h3 className="text-lg font-medium border-b pb-2">Identity Verification (Aadhaar)</h3>
+               <Alert>
+                    <ShieldCheck className="h-4 w-4" />
+                    <AlertTitle>Your Information is Secure</AlertTitle>
+                    <FormDescription>
+                        Your Aadhaar details are encrypted and used only for verification. They will not be shared with recruiters.
+                    </FormDescription>
+                </Alert>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+                  <FormField control={form.control} name="aadhaarNumber" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Aadhaar Number <span className="text-primary">*</span></FormLabel>
+                         <div className="relative">
+                            <Input placeholder="Enter 12-digit number" value={field.value} onChange={handleAadhaarChange} maxLength={12} />
+                            {field.value.length === 12 && <span className="absolute right-3 top-2.5 text-xs text-muted-foreground">{formatAadhaar(field.value)}</span>}
+                         </div>
+                         <FormMessage />
+                      </FormItem>
+                  )} />
+                  <div></div>
+                  <FormField control={form.control} name="aadhaarFront" render={({ field }) => (
+                      <FormItem>
+                          <FormLabel>Upload Aadhaar (Front) <span className="text-primary">*</span></FormLabel>
+                          <FormControl>
+                              <Input type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => field.onChange(e.target.files)} />
+                          </FormControl>
+                           <FormDescription>JPG, PNG, PDF (Max 5MB)</FormDescription>
+                          <FormMessage />
+                      </FormItem>
+                  )} />
+                   <FormField control={form.control} name="aadhaarBack" render={({ field }) => (
+                      <FormItem>
+                          <FormLabel>Upload Aadhaar (Back) <span className="text-primary">*</span></FormLabel>
+                          <FormControl>
+                              <Input type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => field.onChange(e.target.files)} />
+                          </FormControl>
+                           <FormDescription>JPG, PNG, PDF (Max 5MB)</FormDescription>
+                          <FormMessage />
+                      </FormItem>
+                  )} />
+                  <div className="md:col-span-2">
+                     <FormField
+                        control={form.control}
+                        name="aadhaarConsent"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                             <FormControl>
-                                <Input type="file" accept=".mp4,.mov,.webm" onChange={(e) => field.onChange(e.target.files)} />
+                                <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                />
                             </FormControl>
-                            <CardDescription className="text-xs">{t('jobSeeker_profile_work_video_helper')}</CardDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )} />
-                </div>
+                            <div className="space-y-1 leading-none">
+                                <FormLabel>
+                                I consent to the processing of my Aadhaar for identity verification. <span className="text-destructive">*</span>
+                                </FormLabel>
+                                <FormDescription>
+                                By checking this, you agree to our <Link href="/privacy" className="underline">Privacy Policy</Link>.
+                                </FormDescription>
+                            </div>
+                            </FormItem>
+                        )}
+                        />
+                  </div>
+              </div>
             </div>
 
             <div className="md:col-span-2 text-xs text-muted-foreground">
@@ -397,8 +488,7 @@ export function JobSeekerProfileForm() {
             </div>
             
             <div className="flex gap-4">
-                <Button type="submit" size="lg" className="rounded-xl">{t('jobSeeker_profile_save_button')}</Button>
-                <Button type="button" variant="outline" size="lg" className="rounded-xl">{t('jobSeeker_profile_draft_button')}</Button>
+                <Button type="submit" size="lg" className="rounded-xl">Submit for Review</Button>
             </div>
           </form>
         </Form>

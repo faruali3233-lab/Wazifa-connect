@@ -1,7 +1,7 @@
 
 "use client";
 
-import { type ReactNode } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import Link from 'next/link';
@@ -43,7 +43,15 @@ export default function JobSeekerDashboardLayout({ children }: { children: React
   const router = useRouter();
   const pathname = usePathname();
 
-  if (!seekerProfile) {
+  useEffect(() => {
+    // Gate dashboard access based on KYC status
+    if (seekerProfile && seekerProfile.kycStatus !== 'approved') {
+        router.replace('/job-seeker/review');
+    }
+  }, [seekerProfile, router]);
+
+
+  if (!seekerProfile || seekerProfile.kycStatus !== 'approved') {
       return (
         <div className="flex items-center justify-center min-h-screen">
             <Skeleton className="h-screen w-screen" />
