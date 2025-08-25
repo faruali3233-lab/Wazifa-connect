@@ -1,9 +1,9 @@
 
 "use client";
 
-import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
+import { createContext, useContext, type Dispatch, type SetStateAction, type Omit } from 'react';
 
-export type UserRole = "jobSeeker" | "recruiter" | "subAgent" | "unselected" | "admin";
+export type UserRole = "jobSeeker" | "recruiter" | "subAgent" | "unselected" | "admin" | "agent";
 
 export type Language = 'en' | 'ar' | 'hi';
 
@@ -47,6 +47,21 @@ export interface RecruiterProfile {
   profilePhotoUrl: string;
 }
 
+export interface AgentProfile {
+  fullName: string;
+  profilePhotoUrl: string;
+  phone: string;
+  countryCode: string;
+  email?: string;
+  dob?: Date;
+  governmentIdUrl: string;
+  agencyName: string;
+  agencyAddress: string;
+  complianceCheckbox: boolean;
+  digitalSignature: string;
+  name: string;
+}
+
 export interface SubAgentProfile {
   fullName: string;
   profilePhotoUrl: string;
@@ -70,6 +85,7 @@ export interface AuthState {
   seekerProfile: SeekerProfile | null;
   recruiterProfile: RecruiterProfile | null;
   subAgentProfile: SubAgentProfile | null;
+  agentProfile: AgentProfile | null;
   isProfileComplete: boolean;
   language: Language;
   setLanguage: Dispatch<SetStateAction<Language>>;
@@ -79,6 +95,7 @@ export interface AuthState {
   updateSeekerProfile: (profile: SeekerProfile) => void;
   updateRecruiterProfile: (profile: RecruiterProfile) => void;
   updateSubAgentProfile: (profile: SubAgentProfile) => void;
+  updateAgentProfile: (profile: AgentProfile) => void;
 }
 
 export const AuthContext = createContext<AuthState | null>(null);
