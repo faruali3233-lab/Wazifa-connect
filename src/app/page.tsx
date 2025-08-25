@@ -17,6 +17,11 @@ export default function LoginPage() {
         router.replace(homePath);
         return;
       }
+      
+      if (user.role === 'admin') {
+        router.replace('/admin/overview');
+        return;
+      }
 
       // Handle all other roles (+91 country code users)
       if (user.role === 'unselected') {
