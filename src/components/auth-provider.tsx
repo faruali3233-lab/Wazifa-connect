@@ -47,7 +47,6 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
 
     const handleSetLanguage = (newLang: Language) => {
         setLanguage(newLang);
-        // Toast logic can be improved to use translation keys
     }
 
     const login = (userData: User, role: UserRole = 'unselected') => {
@@ -63,6 +62,26 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
             };
             setUser(mockUser);
             setSeekerProfile(mockProfile);
+            setProfileComplete(true);
+        } else if (userData.id === 'agent' && userData.password === 'password') {
+             const mockUser: User = { ...userData, role: 'agent' };
+             const mockProfile: AgentProfile = {
+                fullName: 'Sanjay Patel',
+                name: 'Sanjay Patel',
+                email: 'sanjay.patel@agent.com',
+                agencyName: 'Patel Recruitment',
+                agencyAddress: '123 Main St, Mumbai, India',
+                phone: '9876543211',
+                countryCode: '+91',
+                profilePhotoUrl: 'https://placehold.co/100x100.png',
+                governmentIdUrl: 'verified',
+                licenseNumber: 'LIC-12345',
+                gstNumber: 'GST-98765',
+                complianceCheckbox: true,
+                digitalSignature: 'Sanjay Patel',
+            };
+            setUser(mockUser);
+            setAgentProfile(mockProfile);
             setProfileComplete(true);
         } else {
             setUser({ ...userData, role });
