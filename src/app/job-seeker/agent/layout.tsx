@@ -9,7 +9,7 @@ import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 
 export default function AgentRootLayout({ children }: { children: ReactNode }) {
-  const { user, isProfileComplete } = useAuth();
+  const { user, isProfileComplete, agentProfile } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -20,9 +20,10 @@ export default function AgentRootLayout({ children }: { children: ReactNode }) {
     }
     
     if (user && user.role !== 'agent') {
-      return;
+      return; // Other layouts will handle this user
     }
     
+    // Redirect to profile page if profile is not complete and user is not already there
     if (user && user.role === 'agent' && !isProfileComplete) {
         if (pathname !== '/job-seeker/agent/profile') {
             router.replace('/job-seeker/agent/profile');
@@ -30,6 +31,8 @@ export default function AgentRootLayout({ children }: { children: ReactNode }) {
     }
   }, [user, isProfileComplete, router, pathname]);
 
+  // This is a loading state. If the user object isn't loaded yet,
+  // or if the user is not an agent, we show a skeleton loader.
   if (!user || user.role !== 'agent') {
     return (
         <div className="flex items-center justify-center min-h-screen">
@@ -38,7 +41,8 @@ export default function AgentRootLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  // If profile is not complete and we are on the profile page, show just the form without the dashboard layout
+  // If the profile is incomplete and we are on the profile page,
+  // render the children (the form) within a simple layout.
   if (!isProfileComplete && pathname === '/job-seeker/agent/profile') {
       return (
          <div className="min-h-screen flex flex-col bg-white">
@@ -48,8 +52,10 @@ export default function AgentRootLayout({ children }: { children: ReactNode }) {
             </main>
             <Footer />
          </div>
-      )
+      );
   }
   
+  // If the profile is complete, or for any other agent-related pages, render the children.
+  // The dashboard layout will be nested within this.
   return <>{children}</>;
 }
