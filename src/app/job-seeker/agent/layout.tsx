@@ -9,9 +9,11 @@ import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 
 export default function AgentRootLayout({ children }: { children: ReactNode }) {
-  const { user, isProfileComplete } = useAuth();
+  const { user, agentProfile } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+
+  const isProfileComplete = !!agentProfile;
 
   useEffect(() => {
     if (user === null) {
@@ -34,7 +36,7 @@ export default function AgentRootLayout({ children }: { children: ReactNode }) {
   }, [user, isProfileComplete, router, pathname]);
 
   // Loading state while auth is resolving or if user is not a verified agent
-  if (!user || user.role !== 'agent' || (pathname !== '/job-seeker/agent/profile' && !isProfileComplete)) {
+  if (!user || user.role !== 'agent') {
     return (
         <div className="flex items-center justify-center min-h-screen">
           <Skeleton className="h-screen w-screen" />
@@ -55,7 +57,14 @@ export default function AgentRootLayout({ children }: { children: ReactNode }) {
       )
   }
   
+  // If the profile is incomplete, but we are not on the profile page yet (e.g. during redirect), show a loader.
+  if (!isProfileComplete) {
+     return (
+        <div className="flex items-center justify-center min-h-screen">
+          <Skeleton className="h-screen w-screen" />
+        </div>
+    );
+  }
+  
   return <>{children}</>;
 }
-
-    
