@@ -30,11 +30,15 @@ import {
     DatabaseZap,
     Settings,
     UserCircle,
+    Search,
+    Bell,
+    PlusCircle,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
 
 const NavItem = ({ href, icon, children, currentPath }: { href: string; icon: React.ReactNode; children: React.ReactNode; currentPath: string; }) => (
     <SidebarMenuItem>
@@ -48,6 +52,9 @@ const NavItem = ({ href, icon, children, currentPath }: { href: string; icon: Re
 
 const getPageTitle = (pathname: string) => {
     const routeName = pathname.split('/').pop()?.replace(/-/g, ' ') || 'overview';
+    if (routeName === 'kyc') return 'KYC & Compliance';
+    if (routeName === 'system-health') return 'System Health';
+    if (routeName === 'audit-security') return 'Audit & Security';
     return routeName.charAt(0).toUpperCase() + routeName.slice(1);
 }
 
@@ -120,11 +127,24 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
         </Sidebar>
         <SidebarInset>
             <header className="flex items-center justify-between p-4 border-b">
-                <SidebarTrigger />
-                <h1 className="text-2xl font-bold">
-                   {getPageTitle(pathname)}
-                </h1>
-                <div></div>
+                <div className="flex items-center gap-4">
+                    <SidebarTrigger />
+                    <div className="relative hidden md:block">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input placeholder="Search..." className="pl-8" />
+                    </div>
+                </div>
+                <div className="flex items-center gap-4">
+                     <Button variant="outline" size="sm">Today</Button>
+                    <Button variant="ghost" size="icon">
+                        <Bell className="h-5 w-5" />
+                        <span className="sr-only">Notifications</span>
+                    </Button>
+                     <Button variant="ghost" size="icon">
+                        <PlusCircle className="h-5 w-5" />
+                        <span className="sr-only">Quick Actions</span>
+                    </Button>
+                </div>
             </header>
             <main className="flex-1 p-6 bg-gray-50/50">
                 {children}
@@ -133,4 +153,3 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
     </SidebarProvider>
   );
 }
-
