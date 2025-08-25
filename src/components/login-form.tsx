@@ -78,7 +78,7 @@ export function LoginForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="userId"
@@ -97,7 +97,10 @@ export function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('login_password_label')}</FormLabel>
+                    <div className="flex items-center justify-between">
+                        <FormLabel>{t('login_password_label')}</FormLabel>
+                        <Button variant="link" type="button" className="p-0 h-auto text-xs">Forgot Password?</Button>
+                    </div>
                   <FormControl>
                     <Input type="password" placeholder="********" {...field} />
                   </FormControl>
@@ -106,7 +109,7 @@ export function LoginForm() {
               )}
             />
             
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full pt-6 pb-6">
                 {t('login_button')}
             </Button>
           </form>
