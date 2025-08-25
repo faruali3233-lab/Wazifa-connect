@@ -55,14 +55,15 @@ export default function JobSeekerDashboard() {
       router.replace('/');
       return;
     }
+    
+    setLoading(true);
     if (isProfileComplete && seekerProfile) {
-      setLoading(true);
       getJobRecommendations({ profile: seekerProfile })
         .then(setRecommendations)
         .catch(console.error)
         .finally(() => setLoading(false));
     } else {
-        setLoading(false);
+      setLoading(false);
     }
   }, [isProfileComplete, seekerProfile, user, router]);
 
@@ -200,7 +201,7 @@ export default function JobSeekerDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Profile Completeness</CardTitle>
-            </Header>
+            </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-4">
                 <Progress value={progress} className="w-full" />
@@ -219,7 +220,7 @@ export default function JobSeekerDashboard() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2"><FileText /> Application Status</CardTitle>
-            </Header>
+            </CardHeader>
             <CardContent className="text-center text-muted-foreground">
               <p>Your applied jobs will appear here.</p>
             </CardContent>
