@@ -24,7 +24,7 @@ import { LogOut } from 'lucide-react';
 
 const NavItem = ({ href, icon, children, currentPath }: { href: string; icon: React.ReactNode; children: React.ReactNode; currentPath: string; }) => (
     <SidebarMenuItem>
-        <Link href={href} passHref legacyBehavior>
+        <Link href={href} passHref>
             <SidebarMenuButton isActive={currentPath === href} icon={icon}>
                 {children}
             </SidebarMenuButton>
