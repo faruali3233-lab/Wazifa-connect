@@ -26,6 +26,8 @@ const agentProfileSchema = z.object({
   agencyAddress: z.string().min(10, "A detailed agency address is required."),
   email: z.string().email("A valid email is required."),
   dob: z.string().optional(),
+  licenseNumber: z.string().optional(),
+  gstNumber: z.string().optional(),
   governmentId: z.any().refine((files) => files?.length > 0, "Government ID is required."),
   complianceCheckbox: z.boolean().refine((val) => val === true, "You must agree to the terms."),
   digitalSignature: z.string().min(2, "Please type your full name as a digital signature."),
@@ -44,6 +46,8 @@ export function AgentProfileForm() {
       email: "",
       agencyName: "",
       agencyAddress: "",
+      licenseNumber: "",
+      gstNumber: "",
       complianceCheckbox: false,
       digitalSignature: ""
     },
@@ -145,6 +149,13 @@ export function AgentProfileForm() {
                     )} />
                     <FormField control={form.control} name="agencyAddress" render={({ field }) => (
                         <FormItem><FormLabel>Agency Address <span className="text-destructive">*</span></FormLabel><FormControl><Textarea rows={3} placeholder="Your full agency address" {...field} /></FormControl><FormMessage /></FormItem>
+                    )} />
+                    
+                    <FormField control={form.control} name="licenseNumber" render={({ field }) => (
+                        <FormItem><FormLabel>License Number</FormLabel><FormControl><Input placeholder="Enter agency license number" {...field} /></FormControl><FormMessage /></FormItem>
+                    )} />
+                    <FormField control={form.control} name="gstNumber" render={({ field }) => (
+                        <FormItem><FormLabel>GST Number</FormLabel><FormControl><Input placeholder="Enter GST number" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
 
                      <FormField control={form.control} name="governmentId" render={({ field }) => (

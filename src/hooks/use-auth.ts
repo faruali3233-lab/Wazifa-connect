@@ -57,6 +57,8 @@ export interface AgentProfile {
   governmentIdUrl: string;
   agencyName: string;
   agencyAddress: string;
+  licenseNumber?: string;
+  gstNumber?: string;
   complianceCheckbox: boolean;
   digitalSignature: string;
   name: string;
