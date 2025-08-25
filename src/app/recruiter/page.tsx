@@ -6,10 +6,10 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Briefcase, Users, MessageSquare, AlertCircle, FileCheck } from 'lucide-react';
+import { PlusCircle, Briefcase, Users, MessageSquare, AlertCircle, FileCheck, FileClock, Inbox } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useTranslation } from '@/components/i18n-provider';
+import Link from 'next/link';
 
 const KpiCard = ({ title, value, icon, href, router }: { title: string, value: string | number, icon: React.ReactNode, href: string, router: any }) => (
   <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push(href)}>
@@ -28,6 +28,12 @@ const mockJobs = [
     { title: 'Construction Painter', applied: 8, shortlisted: 2, selected: 0 },
     { title: 'Household Cook', applied: 23, shortlisted: 8, selected: 2 },
 ];
+
+const mockActionItems = [
+    { title: "Review New Applications", description: "5 new candidates are waiting for your review.", cta: "Review Now", href: "/recruiter/applications?stage=applied&when=today", icon: <Users />},
+    { title: "Upload Wakala", description: "3 candidates are waiting for their Wakala.", cta: "Upload Documents", href: "/recruiter/applications?stage=wakala&needs=upload", icon: <FileClock /> },
+    { title: "Approve Seeker Responses", description: "1 seeker has responded to your request.", cta: "View Message", href: "/recruiter/messages", icon: <Inbox /> },
+]
 
 export default function RecruiterDashboard() {
   const { user, recruiterProfile, isProfileComplete } = useAuth();
@@ -56,9 +62,9 @@ export default function RecruiterDashboard() {
 
   const kpiData = [
     { title: "Live Jobs", value: 3, icon: <Briefcase />, href: "/recruiter/jobs?status=live" },
-    { title: "New Applications (Today)", value: 5, icon: <Users />, href: "/recruiter/applications?when=today" },
-    { title: "Pending Wakalas", value: 2, icon: <FileCheck />, href: "/recruiter/applications?stage=wakala" },
-    { title: "Pending Actions", value: 4, icon: <AlertCircle />, href: "/recruiter/applications?actions=required" },
+    { title: "New Applications (Today)", value: 5, icon: <Users />, href: "/recruiter/applications?stage=applied&when=today" },
+    { title: "Pending Wakalas", value: 2, icon: <FileCheck />, href: "/recruiter/applications?stage=wakala&needs=upload" },
+    { title: "Pending Actions", value: 4, icon: <AlertCircle />, href: "/recruiter/applications?needs=action" },
   ];
 
   return (
@@ -81,9 +87,9 @@ export default function RecruiterDashboard() {
                              <Button variant="outline" size="sm" onClick={() => router.push('/recruiter/jobs/1')}>View</Button>
                         </div>
                         <div className="flex gap-4 text-sm text-muted-foreground mt-2">
-                            <span>Applied: <span className="font-bold text-foreground">{job.applied}</span></span>
-                             <span>Shortlisted: <span className="font-bold text-foreground">{job.shortlisted}</span></span>
-                              <span>Selected: <span className="font-bold text-foreground">{job.selected}</span></span>
+                             <Link href="/recruiter/applications?job=1&stage=applied" className="hover:underline">Applied: <span className="font-bold text-foreground">{job.applied}</span></Link>
+                             <Link href="/recruiter/applications?job=1&stage=shortlisted" className="hover:underline">Shortlisted: <span className="font-bold text-foreground">{job.shortlisted}</span></Link>
+                             <Link href="/recruiter/applications?job=1&stage=selected" className="hover:underline">Selected: <span className="font-bold text-foreground">{job.selected}</span></Link>
                         </div>
                     </Card>
                 ))}
@@ -95,8 +101,17 @@ export default function RecruiterDashboard() {
                     <CardHeader>
                         <CardTitle>Action Required</CardTitle>
                     </CardHeader>
-                    <CardContent className="text-center text-muted-foreground py-10">
-                        <p>Tasks needing your attention will appear here.</p>
+                    <CardContent className="space-y-3">
+                       {mockActionItems.map((item, index) => (
+                          <div key={index} className="flex items-start gap-4 p-3 rounded-lg border bg-amber-50 border-amber-200">
+                               <div className="text-amber-600 mt-1">{item.icon}</div>
+                               <div>
+                                  <p className="font-semibold">{item.title}</p>
+                                  <p className="text-sm text-muted-foreground">{item.description}</p>
+                                  <Button variant="link" size="sm" className="p-0 h-auto mt-1" asChild><Link href={item.href}>{item.cta}</Link></Button>
+                               </div>
+                          </div>
+                       ))}
                     </CardContent>
                 </Card>
                  <Card>

@@ -34,6 +34,7 @@ const NavItem = ({ href, icon, children, currentPath }: { href: string; icon: Re
 
 const getPageTitle = (pathname: string) => {
     const routeName = pathname.split('/').pop()?.replace(/-/g, ' ') || 'dashboard';
+    if (routeName === 'new') return 'Post a New Job';
     return routeName.charAt(0).toUpperCase() + routeName.slice(1);
 }
 
