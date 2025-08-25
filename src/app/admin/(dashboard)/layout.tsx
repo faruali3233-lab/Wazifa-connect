@@ -39,7 +39,7 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
 
   useEffect(() => {
     if (user === null) {
-      router.replace('/login');
+      router.replace('/');
     } else if (user && user.role !== 'admin') {
       router.replace('/');
     }

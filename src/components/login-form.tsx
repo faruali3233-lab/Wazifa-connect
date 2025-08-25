@@ -60,20 +60,6 @@ export function LoginForm() {
           description: t(user.role === 'recruiter' ? 'login_toast_success_description_recruiter' : 'login_toast_success_description_jobSeeker'),
         });
 
-        if (user.role === 'admin') {
-            router.push('/admin');
-            return;
-        }
-
-        if (user.role === 'agent') {
-            router.push('/job-seeker/agent/profile');
-            return;
-        }
-
-        const isRecruiter = ALL_COUNTRY_CODES.find(c => c.value === user.countryCode)?.role === 'recruiter';
-        const homePath = isRecruiter ? "/recruiter/welcome" : "/job-seeker/home";
-        router.push(homePath);
-
     } else {
         toast({
             variant: "destructive",

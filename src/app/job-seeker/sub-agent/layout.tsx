@@ -13,7 +13,7 @@ export default function SubAgentRootLayout({ children }: { children: ReactNode }
 
   useEffect(() => {
     if (user === null) {
-      router.replace('/login');
+      router.replace('/');
       return;
     }
     
