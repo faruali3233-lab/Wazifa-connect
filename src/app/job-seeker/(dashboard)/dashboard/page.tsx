@@ -7,42 +7,28 @@ import { useAuth } from '@/hooks/use-auth';
 import { getJobRecommendations, type JobRecommendationsOutput } from '@/ai/flows/job-recommendations';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { JobCard } from '@/components/job-card';
-import { FileText, Star, BrainCircuit, AlertTriangle, Briefcase, BarChart3, UserCheck, Mail } from 'lucide-react';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts"
+import { FileText, Star, BrainCircuit, AlertTriangle, Briefcase, BarChart3, UserCheck, Mail, HandCoins, UserRoundCheck, ListTodo, MessageSquare, ArrowRight } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
-const chartData = [
-  { stage: "Applied", value: 12, fill: "var(--color-applied)" },
-  { stage: "Viewed", value: 8, fill: "var(--color-viewed)" },
-  { stage: "Interview", value: 4, fill: "var(--color-interview)" },
-  { stage: "Offer", value: 1, fill: "var(--color-offer)" },
+const mockApplications = [
+    { id: 1, jobTitle: "Heavy Duty Driver", company: "Al-Futtaim Logistics", stage: "Wakala" },
+    { id: 2, jobTitle: "Construction Painter", company: "Emaar Properties", stage: "Medical" },
+    { id: 3, jobTitle: "Household Cook", company: "Private Villa", stage: "Interested" },
 ];
 
-const chartConfig = {
-  value: {
-    label: "Applications",
-  },
-  applied: {
-    label: "Applied",
-    color: "hsl(var(--chart-1))",
-  },
-  viewed: {
-    label: "Viewed",
-    color: "hsl(var(--chart-2))",
-  },
-  interview: {
-    label: "Interview",
-    color: "hsl(var(--chart-3))",
-  },
-  offer: {
-    label: "Offer",
-    color: "hsl(var(--chart-4))",
-  },
-} satisfies import("@/components/ui/chart").ChartConfig
+const mockActionItems = [
+    { id: 1, title: "Pay ₹200 interest fee for 'Household Cook'", description: "The recruiter is interested. Pay this non-refundable fee to proceed to the medical stage.", cta: "Pay Now", href: "/job-seeker/payments", status: 'required' },
+    { id: 2, title: "Complete Medical Exam for 'Construction Painter'", description: "Due in 18 days.", cta: "Upload Report", href: "/job-seeker/documents", status: 'required' },
+     { id: 3, title: "Wakala received for 'Heavy Duty Driver'", description: "Your Wakala has been uploaded by the recruiter. You can now proceed with Phase-1 payment.", cta: "Review & Pay", href: "/job-seeker/payments", status: 'info' },
+];
 
+const mockMessages = [
+    { from: "Admin", message: "Platform update: new document upload features...", unread: false },
+    { from: "Recruiter Request", message: "For 'Heavy Duty Driver': Please provide a copy of your previous visa...", unread: true, status: 'approved' },
+    { from: "Agent Support", message: "Hi Ravi, I've received your documents, looks good.", unread: false }
+]
 
 export default function JobSeekerDashboard() {
   const { user, seekerProfile, isProfileComplete } = useAuth();
@@ -52,7 +38,6 @@ export default function JobSeekerDashboard() {
 
   useEffect(() => {
     if (user && user.id === 'jobseeker' && !seekerProfile) {
-        // Mock profile for demo user
         const mockProfile = {
             basics: { name: 'Ravi Kumar', desiredJobTitle: 'Heavy Duty Driver', locationPreferences: 'Dubai', experienceYears: 5 },
             skills: ['Driving', 'Logistics'],
@@ -66,7 +51,6 @@ export default function JobSeekerDashboard() {
     }
   }, [user]);
 
-
   useEffect(() => {
     setLoading(true);
     if (isProfileComplete && seekerProfile) {
@@ -79,166 +63,107 @@ export default function JobSeekerDashboard() {
     }
   }, [isProfileComplete, seekerProfile, user, router]);
 
-  const calculateProgress = () => {
-    if (!seekerProfile) return 10;
-     if (user?.id === 'jobseeker') return 100;
-    let score = 0;
-    if (seekerProfile.basics.desiredJobTitle) score += 20;
-    if (seekerProfile.skills.length > 0) score += 20;
-    if (seekerProfile.experience.length > 0) score += 20;
-    if (seekerProfile.education.length > 0) score += 20;
-    if (seekerProfile.resumeUrl) score += 20;
-    return score;
-  };
+  const KpiCard = ({ title, value, icon, href }: { title: string, value: string, icon: React.ReactNode, href: string }) => (
+      <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push(href)}>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">{title}</CardTitle>
+            <div className="text-muted-foreground">{icon}</div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{value}</div>
+          </CardContent>
+        </Card>
+  );
 
-  const progress = calculateProgress();
-  
   return (
     <div className="space-y-8">
-       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Interviews Scheduled</CardTitle>
-            <UserCheck className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2</div>
-            <p className="text-xs text-muted-foreground">+1 since last week</p>
-          </CardContent>
-        </Card>
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Applications Sent</CardTitle>
-            <Briefcase className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-             <p className="text-xs text-muted-foreground">3 submitted this week</p>
-          </CardContent>
-        </Card>
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Profile Views</CardTitle>
-            <BarChart3 className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">18</div>
-            <p className="text-xs text-muted-foreground">Viewed by 5 recruiters</p>
-          </CardContent>
-        </Card>
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Unread Messages</CardTitle>
-            <Mail className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1</div>
-            <p className="text-xs text-muted-foreground">From a recruiter in UAE</p>
-          </CardContent>
-        </Card>
+       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+            <KpiCard title="Interested by Recruiters" value="1" icon={<UserRoundCheck />} href="/job-seeker/applications?filter=Interested" />
+            <KpiCard title="Applications Sent" value="3" icon={<Briefcase />} href="/job-seeker/applications" />
+            <KpiCard title="Interviews Scheduled" value="0" icon={<UserCheck />} href="/job-seeker/applications?filter=Interview" />
+            <KpiCard title="Unread Messages" value="1" icon={<Mail />} href="/job-seeker/messages" />
+            <KpiCard title="Payments Due" value="2" icon={<HandCoins />} href="/job-seeker/payments" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-          {isProfileComplete || user?.id === 'jobseeker' ? (
+           <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><ListTodo /> Action Center</CardTitle>
+                <CardDescription>Your next steps to get hired. Complete these tasks to move forward.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                 {mockActionItems.map(item => (
+                    <div key={item.id} className="flex items-center justify-between p-4 rounded-lg border bg-amber-50 border-amber-200">
+                        <div>
+                            <p className="font-semibold">{item.title}</p>
+                            <p className="text-sm text-muted-foreground">{item.description}</p>
+                        </div>
+                        <Button onClick={() => router.push(item.href)}>{item.cta}</Button>
+                    </div>
+                ))}
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2"><BrainCircuit /> AI-Powered Job Recommendations</CardTitle>
-                <CardDescription>Jobs matched to your profile and preferences.</CardDescription>
+                <CardDescription>Jobs matched to your profile. <Button variant="link" className="p-0 h-auto" onClick={() => router.push('/job-seeker/profile')}>Update preferences</Button> for better results.</CardDescription>
               </CardHeader>
               <CardContent>
                 {loading ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Skeleton className="h-48 w-full" />
                     <Skeleton className="h-48 w-full" />
-                    <Skeleton className="h-48 w-full" />
-                    <Skeleton className="h-48 w-full" />
                   </div>
                 ) : recommendations && recommendations.recommendations.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {recommendations.recommendations.map((job, index) => (
+                    {recommendations.recommendations.slice(0, 2).map((job, index) => (
                       <JobCard key={index} job={job} />
                     ))}
                   </div>
                 ) : (
                   <div className="text-center py-12 text-muted-foreground">
                     <p>No recommendations found at the moment.</p>
-                    <p className="text-sm">Try updating your profile with more details for better matches.</p>
-                     <Button variant="outline" className="mt-4" onClick={() => router.push('/job-seeker/profile')}>Update Profile</Button>
                   </div>
                 )}
               </CardContent>
             </Card>
-          ) : (
-            <Card className="border-primary border-2">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-primary">
-                        <AlertTriangle /> Complete Your Profile to Get Job Matches
-                    </CardTitle>
-                    <CardDescription>
-                        Your profile is only {progress}% complete. Recruiters are looking for candidates with complete profiles. Finish yours to start receiving job recommendations.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Button size="lg" onClick={() => router.push('/job-seeker/profile')}>
-                        Go to Profile
-                    </Button>
-                </CardContent>
-            </Card>
-          )}
-           <Card>
-            <CardHeader>
-              <CardTitle>Vacancy Stats</CardTitle>
-              <CardDescription>Your application funnel for the last 30 days.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
-                <ResponsiveContainer width="100%" height={250}>
-                    <BarChart accessibilityLayer data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: -10 }}>
-                      <CartesianGrid vertical={false} />
-                      <XAxis dataKey="stage" tickLine={false} tickMargin={10} axisLine={false} />
-                      <YAxis tickLine={false} axisLine={false} />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="value" radius={8} />
-                    </BarChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            </CardContent>
-            <CardFooter>
-                 <p className="text-xs text-muted-foreground">Your shortlist rate is higher than average.</p>
-            </CardFooter>
-          </Card>
         </div>
 
         <div className="space-y-8">
           <Card>
             <CardHeader>
-              <CardTitle>Profile Completeness</CardTitle>
+              <CardTitle className="flex items-center justify-between">My Applications <Button variant="link" size="sm" className="p-0" onClick={() => router.push('/job-seeker/applications')}>View all</Button></CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-4">
-                <Progress value={progress} className="w-full h-3" />
-                <span className="font-bold text-primary">{progress}%</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {progress === 100 
-                  ? "Your profile is ready to be seen by recruiters!" 
-                  : "Complete your profile to increase your visibility."}
-              </p>
-              <Button variant="outline" className="w-full" onClick={() => router.push('/job-seeker/profile')}>
-                {progress === 100 ? 'View & Edit Profile' : 'Complete Profile'}
-              </Button>
+            <CardContent className="space-y-3">
+                {mockApplications.map(app => (
+                    <div key={app.id} className="flex items-center gap-3 p-2 border rounded-md">
+                        <div className="flex-1">
+                            <p className="font-medium text-sm">{app.jobTitle}</p>
+                            <p className="text-xs text-muted-foreground">{app.company}</p>
+                        </div>
+                        <Badge variant="secondary">{app.stage}</Badge>
+                    </div>
+                ))}
             </CardContent>
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2"><FileText /> Application Status</CardTitle>
+              <CardTitle className="flex items-center justify-between">Messages <Button variant="link" size="sm" className="p-0" onClick={() => router.push('/job-seeker/messages')}>View all</Button></CardTitle>
             </CardHeader>
-            <CardContent className="text-center text-muted-foreground py-8">
-              <p>Your applied jobs will appear here.</p>
-               <Button variant="secondary" size="sm" className="mt-4" onClick={() => router.push('/job-seeker/applications')}>
-                    View All Applications
-                </Button>
+            <CardContent className="space-y-3">
+              {mockMessages.map((msg, i) => (
+                 <div key={i} className="flex items-start gap-3 p-2 border-b last:border-0">
+                    <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                             <p className="font-medium text-sm">{msg.from}</p>
+                             {msg.unread && <Badge variant="destructive" className="h-2 w-2 p-0 rounded-full" />}
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate">{msg.message}</p>
+                    </div>
+                 </div>
+              ))}
             </CardContent>
           </Card>
         </div>

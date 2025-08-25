@@ -5,14 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { FileText } from "lucide-react";
 
-const stages = ["Applied", "Viewed", "Shortlisted", "Interview", "Offer", "Hired"];
+const stages = ["Applied", "Interested", "Medical", "Wakala", "Phase-1", "Ticket", "Final", "Ready to Fly", "Hired"];
 
 const mockApplications = [
-    { id: 1, jobTitle: "Heavy Duty Driver", company: "Al-Futtaim Logistics", location: "Dubai, UAE", stage: "Interview" },
-    { id: 2, jobTitle: "Construction Painter", company: "Emaar Properties", location: "Abu Dhabi, UAE", stage: "Shortlisted" },
-    { id: 3, jobTitle: "Household Cook", company: "Private Villa", location: "Riyadh, KSA", stage: "Applied" },
+    { id: 1, jobTitle: "Heavy Duty Driver", company: "Al-Futtaim Logistics", location: "Dubai, UAE", stage: "Wakala" },
+    { id: 2, jobTitle: "Construction Painter", company: "Emaar Properties", location: "Abu Dhabi, UAE", stage: "Medical" },
+    { id: 3, jobTitle: "Household Cook", company: "Private Villa", location: "Riyadh, KSA", stage: "Interested" },
     { id: 4, jobTitle: "Delivery Driver", company: "Aramark", location: "Doha, Qatar", stage: "Applied" },
-    { id: 5, jobTitle: "AC Technician", company: "Carrier", location: "Dubai, UAE", stage: "Offer" },
+    { id: 5, jobTitle: "AC Technician", company: "Carrier", location: "Dubai, UAE", stage: "Applied" },
 ];
 
 export default function JobSeekerApplicationsPage() {
@@ -24,7 +24,7 @@ export default function JobSeekerApplicationsPage() {
                 <FileText /> My Applications
             </CardTitle>
             <CardDescription>
-                Track the status of all the jobs you've applied for.
+                Track the status of all the jobs you've applied for, from start to finish.
             </CardDescription>
         </CardHeader>
       </div>

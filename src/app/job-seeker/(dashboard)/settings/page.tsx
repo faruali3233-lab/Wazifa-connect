@@ -10,7 +10,7 @@ export default function JobSeekerSettingsPage() {
           <Settings /> Settings
         </CardTitle>
         <CardDescription>
-          Manage your account and notification preferences.
+          Manage your account, notification preferences, and privacy settings.
         </CardDescription>
       </CardHeader>
       <CardContent>

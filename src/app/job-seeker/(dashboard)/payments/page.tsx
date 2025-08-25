@@ -4,11 +4,12 @@
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { HandCoins, CheckCircle, Clock } from "lucide-react";
+import { HandCoins, CheckCircle, Clock, Lock } from "lucide-react";
 
 const mockPayments = [
-    { id: 1, title: "Service Fee (Phase 1)", amount: "₹50,000", currency: "INR", status: "Paid" },
-    { id: 2, title: "Service Fee (Phase 2)", amount: "₹70,000", currency: "INR", status: "Pending" },
+    { id: 1, title: "Interest Fee", amount: "₹200", currency: "INR", status: "Pending", job: "Household Cook", description: "Non-refundable fee to confirm your interest and unlock the medical stage." },
+    { id: 2, title: "Phase-1 Payment", amount: "₹50,000", currency: "INR", status: "Pending", job: "Heavy Duty Driver", description: "Due after Wakala is received." },
+    { id: 3, title: "Final Payment", amount: "₹70,000", currency: "INR", status: "Locked", job: "Heavy Duty Driver", description: "Unlocks after ticket and travel docs are uploaded by the agent." },
 ];
 
 export default function JobSeekerPaymentsPage() {
@@ -26,25 +27,26 @@ export default function JobSeekerPaymentsPage() {
         <CardContent>
           <div className="space-y-4">
             {mockPayments.map(payment => (
-              <Card key={payment.id}>
+              <Card key={payment.id} className={payment.status === "Locked" ? "bg-muted/50" : ""}>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-lg">{payment.title}</CardTitle>
-                  <Badge variant={payment.status === "Paid" ? "default" : "secondary"} className="gap-1">
-                    {payment.status === 'Paid' ? <CheckCircle className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
+                  <Badge variant={payment.status === "Paid" ? "default" : payment.status === "Pending" ? "destructive" : "secondary"} className="gap-1">
+                    {payment.status === 'Paid' ? <CheckCircle className="h-4 w-4" /> : payment.status === 'Locked' ? <Lock className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
                     {payment.status}
                   </Badge>
                 </CardHeader>
                 <CardContent>
                     <p className="text-3xl font-bold">{payment.amount}</p>
-                    <p className="text-sm text-muted-foreground">Due for Job Application #JOB-001</p>
+                    <p className="text-sm text-muted-foreground">For Job: {payment.job}</p>
+                     <p className="text-sm text-muted-foreground mt-1">{payment.description}</p>
                 </CardContent>
                 <CardFooter className="flex justify-between">
                   <Button variant="link" className="p-0">What's included?</Button>
                   {payment.status === "Pending" ? (
                     <Button>Pay Now</Button>
-                  ) : (
+                  ) : payment.status === "Paid" ? (
                     <Button variant="outline">View Receipt</Button>
-                  )}
+                  ) : <Button disabled>Pay Now</Button>}
                 </CardFooter>
               </Card>
             ))}
