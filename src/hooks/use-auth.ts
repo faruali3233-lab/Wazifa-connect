@@ -3,7 +3,7 @@
 
 import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
 
-export type UserRole = "jobSeeker" | "recruiter" | "agent" | "subAgent" | "unselected" | "admin";
+export type UserRole = "jobSeeker" | "recruiter" | "subAgent" | "unselected" | "admin";
 
 export type Language = 'en' | 'ar' | 'hi';
 
@@ -47,19 +47,6 @@ export interface RecruiterProfile {
   profilePhotoUrl: string;
 }
 
-export interface AgentProfile {
-    name: string;
-    email: string;
-    phone: string;
-    countryCode: string;
-    agencyName?: string;
-    agencyAddress?: string;
-    profilePhotoUrl: string;
-    governmentIdUrl: string;
-    referralCode: string;
-    uniqueAgentId: string;
-}
-
 export interface SubAgentProfile {
   fullName: string;
   profilePhotoUrl: string;
@@ -82,7 +69,6 @@ export interface AuthState {
   user: User | null;
   seekerProfile: SeekerProfile | null;
   recruiterProfile: RecruiterProfile | null;
-  agentProfile: AgentProfile | null;
   subAgentProfile: SubAgentProfile | null;
   isProfileComplete: boolean;
   language: Language;
@@ -92,7 +78,6 @@ export interface AuthState {
   logout: () => void;
   updateSeekerProfile: (profile: SeekerProfile) => void;
   updateRecruiterProfile: (profile: RecruiterProfile) => void;
-  updateAgentProfile: (profile: AgentProfile) => void;
   updateSubAgentProfile: (profile: SubAgentProfile) => void;
 }
 

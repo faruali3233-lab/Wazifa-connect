@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, type ReactNode, type Dispatch, type SetStateAction } from "react";
-import { AuthContext, type AuthState, type User, type SeekerProfile, type RecruiterProfile, type AgentProfile, type SubAgentProfile, type Language, type UserRole } from "@/hooks/use-auth";
+import { AuthContext, type AuthState, type User, type SeekerProfile, type RecruiterProfile, type SubAgentProfile, type Language, type UserRole } from "@/hooks/use-auth";
 import { I18nProvider } from "./i18n-provider";
 import { useToast } from "@/hooks/use-toast";
 
@@ -25,7 +25,6 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [seekerProfile, setSeekerProfile] = useState<SeekerProfile | null>(null);
     const [recruiterProfile, setRecruiterProfile] = useState<RecruiterProfile | null>(null);
-    const [agentProfile, setAgentProfile] = useState<AgentProfile | null>(null);
     const [subAgentProfile, setSubAgentProfile] = useState<SubAgentProfile | null>(null);
     const [isProfileComplete, setProfileComplete] = useState(false);
     
@@ -64,23 +63,6 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
             setUser(mockUser);
             setSeekerProfile(mockProfile);
             setProfileComplete(true);
-        } else if (userData.id === 'agent' && userData.password === 'password') {
-            const mockUser: User = { ...userData, role: 'agent' };
-             const mockAgentProfile: AgentProfile = {
-                name: "Sanjay Singh",
-                email: "sanjay.singh@agent.com",
-                phone: "9876543211",
-                countryCode: "+91",
-                agencyName: "Singh Recruitment",
-                agencyAddress: "123 Main St, Mumbai, India",
-                profilePhotoUrl: "https://placehold.co/100x100.png",
-                governmentIdUrl: "verified",
-                referralCode: "REF-AG123-XYZ",
-                uniqueAgentId: "AG-12345678"
-            };
-            setUser(mockUser);
-            setAgentProfile(mockAgentProfile);
-            setProfileComplete(true);
         } else {
             setUser({ ...userData, role });
             setProfileComplete(false); // Reset on login
@@ -95,7 +77,6 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
         setUser(null);
         setSeekerProfile(null);
         setRecruiterProfile(null);
-        setAgentProfile(null);
         setSubAgentProfile(null);
         setProfileComplete(false);
     };
@@ -110,11 +91,6 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
         setProfileComplete(true);
     };
 
-    const updateAgentProfile = (profile: AgentProfile) => {
-        setAgentProfile(profile);
-        setProfileComplete(true);
-    };
-
     const updateSubAgentProfile = (profile: SubAgentProfile) => {
         setSubAgentProfile(profile);
         setProfileComplete(true);
@@ -124,7 +100,6 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
         user,
         seekerProfile,
         recruiterProfile,
-        agentProfile,
         subAgentProfile,
         isProfileComplete,
         language,
@@ -134,7 +109,6 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
         logout,
         updateSeekerProfile,
         updateRecruiterProfile,
-        updateAgentProfile,
         updateSubAgentProfile,
     };
 

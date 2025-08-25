@@ -21,7 +21,7 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
     
     // This layout should not handle recruiter, subAgent or admin roles.
     // They have their own layouts.
-    if (user && (user.role === 'recruiter' || user.role === 'subAgent' || user.role === 'admin' || user.role === 'agent')) {
+    if (user && (user.role === 'recruiter' || user.role === 'subAgent' || user.role === 'admin')) {
        return;
     }
 
@@ -40,7 +40,7 @@ export default function JobSeekerLayout({ children }: { children: ReactNode }) {
   
   // If the user role is one handled by another layout, render a loader
   // to prevent flicker while the correct layout takes over.
-  if (!user || user.role === 'recruiter' || user.role === 'subAgent' || user.role === 'admin' || user.role === 'agent') {
+  if (!user || user.role === 'recruiter' || user.role === 'subAgent' || user.role === 'admin') {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto p-8"><Skeleton className="h-screen w-full" /></div>
