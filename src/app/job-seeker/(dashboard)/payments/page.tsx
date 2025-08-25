@@ -7,9 +7,8 @@ import { Button } from "@/components/ui/button";
 import { HandCoins, CheckCircle, Clock } from "lucide-react";
 
 const mockPayments = [
-    { id: 1, title: "Medical Examination Fee", amount: "₹5,000", currency: "INR", status: "Pending" },
-    { id: 2, title: "Document Processing Fee", amount: "₹2,500", currency: "INR", status: "Pending" },
-    { id: 3, title: "Service Fee (Phase 1)", amount: "₹10,000", currency: "INR", status: "Paid" },
+    { id: 1, title: "Service Fee (Phase 1)", amount: "₹50,000", currency: "INR", status: "Paid" },
+    { id: 2, title: "Service Fee (Phase 2)", amount: "₹70,000", currency: "INR", status: "Pending" },
 ];
 
 export default function JobSeekerPaymentsPage() {
