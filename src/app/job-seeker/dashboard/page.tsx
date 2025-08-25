@@ -200,7 +200,7 @@ export default function JobSeekerDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Profile Completeness</CardTitle>
-            </CardHeader>
+            </Header>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-4">
                 <Progress value={progress} className="w-full" />
@@ -229,5 +229,3 @@ export default function JobSeekerDashboard() {
     </div>
   );
 }
-
-    
